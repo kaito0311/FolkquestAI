@@ -76,10 +76,10 @@ When Flutter web is already running in Chrome debug, find the active Chrome DevT
 Get-NetTCPConnection -State Listen | Where-Object { $_.OwningProcess -in (Get-Process chrome -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id) } | Select-Object LocalAddress,LocalPort,OwningProcess
 ```
 
-Then capture the `FolkQuest` tab. Replace `$port` if Chrome is not using `61208`:
+Then capture the `FolkQuest` tab. Replace `$port` if Chrome is not using `64505`:
 
 ```powershell
-$port = 61208
+$port = 64505
 $outDir = Join-Path (Get-Location) 'screenshots'
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 $outFile = Join-Path $outDir 'folkquest-chrome-latest.png'
