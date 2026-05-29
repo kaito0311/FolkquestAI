@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fqa/main.dart';
+
+import 'package:fqa/app/main_app.dart';
+import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/models/app_view.dart';
+import 'package:fqa/models/collection_filter.dart';
+import 'package:fqa/models/story_node_type.dart';
+import 'package:fqa/repositories/story_repository.dart';
+import 'package:fqa/stores/memory_progress_store.dart';
+import 'package:fqa/widgets/collection/collectible_card.dart';
 
 Future<GameController> _controller() async {
   final controller = GameController(MemoryProgressStore());
