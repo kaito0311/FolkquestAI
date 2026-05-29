@@ -16,13 +16,22 @@ Future<GameController> _controller() async {
   return controller;
 }
 
-Future<void> _pumpApp(WidgetTester tester, GameController controller) async {
-  tester.view.physicalSize = const Size(426, 899);
+Future<void> _pumpApp(
+  WidgetTester tester,
+  GameController controller, {
+  Size surfaceSize = const Size(426, 899),
+}) async {
+  tester.view.physicalSize = surfaceSize;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
   await tester.pumpWidget(MainApp(controller: controller));
   await tester.pump();
+}
+
+void _expectNoOverflow(WidgetTester tester) {
+  final exception = tester.takeException();
+  expect(exception, isNull);
 }
 
 void main() {
@@ -130,4 +139,37 @@ void main() {
     expect(controller.collectionFilter, CollectionFilter.locked);
     expect(find.byType(CollectibleCard), findsNWidgets(7));
   });
+
+  for (final surfaceSize in [
+    const Size(426, 899),
+    const Size(390, 844),
+    const Size(360, 800),
+  ]) {
+    testWidgets('key screens fit at $surfaceSize', (tester) async {
+      final controller = await _controller();
+      await _pumpApp(tester, controller, surfaceSize: surfaceSize);
+      _expectNoOverflow(tester);
+
+      controller.startOrResume();
+      controller.advance();
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller
+        ..currentNodeId = 'enough_ending'
+        ..completedEndingId = null
+        ..karma = 3
+        ..selectedChoices = [
+          'Nhận cây khế',
+          'Chọn túi ba gang',
+          'Không lấy thêm vàng',
+        ];
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller.completedEndingId = 'enough';
+      await tester.pump();
+      _expectNoOverflow(tester);
+    });
+  }
 }
