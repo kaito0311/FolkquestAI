@@ -1,4 +1,43 @@
-# AGENTS.md
+# CLAUDE.md
+
+## Project structure
+
+Flutter source is split by responsibility under `lib/`:
+
+```text
+lib/
+  main.dart                         # app bootstrap only
+  app/                              # app shell, top-level view switching, placeholders
+  controllers/                      # game state and user actions
+  core/                             # app constants, colors, asset helpers
+  models/                           # pure data classes and enums
+  repositories/                     # static story/content data
+  screens/                          # full-page UI screens
+    collection/
+    story/
+  stores/                           # progress persistence abstraction and implementations
+  widgets/                          # reusable UI pieces
+    collection/
+```
+
+## Refactor rules
+
+- Prefer built-in Claude Code file tools (`Read`, `Write`, `Edit`, `Glob`, `Grep`) before ad-hoc shell scripts.
+- If automation is needed in this Dart/Flutter project, prefer project-native Dart over Python/Node/Perl.
+- Avoid Python/Node/Perl extraction scripts unless clearly safer, installed, small, and easy to verify.
+- For file splits/refactors: inspect current state first, edit in small batches, then run `dart format` and `flutter analyze`.
+
+## Verification
+
+After Dart source changes, run:
+
+```bash
+dart format lib test
+flutter analyze
+```
+
+Current refactor verification result: `flutter analyze` reports `No issues found!`.
+
 
 ## Project
 
@@ -26,6 +65,7 @@ This repo is a Flutter app for the FQA/FolkQuest mobile experience. The current 
   - Unlock collectible: `26:68`
   - Collection: `31:2`
   - Pause overlay: `34:2`
+  - Fist Postive Ending: `9:2`
 
 Use the installed Figma plugin tools when available. The CLI MCP entry was intentionally removed; do not assume `codex mcp login figma` is needed. In this Codex Desktop session, Figma plugin access was previously authenticated for `minhdt.design@gmail.com`.
 
@@ -53,6 +93,10 @@ The web mirror exists because Flutter web debug requests assets under `/assets/a
 - Prefer the existing lightweight Flutter architecture before adding packages.
 - Keep story data replaceable; placeholder script content should stay isolated in the story repository section.
 - Preserve Vietnamese UI text and check for wrapping/overflow on a 426x899 reference layout.
+- Treat 426x899 as the Figma design baseline, not as a hard runtime aspect ratio. Do not globally force the app into a fixed portrait `AspectRatio`.
+- Build responsive UI from the real viewport constraints. Portrait should stay close to the Figma composition; landscape/tablet should use an adaptive full-screen canvas rather than a centered 426px phone frame.
+- When using `clamp()` with viewport-derived bounds, make sure the lower bound cannot exceed the upper bound. Short browser heights can otherwise throw runtime `Invalid argument` errors on Flutter web.
+- Use `ResponsiveLayout` helpers for scaling positions, spacing, typography, content widths, and portrait/landscape decisions instead of scattering raw Figma coordinates through screens.
 - Use Figma assets where available instead of recreating visual elements with plain Flutter shapes.
 - Do not remove fallback rendering in `FqaAssetImage`; it helps reveal missing assets during debug.
 

@@ -2,9 +2,16 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 
+enum FqaLayoutClass { compactPortrait, regularPortrait, landscape }
+
 class ResponsiveLayout {
   ResponsiveLayout._(this.size)
-    : widthScale = size.width / designWidth,
+    : layoutClass = size.width >= size.height
+          ? FqaLayoutClass.landscape
+          : size.width < 390
+          ? FqaLayoutClass.compactPortrait
+          : FqaLayoutClass.regularPortrait,
+      widthScale = size.width / designWidth,
       heightScale = size.height / designHeight,
       minScale = math.min(size.width / designWidth, size.height / designHeight),
       maxScale = math.max(size.width / designWidth, size.height / designHeight);
@@ -19,10 +26,13 @@ class ResponsiveLayout {
   static const designHeight = 899.0;
 
   final Size size;
+  final FqaLayoutClass layoutClass;
   final double widthScale;
   final double heightScale;
   final double minScale;
   final double maxScale;
+
+  bool get isLandscape => layoutClass == FqaLayoutClass.landscape;
 
   double x(double value) => value * widthScale;
 
@@ -40,7 +50,20 @@ class ResponsiveLayout {
     return math.min(value, math.max(16, size.width * 0.08));
   }
 
+  double horizontalScreenPadding({
+    double portrait = 24,
+    double landscape = 48,
+  }) {
+    final value = isLandscape ? landscape : portrait;
+    return math.min(value, math.max(16, size.width * 0.08));
+  }
+
   double maxWidth(double value, {double padding = 0}) {
     return math.min(value, math.max(0, size.width - padding * 2));
+  }
+
+  double contentWidth(double portraitValue, {double? landscapeValue}) {
+    final value = isLandscape ? landscapeValue ?? portraitValue : portraitValue;
+    return math.min(value, size.width);
   }
 }
