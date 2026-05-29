@@ -19,39 +19,30 @@ class FqaScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: FqaColors.brown,
-      body: Center(
-        child: AspectRatio(
-          aspectRatio: 426 / 899,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return ClipRect(
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    FqaAssetImage(
-                      background,
-                      fit: BoxFit.cover,
-                      fallback: const DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xff36210f),
-                              Color(0xff19100b),
-                              Color(0xff090705),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    ?overlay,
-                    child,
-                  ],
+      body: ClipRect(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            FqaAssetImage(
+              background,
+              fit: BoxFit.cover,
+              fallback: const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xff36210f),
+                      Color(0xff19100b),
+                      Color(0xff090705),
+                    ],
+                  ),
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+            ?overlay,
+            child,
+          ],
         ),
       ),
     );

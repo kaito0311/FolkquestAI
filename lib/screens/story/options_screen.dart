@@ -27,15 +27,34 @@ class OptionsScreen extends StatelessWidget {
         builder: (context, constraints) {
           final layout = ResponsiveLayout.of(constraints);
           final horizontalPadding = layout.horizontalPadding(32);
-          final choiceWidth = layout.maxWidth(362, padding: horizontalPadding);
-          final choiceHeight = layout.s(60).clamp(52.0, 60.0);
-          final promptTop = layout
-              .y(464)
-              .clamp(390.0, constraints.maxHeight * 0.56);
-          final choicesTop = (promptTop + layout.y(164)).clamp(
-            promptTop + 140,
-            constraints.maxHeight - 220,
+          final contentWidth = layout.contentWidth(
+            constraints.maxWidth,
+            landscapeValue: 640,
           );
+          final choiceWidth = layout.isLandscape
+              ? layout.contentWidth(362, landscapeValue: 420)
+              : layout.maxWidth(362, padding: horizontalPadding);
+          final choiceHeight = layout.s(60).clamp(52.0, 60.0);
+          final portraitPromptTop = layout.y(464);
+          final portraitPromptMax = constraints.maxHeight * 0.56;
+          final safePortraitPromptTop = portraitPromptMax < 390
+              ? portraitPromptMax
+              : portraitPromptTop.clamp(390.0, portraitPromptMax);
+          final promptTop = layout.isLandscape
+              ? layout.y(214).clamp(150.0, constraints.maxHeight * 0.36)
+              : safePortraitPromptTop;
+          final portraitChoicesTop = promptTop + layout.y(164);
+          final portraitChoicesMin = promptTop + 140;
+          final portraitChoicesMax = constraints.maxHeight - 220;
+          final safePortraitChoicesTop = portraitChoicesMax < portraitChoicesMin
+              ? portraitChoicesMax
+              : portraitChoicesTop.clamp(
+                  portraitChoicesMin,
+                  portraitChoicesMax,
+                );
+          final choicesTop = layout.isLandscape
+              ? promptTop + layout.gap(150)
+              : safePortraitChoicesTop;
 
           return Stack(
             children: [
@@ -48,34 +67,44 @@ class OptionsScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 top: promptTop,
-                child: StoryPromptPanel(
-                  speaker: node.speaker ?? '',
-                  text: node.text,
+                child: Center(
+                  child: SizedBox(
+                    width: contentWidth,
+                    child: StoryPromptPanel(
+                      speaker: node.speaker ?? '',
+                      text: node.text,
+                    ),
+                  ),
                 ),
               ),
               Positioned(
-                left: horizontalPadding,
-                right: horizontalPadding,
+                left: layout.isLandscape ? 0 : horizontalPadding,
+                right: layout.isLandscape ? 0 : horizontalPadding,
                 top: choicesTop,
                 bottom: layout.gap(18),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      for (final entry in node.choices.asMap().entries) ...[
-                        if (entry.key > 0) SizedBox(height: layout.gap(12)),
-                        FqaImageButton(
-                          label: entry.value.label,
-                          width: choiceWidth,
-                          height: choiceHeight,
-                          fontSize: layout.font(18),
-                          letterSpacing: 0.45,
-                          assetName:
-                              _choiceButtonAssets[entry.key %
-                                  _choiceButtonAssets.length],
-                          onPressed: () => controller.choose(entry.value),
-                        ),
-                      ],
-                    ],
+                child: Center(
+                  child: SizedBox(
+                    width: layout.isLandscape ? contentWidth : null,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          for (final entry in node.choices.asMap().entries) ...[
+                            if (entry.key > 0) SizedBox(height: layout.gap(12)),
+                            FqaImageButton(
+                              label: entry.value.label,
+                              width: choiceWidth,
+                              height: choiceHeight,
+                              fontSize: layout.font(18),
+                              letterSpacing: 0.45,
+                              assetName:
+                                  _choiceButtonAssets[entry.key %
+                                      _choiceButtonAssets.length],
+                              onPressed: () => controller.choose(entry.value),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),

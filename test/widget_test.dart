@@ -142,8 +142,12 @@ void main() {
 
   for (final surfaceSize in [
     const Size(426, 899),
+    const Size(430, 932),
     const Size(390, 844),
     const Size(360, 800),
+    const Size(768, 1024),
+    const Size(1024, 768),
+    const Size(1366, 768),
   ]) {
     testWidgets('key screens fit at $surfaceSize', (tester) async {
       final controller = await _controller();
@@ -168,6 +172,21 @@ void main() {
       _expectNoOverflow(tester);
 
       controller.completedEndingId = 'enough';
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller
+        ..completedEndingId = null
+        ..currentNodeId = 'enough_reflection';
+      controller.startOrResume();
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller.currentNodeId = 'feather_unlock';
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller.openCollection();
       await tester.pump();
       _expectNoOverflow(tester);
     });
