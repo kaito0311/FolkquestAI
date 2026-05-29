@@ -65,6 +65,7 @@ This repo is a Flutter app for the FQA/FolkQuest mobile experience. The current 
   - Unlock collectible: `26:68`
   - Collection: `31:2`
   - Pause overlay: `34:2`
+  - Fist Postive Ending: `9:2`
 
 Use the installed Figma plugin tools when available. The CLI MCP entry was intentionally removed; do not assume `codex mcp login figma` is needed. In this Codex Desktop session, Figma plugin access was previously authenticated for `minhdt.design@gmail.com`.
 

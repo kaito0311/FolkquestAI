@@ -210,8 +210,15 @@ class StoryRepository {
       title: 'Đã mở khóa',
       type: StoryNodeType.unlock,
       text: 'Biểu tượng của cơ duyên, phần thưởng và lòng tốt được đền đáp.',
-      nextId: 'enough_ending',
+      nextId: 'first_positive_ending',
       unlockCollectibleId: 'feather',
+    ),
+    'first_positive_ending': StoryNode(
+      id: 'first_positive_ending',
+      title: 'Kết thúc tốt đẹp',
+      type: StoryNodeType.unlock,
+      text: 'Người biết đủ sẽ luôn nhận được những điều xứng đáng.',
+      nextId: 'enough_ending',
     ),
     'enough_ending': StoryNode(
       id: 'enough_ending',
