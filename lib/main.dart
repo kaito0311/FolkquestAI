@@ -737,6 +737,7 @@ class FqaImageButton extends StatelessWidget {
     this.width = 300,
     this.height = 80,
     this.fontSize = 22,
+    this.letterSpacing,
     super.key,
   });
 
@@ -746,6 +747,7 @@ class FqaImageButton extends StatelessWidget {
   final double width;
   final double height;
   final double fontSize;
+  final double? letterSpacing;
 
   @override
   Widget build(BuildContext context) {
@@ -774,6 +776,7 @@ class FqaImageButton extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   fontSize: fontSize,
                   height: 1.2,
+                  letterSpacing: letterSpacing,
                   shadows: const [Shadow(color: Colors.black54, blurRadius: 4)],
                 ),
               ),
@@ -930,30 +933,34 @@ class StoryTopBar extends StatelessWidget {
               onTap: onBack,
             ),
           ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              width: 240,
-              height: 127,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  const FqaAssetImage('panels/title_plaque.png'),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: FqaColors.cream,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
+          Positioned(
+            top: -14,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: SizedBox(
+                width: 240,
+                height: 127,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    const FqaAssetImage('panels/title_plaque.png'),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          title,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: FqaColors.cream,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -1011,6 +1018,12 @@ class OptionsScreen extends StatelessWidget {
 
   final GameController controller;
 
+  static const _choiceButtonAssets = [
+    'buttons/choice_button_blue.png',
+    'buttons/choice_button_brown.png',
+    'buttons/choice_button_green.png',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final node = controller.currentNode;
@@ -1038,16 +1051,19 @@ class OptionsScreen extends StatelessWidget {
             top: 628,
             child: Column(
               children: [
-                for (final choice in node.choices) ...[
+                for (final entry in node.choices.asMap().entries) ...[
+                  if (entry.key > 0) const SizedBox(height: 12),
                   FqaImageButton(
-                    label: choice.label,
+                    label: entry.value.label,
                     width: 362,
                     height: 60,
                     fontSize: 18,
-                    assetName: 'buttons/choice_button.png',
-                    onPressed: () => controller.choose(choice),
+                    letterSpacing: 0.45,
+                    assetName:
+                        _choiceButtonAssets[entry.key %
+                            _choiceButtonAssets.length],
+                    onPressed: () => controller.choose(entry.value),
                   ),
-                  const SizedBox(height: 12),
                 ],
               ],
             ),
