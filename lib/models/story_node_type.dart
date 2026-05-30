@@ -1,1 +1,1 @@
-enum StoryNodeType { dialogue, options, karma, unlock, ending, firstEnding }
+enum StoryNodeType { dialogue, options, firstEnding, karma, unlock, ending }

@@ -83,6 +83,30 @@ void main() {
     expect(controller.currentNode.id, 'bag_choice');
   });
 
+  testWidgets('positive path shows first ending before karma reflection', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'gold_choice'
+      ..karma = 2;
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.text('Không lấy thêm vàng'));
+    await tester.pump();
+
+    expect(controller.currentNode.type, StoryNodeType.firstEnding);
+    expect(controller.currentNode.id, 'first_positive_ending');
+    expect(find.text('Kết thúc tốt đẹp'), findsOneWidget);
+
+    await tester.tap(find.text('Tiếp tục'));
+    await tester.pump();
+
+    expect(controller.currentNode.id, 'enough_reflection');
+    expect(controller.currentNode.type, StoryNodeType.karma);
+  });
+
   testWidgets('unlock collectible adds item to persisted state', (
     tester,
   ) async {
