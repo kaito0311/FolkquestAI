@@ -20,10 +20,10 @@ class StoryScreen extends StatelessWidget {
     return switch (node.type) {
       StoryNodeType.dialogue => DiscussionScreen(controller: controller),
       StoryNodeType.options => OptionsScreen(controller: controller),
+      StoryNodeType.firstEnding => FirstEndingScreen(controller: controller),
       StoryNodeType.karma => KarmaReflectionScreen(controller: controller),
       StoryNodeType.unlock => UnlockCollectibleScreen(controller: controller),
       StoryNodeType.ending => FinalEndingScreen(controller: controller),
-      StoryNodeType.firstEnding => FirstEndingScreen(controller: controller),
     };
   }
 }
