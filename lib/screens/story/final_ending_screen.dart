@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/models/collectible.dart';
+import 'package:fqa/models/ending.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/widgets/choice_bullet.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
@@ -21,6 +23,7 @@ class FinalEndingScreen extends StatelessWidget {
         .where(controller.isUnlocked)
         .take(3)
         .toList(growable: false);
+
     return FqaScaffold(
       background: 'backgrounds/ending_bg.png',
       overlay: const DecoratedBox(
@@ -30,168 +33,338 @@ class FinalEndingScreen extends StatelessWidget {
         builder: (context, constraints) {
           final layout = ResponsiveLayout.of(constraints);
           final horizontalPadding = layout.horizontalPadding(20);
-          final imageWidth = layout.maxWidth(350, padding: horizontalPadding);
-          final collectibleSize = ((imageWidth - 18) / 3).clamp(82.0, 100.0);
-          final buttonWidth = layout.maxWidth(238, padding: horizontalPadding);
-          final buttonHeight = layout.s(56).clamp(50.0, 56.0);
+          final buttonBottom = layout.isLandscape
+              ? layout.gap(24)
+              : layout.y(31).clamp(24.0, 31.0);
+          final buttonWidth = layout.contentWidth(238, landscapeValue: 238);
+          final buttonHeight = layout.s(56).clamp(48.0, 56.0);
+          final actionHeight = buttonHeight * 2 + layout.gap(14);
+          final contentBottom = buttonBottom + actionHeight + layout.gap(24);
 
-          return Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child: SafeArea(
-              top: false,
-              child: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Column(
-                    children: [
-                      SizedBox(height: layout.gap(12)),
-                      Text(
-                        'Kết cục của bạn',
-                        style: TextStyle(
-                          color: const Color(0xffd9b86d),
-                          fontSize: layout.font(14),
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.12,
-                        ),
-                      ),
-                      SizedBox(height: layout.gap(16)),
-                      Text(
-                        ending.title,
-                        key: const ValueKey('ending_title'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: const Color(0xfff5da92),
-                          fontSize: layout.font(22),
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      SizedBox(height: layout.gap(20)),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: SizedBox(
-                          width: imageWidth,
-                          height: imageWidth * 0.5,
-                          child: const FqaAssetImage(
-                            'backgrounds/ending_image.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: layout.gap(12)),
-                      const FqaAssetImage(
-                        'decor/divider.png',
-                        fit: BoxFit.contain,
-                      ),
-                      SizedBox(height: layout.gap(12)),
-                      Row(
-                        children: [
-                          Text(
-                            'Nghiệp lực',
-                            style: TextStyle(
-                              color: const Color(0xffd7b66f),
-                              fontSize: layout.font(18),
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          const Spacer(),
-                          SizedBox(
-                            width: layout.s(100).clamp(88.0, 100.0),
-                            height: layout.s(40).clamp(36.0, 40.0),
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                const FqaAssetImage(
-                                  'panels/karma_score_pill.png',
-                                ),
-                                Center(
-                                  child: Text(
-                                    controller.karma >= 0
-                                        ? '+${controller.karma}'
-                                        : '${controller.karma}',
-                                    style: TextStyle(
-                                      color: const Color(0xffefd98d),
-                                      fontSize: layout.font(30),
-                                      fontWeight: FontWeight.w900,
-                                      height: 1,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: layout.gap(12)),
-                      const FqaAssetImage(
-                        'decor/divider.png',
-                        fit: BoxFit.contain,
-                      ),
-                      SizedBox(height: layout.gap(12)),
-                      const SectionTitle('Những lựa chọn chính'),
-                      SizedBox(height: layout.gap(6)),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            for (final choice
-                                in controller.selectedChoices.take(3))
-                              ChoiceBullet(choice),
-                            if (controller.selectedChoices.isEmpty)
-                              const ChoiceBullet('Chưa có lựa chọn'),
-                          ],
-                        ),
-                      ),
-                      const FqaAssetImage(
-                        'decor/divider.png',
-                        fit: BoxFit.contain,
-                      ),
-                      SizedBox(height: layout.gap(12)),
-                      const SectionTitle('Cổ vật đã mở khóa'),
-                      SizedBox(height: layout.gap(8)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          for (final item in opened)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 3,
-                              ),
-                              child: SizedBox(
-                                width: collectibleSize,
-                                height: collectibleSize,
-                                child: FqaAssetImage(item.assetName),
-                              ),
-                            ),
-                        ],
-                      ),
-                      SizedBox(height: layout.gap(18)),
-                      FqaImageButton(
-                        label: 'Chơi lại',
-                        width: buttonWidth,
-                        height: buttonHeight,
-                        fontSize: layout.font(19),
-                        assetName: 'buttons/ending_button.png',
-                        onPressed: controller.restartRun,
-                      ),
-                      SizedBox(height: layout.gap(14)),
-                      FqaImageButton(
-                        label: 'Về menu chính',
-                        width: buttonWidth,
-                        height: buttonHeight,
-                        fontSize: layout.font(19),
-                        assetName: 'buttons/ending_button.png',
-                        onPressed: controller.exitToHome,
-                      ),
-                      SizedBox(height: layout.gap(18)),
-                    ],
-                  ),
+          return Stack(
+            children: [
+              Positioned(
+                left: horizontalPadding,
+                right: horizontalPadding,
+                top: 0,
+                bottom: contentBottom,
+                child: _FinalEndingContent(
+                  ending: ending,
+                  karma: controller.karma,
+                  selectedChoices: controller.selectedChoices,
+                  unlockedCollectibles: opened,
+                  layout: layout,
+                  horizontalPadding: horizontalPadding,
                 ),
               ),
-            ),
+              _FinalEndingActions(
+                layout: layout,
+                bottom: buttonBottom,
+                width: buttonWidth,
+                height: buttonHeight,
+                onPlayAgain: controller.restartRun,
+                onBackToMenu: controller.exitToHome,
+              ),
+            ],
           );
         },
       ),
+    );
+  }
+}
+
+class _FinalEndingContent extends StatelessWidget {
+  const _FinalEndingContent({
+    required this.ending,
+    required this.karma,
+    required this.selectedChoices,
+    required this.unlockedCollectibles,
+    required this.layout,
+    required this.horizontalPadding,
+  });
+
+  final Ending ending;
+  final int karma;
+  final List<String> selectedChoices;
+  final List<Collectible> unlockedCollectibles;
+  final ResponsiveLayout layout;
+  final double horizontalPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(height: layout.gap(12)),
+          _FinalEndingTitles(ending: ending, layout: layout),
+          SizedBox(height: layout.gap(20)),
+          _FinalEndingCover(
+            layout: layout,
+            horizontalPadding: horizontalPadding,
+          ),
+          SizedBox(height: layout.gap(12)),
+          _FinalEndingDivider(
+            layout: layout,
+            horizontalPadding: horizontalPadding,
+          ),
+          SizedBox(height: layout.gap(12)),
+          _FinalEndingKarma(karma: karma, layout: layout),
+          SizedBox(height: layout.gap(12)),
+          _FinalEndingDivider(
+            layout: layout,
+            horizontalPadding: horizontalPadding,
+          ),
+          SizedBox(height: layout.gap(12)),
+          _FinalEndingChoices(choices: selectedChoices),
+          SizedBox(height: layout.gap(10)),
+          _FinalEndingDivider(
+            layout: layout,
+            horizontalPadding: horizontalPadding,
+          ),
+          SizedBox(height: layout.gap(12)),
+          _FinalEndingUnlockedCollection(
+            items: unlockedCollectibles,
+            layout: layout,
+            horizontalPadding: horizontalPadding,
+          ),
+          SizedBox(height: layout.gap(18)),
+        ],
+      ),
+    );
+  }
+}
+
+class _FinalEndingTitles extends StatelessWidget {
+  const _FinalEndingTitles({required this.ending, required this.layout});
+
+  final Ending ending;
+  final ResponsiveLayout layout;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          'Kết cục của bạn',
+          style: TextStyle(
+            color: const Color(0xffd9b86d),
+            fontSize: layout.font(14),
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.12,
+          ),
+        ),
+        SizedBox(height: layout.gap(16)),
+        Text(
+          ending.title,
+          key: const ValueKey('ending_title'),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: const Color(0xfff5da92),
+            fontSize: layout.font(22),
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FinalEndingCover extends StatelessWidget {
+  const _FinalEndingCover({
+    required this.layout,
+    required this.horizontalPadding,
+  });
+
+  final ResponsiveLayout layout;
+  final double horizontalPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = layout.maxWidth(350, padding: horizontalPadding);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: SizedBox(
+        width: width,
+        height: width * 0.5,
+        child: const FqaAssetImage(
+          'backgrounds/first_positive_ending_bg.png',
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+}
+
+class _FinalEndingKarma extends StatelessWidget {
+  const _FinalEndingKarma({required this.karma, required this.layout});
+
+  final int karma;
+  final ResponsiveLayout layout;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          'Nghiệp lực',
+          style: TextStyle(
+            color: const Color(0xffd7b66f),
+            fontSize: layout.font(18),
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const Spacer(),
+        SizedBox(
+          width: layout.s(100).clamp(88.0, 100.0),
+          height: layout.s(40).clamp(36.0, 40.0),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              const FqaAssetImage('panels/karma_score_pill.png'),
+              Center(
+                child: Text(
+                  karma >= 0 ? '+$karma' : '$karma',
+                  style: TextStyle(
+                    color: const Color(0xffefd98d),
+                    fontSize: layout.font(30),
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FinalEndingChoices extends StatelessWidget {
+  const _FinalEndingChoices({required this.choices});
+
+  final List<String> choices;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SectionTitle('Những lựa chọn chính'),
+          const SizedBox(height: 6),
+          for (final choice in choices.take(3)) ChoiceBullet(choice),
+          if (choices.isEmpty) const ChoiceBullet('Chưa có lựa chọn'),
+        ],
+      ),
+    );
+  }
+}
+
+class _FinalEndingUnlockedCollection extends StatelessWidget {
+  const _FinalEndingUnlockedCollection({
+    required this.items,
+    required this.layout,
+    required this.horizontalPadding,
+  });
+
+  final List<Collectible> items;
+  final ResponsiveLayout layout;
+  final double horizontalPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    final coverWidth = layout.maxWidth(350, padding: horizontalPadding);
+    final itemSize = ((coverWidth - 18) / 3).clamp(82.0, 100.0);
+
+    return Column(
+      children: [
+        const SectionTitle('Cổ vật đã mở khóa'),
+        SizedBox(height: layout.gap(8)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (final item in items)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: SizedBox(
+                  width: itemSize,
+                  height: itemSize,
+                  child: FqaAssetImage(item.assetName),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _FinalEndingActions extends StatelessWidget {
+  const _FinalEndingActions({
+    required this.layout,
+    required this.bottom,
+    required this.width,
+    required this.height,
+    required this.onPlayAgain,
+    required this.onBackToMenu,
+  });
+
+  final ResponsiveLayout layout;
+  final double bottom;
+  final double width;
+  final double height;
+  final VoidCallback onPlayAgain;
+  final VoidCallback onBackToMenu;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: bottom,
+      child: Column(
+        children: [
+          FqaImageButton(
+            label: 'Chơi lại',
+            width: width,
+            height: height,
+            fontSize: layout.font(19),
+            assetName: 'buttons/ending_button.png',
+            onPressed: onPlayAgain,
+          ),
+          SizedBox(height: layout.gap(14)),
+          FqaImageButton(
+            label: 'Về menu chính',
+            width: width,
+            height: height,
+            fontSize: layout.font(19),
+            assetName: 'buttons/ending_button.png',
+            onPressed: onBackToMenu,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FinalEndingDivider extends StatelessWidget {
+  const _FinalEndingDivider({
+    required this.layout,
+    required this.horizontalPadding,
+  });
+
+  final ResponsiveLayout layout;
+  final double horizontalPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: layout.x(200).clamp(100, 300),
+      height: layout.s(18).clamp(12.0, 18.0),
+      child: const FqaAssetImage('decor/divider.png', fit: BoxFit.contain),
     );
   }
 }
