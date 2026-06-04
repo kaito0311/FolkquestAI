@@ -1,1 +1,9 @@
-enum AppView { home, story, collection }
+enum AppView {
+  home,
+  story,
+  collection,
+  settings,
+  tutorial,
+  birdChat,
+  birdConversation,
+}

@@ -25,6 +25,8 @@ class GameController extends ChangeNotifier {
   String? completedEndingId;
   bool pauseVisible = false;
   CollectionFilter collectionFilter = CollectionFilter.all;
+  AppView? _returnView;
+  String birdQuestion = '';
 
   StoryNode get currentNode => StoryRepository.node(currentNodeId);
 
@@ -60,8 +62,24 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void openSettings() {
+    _openUtility(AppView.settings);
+  }
+
+  void openTutorial() {
+    _openUtility(AppView.tutorial);
+  }
+
+  void closeUtility() {
+    view = _returnView ?? AppView.home;
+    _returnView = null;
+    pauseVisible = false;
+    notifyListeners();
+  }
+
   void exitToHome() {
     view = AppView.home;
+    _returnView = null;
     pauseVisible = false;
     notifyListeners();
   }
@@ -80,6 +98,34 @@ class GameController extends ChangeNotifier {
     final nextId = currentNode.nextId;
     if (nextId == null) return;
     _goToNode(nextId);
+  }
+
+  void openBirdChat() {
+    birdQuestion = '';
+    view = AppView.birdChat;
+    pauseVisible = false;
+    notifyListeners();
+  }
+
+  void submitBirdQuestion(String question) {
+    final normalizedQuestion = question.trim();
+    if (normalizedQuestion.isEmpty) return;
+    birdQuestion = normalizedQuestion;
+    view = AppView.birdConversation;
+    pauseVisible = false;
+    notifyListeners();
+  }
+
+  void backFromBirdConversation() {
+    view = AppView.birdChat;
+    pauseVisible = false;
+    notifyListeners();
+  }
+
+  void closeBirdChat() {
+    view = AppView.story;
+    pauseVisible = false;
+    notifyListeners();
   }
 
   void choose(StoryChoice choice) {
@@ -111,6 +157,8 @@ class GameController extends ChangeNotifier {
     selectedChoices = [];
     completedEndingId = null;
     view = AppView.story;
+    _returnView = null;
+    birdQuestion = '';
     pauseVisible = false;
     _persist();
     notifyListeners();
@@ -132,6 +180,16 @@ class GameController extends ChangeNotifier {
 
   void setCollectionFilter(CollectionFilter filter) {
     collectionFilter = filter;
+    notifyListeners();
+  }
+
+  void _openUtility(AppView utilityView) {
+    _returnView = switch (view) {
+      AppView.settings || AppView.tutorial => _returnView ?? AppView.home,
+      _ => view,
+    };
+    view = utilityView;
+    pauseVisible = false;
     notifyListeners();
   }
 

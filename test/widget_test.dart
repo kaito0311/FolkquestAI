@@ -105,6 +105,111 @@ void main() {
 
     expect(controller.currentNode.id, 'enough_reflection');
     expect(controller.currentNode.type, StoryNodeType.karma);
+    expect(find.text('Hỏi Chim Thần'), findsOneWidget);
+  });
+
+  testWidgets('karma screen opens bird chat and submits typed question', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'enough_reflection'
+      ..karma = 3;
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.text('Hỏi Chim Thần'));
+    await tester.pump();
+
+    expect(controller.view, AppView.birdChat);
+    expect(find.text('Chim Thần'), findsOneWidget);
+
+    const question = 'Vì sao phải là túi ba gang?';
+    await tester.enterText(
+      find.byKey(const ValueKey('bird_message_input')),
+      question,
+    );
+    await tester.tap(find.byKey(const ValueKey('bird_send')));
+    await tester.pump();
+
+    expect(controller.view, AppView.birdConversation);
+    expect(controller.birdQuestion, question);
+    expect(find.text(question), findsOneWidget);
+  });
+
+  testWidgets('bird preset question opens conversation', (tester) async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'enough_reflection'
+      ..karma = 3;
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.text('Hỏi Chim Thần'));
+    await tester.pump();
+
+    const question = 'Vì sao phải là túi ba gang?';
+    await tester.tap(find.byKey(const ValueKey('bird_preset_$question')));
+    await tester.pump();
+
+    expect(controller.view, AppView.birdConversation);
+    expect(controller.birdQuestion, question);
+    expect(find.text(question), findsOneWidget);
+  });
+
+  testWidgets('home guide and settings icons open real screens', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Hướng dẫn')));
+    await tester.pump();
+    expect(controller.view, AppView.tutorial);
+    expect(find.text('HƯỚNG DẪN'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await tester.pump();
+    expect(controller.view, AppView.home);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Cài đặt')));
+    await tester.pump();
+    expect(controller.view, AppView.settings);
+    expect(find.text('Cài đặt'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await tester.pump();
+    expect(controller.view, AppView.home);
+  });
+
+  testWidgets('pause settings and help open real screens from story', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    controller.showPause();
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('icon_Cài đặt')));
+    await tester.pump();
+    expect(controller.view, AppView.settings);
+    expect(controller.pauseVisible, isFalse);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await tester.pump();
+    expect(controller.view, AppView.story);
+
+    controller.showPause();
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('icon_Trợ giúp')));
+    await tester.pump();
+    expect(controller.view, AppView.tutorial);
+    expect(controller.pauseVisible, isFalse);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await tester.pump();
+    expect(controller.view, AppView.story);
   });
 
   testWidgets('unlock collectible adds item to persisted state', (
@@ -206,11 +311,32 @@ void main() {
       await tester.pump();
       _expectNoOverflow(tester);
 
+      controller.openBirdChat();
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller.submitBirdQuestion('Vì sao phải là túi ba gang?');
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller.closeBirdChat();
+      await tester.pump();
+      _expectNoOverflow(tester);
+
       controller.currentNodeId = 'feather_unlock';
       await tester.pump();
       _expectNoOverflow(tester);
 
       controller.openCollection();
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller.openSettings();
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller.closeUtility();
+      controller.openTutorial();
       await tester.pump();
       _expectNoOverflow(tester);
     });

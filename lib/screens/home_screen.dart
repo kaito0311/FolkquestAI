@@ -102,14 +102,14 @@ class HomeScreen extends StatelessWidget {
                       assetName: 'icons/guide_icon.png',
                       semanticLabel: 'Hướng dẫn',
                       size: utilitySize,
-                      onTap: () => showPlaceholder(context, 'Hướng dẫn'),
+                      onTap: controller.openTutorial,
                     ),
                     SizedBox(width: utilityGap),
                     UtilityIcon(
                       assetName: 'icons/settings_icon.png',
                       semanticLabel: 'Cài đặt',
                       size: utilitySize,
-                      onTap: () => showPlaceholder(context, 'Cài đặt'),
+                      onTap: controller.openSettings,
                     ),
                     SizedBox(width: utilityGap),
                     UtilityIcon(
