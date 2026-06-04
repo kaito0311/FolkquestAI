@@ -79,7 +79,6 @@ class _ConversationWithBirdScreenState
                       SizedBox(height: layout.gap(24)),
                       _BirdBubble(
                         layout: layout,
-                        large: true,
                         text:
                             'Khi lòng tham lớn hơn sự biết đủ, con người dễ đánh mất những gì mình đang có.',
                       ),
@@ -113,19 +112,13 @@ class _ConversationWithBirdScreenState
 }
 
 class _BirdBubble extends StatelessWidget {
-  const _BirdBubble({
-    required this.layout,
-    required this.text,
-    this.large = false,
-  });
+  const _BirdBubble({required this.layout, required this.text});
 
   final ResponsiveLayout layout;
   final String text;
-  final bool large;
 
   @override
   Widget build(BuildContext context) {
-    final bubbleHeight = large ? 91.0 : 56.0;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -137,34 +130,41 @@ class _BirdBubble extends StatelessWidget {
         SizedBox(width: layout.s(11)),
         SizedBox(
           width: layout.contentWidth(212, landscapeValue: 320),
-          height: layout.s(bubbleHeight).clamp(45.0, bubbleHeight),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              const FqaAssetImage(
-                'panels/bird_chat_frame.png',
-                fit: BoxFit.fill,
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  layout.s(16),
-                  layout.s(10),
-                  layout.s(14),
-                  layout.s(10),
-                ),
-                child: Text(
-                  text,
-                  maxLines: large ? 4 : 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: const Color(0xffd4b072),
-                    fontSize: layout.font(11),
-                    height: 1.35,
-                    fontWeight: FontWeight.w700,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: layout.s(45).clamp(40.0, 45.0),
+            ),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: _BubbleFrame(
+                    assetName: 'panels/bird_chat_frame.png',
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(layout.s(15)),
+                      topRight: Radius.circular(layout.s(15)),
+                      bottomRight: Radius.circular(layout.s(15)),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    layout.s(16),
+                    layout.s(10),
+                    layout.s(14),
+                    layout.s(10),
+                  ),
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: const Color(0xffd4b072),
+                      fontSize: layout.font(11),
+                      height: 1.35,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         const Spacer(),
@@ -187,34 +187,41 @@ class _UserBubble extends StatelessWidget {
         const Spacer(),
         SizedBox(
           width: layout.contentWidth(212, landscapeValue: 320),
-          height: layout.s(91).clamp(58.0, 91.0),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              const FqaAssetImage(
-                'panels/user_chat_frame.png',
-                fit: BoxFit.fill,
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  layout.s(18),
-                  layout.s(12),
-                  layout.s(13),
-                  layout.s(12),
-                ),
-                child: Text(
-                  text,
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: const Color(0xffd8c58f),
-                    fontSize: layout.font(10),
-                    height: 1.5,
-                    fontWeight: FontWeight.w700,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: layout.s(45).clamp(40.0, 45.0),
+            ),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: _BubbleFrame(
+                    assetName: 'panels/user_chat_frame.png',
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(layout.s(15)),
+                      topRight: Radius.circular(layout.s(15)),
+                      bottomLeft: Radius.circular(layout.s(15)),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    layout.s(18),
+                    layout.s(12),
+                    layout.s(13),
+                    layout.s(12),
+                  ),
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: const Color(0xffd8c58f),
+                      fontSize: layout.font(10),
+                      height: 1.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         SizedBox(width: layout.s(12)),
@@ -224,6 +231,27 @@ class _UserBubble extends StatelessWidget {
           child: const FqaAssetImage('icons/player_avatar.png'),
         ),
       ],
+    );
+  }
+}
+
+class _BubbleFrame extends StatelessWidget {
+  const _BubbleFrame({required this.assetName, required this.borderRadius});
+
+  final String assetName;
+  final BorderRadius borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: borderRadius,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          border: Border.all(color: const Color(0xff925e12)),
+        ),
+        child: FqaAssetImage(assetName, fit: BoxFit.fill),
+      ),
     );
   }
 }
