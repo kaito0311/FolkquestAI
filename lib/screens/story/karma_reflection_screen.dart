@@ -41,6 +41,7 @@ class KarmaReflectionScreen extends StatelessWidget {
               : layout.y(61).clamp(28.0, 61.0);
           final buttonWidth = layout.contentWidth(238, landscapeValue: 238);
           final buttonHeight = layout.s(56).clamp(48.0, 56.0);
+          final buttonGap = layout.gap(11);
 
           return Stack(
             children: [
@@ -75,7 +76,11 @@ class KarmaReflectionScreen extends StatelessWidget {
                 left: horizontalPadding,
                 right: horizontalPadding,
                 top: summaryTop,
-                bottom: buttonBottom + buttonHeight + layout.gap(16),
+                bottom:
+                    buttonBottom +
+                    buttonHeight * 2 +
+                    buttonGap +
+                    layout.gap(16),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -125,6 +130,21 @@ class KarmaReflectionScreen extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: buttonBottom + buttonHeight + buttonGap,
+                child: Center(
+                  child: FqaImageButton(
+                    label: 'Hỏi Chim Thần',
+                    width: buttonWidth,
+                    height: buttonHeight,
+                    fontSize: layout.font(19),
+                    assetName: 'buttons/small_button.png',
+                    onPressed: controller.openBirdChat,
                   ),
                 ),
               ),

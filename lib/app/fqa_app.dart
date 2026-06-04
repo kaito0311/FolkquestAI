@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/models/app_view.dart';
+import 'package:fqa/screens/bird/chat_with_bird_screen.dart';
+import 'package:fqa/screens/bird/conversation_with_bird_screen.dart';
 import 'package:fqa/screens/collection/collection_screen.dart';
 import 'package:fqa/screens/home_screen.dart';
+import 'package:fqa/screens/settings_screen.dart';
 import 'package:fqa/screens/story/story_screen.dart';
+import 'package:fqa/screens/tutorial_screen.dart';
+import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/pause_overlay.dart';
 
 class FqaApp extends StatelessWidget {
@@ -19,6 +24,12 @@ class FqaApp extends StatelessWidget {
       AppView.home => HomeScreen(controller: controller),
       AppView.story => StoryScreen(controller: controller),
       AppView.collection => CollectionScreen(controller: controller),
+      AppView.settings => SettingsScreen(controller: controller),
+      AppView.tutorial => TutorialScreen(controller: controller),
+      AppView.birdChat => ChatWithBirdScreen(controller: controller),
+      AppView.birdConversation => ConversationWithBirdScreen(
+        controller: controller,
+      ),
     };
 
     return Stack(
@@ -29,8 +40,21 @@ class FqaApp extends StatelessWidget {
             onContinue: controller.hidePause,
             onRestart: controller.restartRun,
             onExit: controller.exitToHome,
-            onUtility: (title) => showPlaceholder(context, title),
+            onUtility: (title) {
+              if (title == 'Cài đặt') {
+                controller.openSettings();
+              } else if (title == 'Trợ giúp') {
+                controller.openTutorial();
+              } else {
+                showPlaceholder(context, title);
+              }
+            },
           ),
+        const Positioned.fill(
+          child: IgnorePointer(
+            child: FqaAssetImage('panels/screen_frame.png', fit: BoxFit.fill),
+          ),
+        ),
       ],
     );
   }
