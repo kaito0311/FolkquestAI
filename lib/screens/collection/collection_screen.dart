@@ -47,34 +47,10 @@ class CollectionScreen extends StatelessWidget {
 
           return Stack(
             children: [
-              Positioned(
-                left: horizontalPadding,
-                top: layout.isLandscape
-                    ? layout.gap(24)
-                    : layout.y(49).clamp(36.0, 49.0),
-                child: UtilityIcon(
-                  assetName: 'icons/back_icon.png',
-                  semanticLabel: 'Quay lại',
-                  size: layout.s(40).clamp(36.0, 44.0),
-                  onTap: controller.exitToHome,
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                top: layout.isLandscape
-                    ? layout.gap(28)
-                    : layout.y(52).clamp(38.0, 52.0),
-                child: Text(
-                  'Bộ sưu tập',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: const Color(0xfff0dca0),
-                    fontSize: layout.font(22),
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.76,
-                  ),
-                ),
+              _CollectionHeader(
+                layout: layout,
+                horizontalPadding: horizontalPadding,
+                onBack: controller.closeCollection,
               ),
               Positioned(
                 left: horizontalPadding,
@@ -137,6 +113,109 @@ class CollectionScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _CollectionHeader extends StatelessWidget {
+  const _CollectionHeader({
+    required this.layout,
+    required this.horizontalPadding,
+    required this.onBack,
+  });
+
+  final ResponsiveLayout layout;
+  final double horizontalPadding;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final top = layout.isLandscape
+        ? layout.gap(24)
+        : layout.y(28).clamp(18.0, 28);
+    final height = layout.s(70).clamp(60.0, 70);
+    final titleWidth = layout.s(284).clamp(212.0, 284.0);
+    final titleScale = titleWidth / 284;
+
+    return Positioned(
+      top: top,
+      left: 0,
+      right: 0,
+      height: height,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Positioned(
+            left: horizontalPadding,
+            top: layout.s(20).clamp(16.0, 20.0),
+            child: UtilityIcon(
+              assetName: 'icons/back_icon.png',
+              semanticLabel: 'Quay lại',
+              size: layout.s(40).clamp(36.0, 44.0),
+              onTap: onBack,
+            ),
+          ),
+          Center(
+            child: SizedBox(
+              width: titleWidth,
+              height: 70 * titleScale,
+              child: Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  Positioned(
+                    left: 24 * titleScale,
+                    top: 4 * titleScale,
+                    width: 236 * titleScale,
+                    height: 17 * titleScale,
+                    child: const FqaAssetImage('decor/collection_title_top_line.png'),
+                  ),
+                  Positioned(
+                    left: 12 * titleScale,
+                    top: 32 * titleScale,
+                    width: 44 * titleScale,
+                    height: 20 * titleScale,
+                    child: const FqaAssetImage('decor/collection_title_side_decor.png'),
+                  ),
+                  Positioned(
+                    right: 12 * titleScale,
+                    top: 32 * titleScale,
+                    width: 44 * titleScale,
+                    height: 20 * titleScale,
+                    child: Transform.scale(
+                      scaleX: -1,
+                      child: const FqaAssetImage('decor/collection_title_side_decor.png'),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 25 * titleScale,
+                    height: 33 * titleScale,
+                    child: Text(
+                      'Bộ sưu tập',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: const Color(0xfff0dca0),
+                        fontSize: layout.font(22),
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2 * titleScale,
+                        height: 33 / 22,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 24 * titleScale,
+                    top: 56 * titleScale,
+                    width: 236 * titleScale,
+                    height: 14 * titleScale,
+                    child: const FqaAssetImage('decor/collection_title_bottom_line.png'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
