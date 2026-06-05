@@ -303,7 +303,7 @@ class _ConversationInput extends StatelessWidget {
                 contentPadding: EdgeInsets.only(
                   left: layout.s(18),
                   right: layout.s(8),
-                  bottom: layout.s(4),
+                  bottom: layout.s(2),
                 ),
               ),
             ),
@@ -317,7 +317,7 @@ class _ConversationInput extends StatelessWidget {
               child: Transform.rotate(
                 angle: -0.37,
                 child: const Padding(
-                  padding: EdgeInsets.all(11),
+                  padding: EdgeInsets.fromLTRB(11, 8, 11, 15),
                   child: FqaAssetImage('icons/send_message_button.png'),
                 ),
               ),
