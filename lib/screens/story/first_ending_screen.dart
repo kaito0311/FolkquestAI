@@ -159,7 +159,7 @@ class _FirstEndingDialog extends StatelessWidget {
     final width = layout.maxWidth(366, padding: horizontalPadding);
     final height = layout.isLandscape
         ? layout.s(260).clamp(220.0, 280.0)
-        : layout.s(300).clamp(260.0, 300.0);
+        : layout.s(240).clamp(240.0, 300.0);
     final buttonWidth = layout.maxWidth(238, padding: horizontalPadding + 64);
     final buttonHeight = layout.s(56).clamp(48.0, 56.0);
 
