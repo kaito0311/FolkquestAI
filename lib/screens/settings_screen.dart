@@ -6,10 +6,20 @@ import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/utility_icon.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({required this.controller, super.key});
 
   final GameController controller;
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _musicEnabled = true;
+  double _musicVolume = 100;
+  double _brightness = 100;
+  _TextSizeSetting _textSize = _TextSizeSetting.medium;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +39,7 @@ class SettingsScreen extends StatelessWidget {
               _UtilityHeader(
                 title: 'Cài đặt',
                 layout: layout,
-                onBack: controller.closeUtility,
+                onBack: widget.controller.closeUtility,
               ),
               Positioned(
                 left: horizontalPadding,
@@ -48,15 +58,24 @@ class SettingsScreen extends StatelessWidget {
                             icon: Icons.music_note,
                             title: 'Nhạc nền',
                             subtitle: 'Bật / tắt nhạc nền trong game',
-                            trailing: Switch.adaptive(
-                              value: true,
-                              activeThumbColor: const Color(0xffd7bb75),
-                              activeTrackColor: const Color(0xff9b6b2c),
-                              onChanged: (_) {},
+                            trailing: _SettingSwitch(
+                              value: _musicEnabled,
+                              onChanged: (value) {
+                                setState(() => _musicEnabled = value);
+                              },
                             ),
-                            footer: _StaticSlider(
+                            footer: _SettingSlider(
                               layout: layout,
-                              label: '100%',
+                              value: _musicVolume,
+                              enabled: _musicEnabled,
+                              leadingIcon: _musicVolume > 50
+                                  ? Icons.volume_up
+                                  : Icons.volume_down,
+                              valueLabel: '${_musicVolume.round()}%',
+                              semanticLabel: 'Âm lượng nhạc nền',
+                              onChanged: (value) {
+                                setState(() => _musicVolume = value);
+                              },
                             ),
                           ),
                           SizedBox(height: layout.gap(15)),
@@ -66,7 +85,13 @@ class SettingsScreen extends StatelessWidget {
                             icon: Icons.text_fields,
                             title: 'Kích thước chữ',
                             subtitle: 'Điều chỉnh kích thước chữ hiển thị',
-                            footer: _TextSizeSegment(layout: layout),
+                            footer: _TextSizeSegment(
+                              layout: layout,
+                              selected: _textSize,
+                              onChanged: (value) {
+                                setState(() => _textSize = value);
+                              },
+                            ),
                           ),
                           SizedBox(height: layout.gap(15)),
                           _SettingCard(
@@ -76,14 +101,23 @@ class SettingsScreen extends StatelessWidget {
                             title: 'Độ sáng',
                             subtitle: 'Điều chỉnh độ sáng màn hình',
                             trailing: Text(
-                              '100%',
+                              '${_brightness.round()}%',
                               style: TextStyle(
                                 color: const Color(0xffad9e79),
                                 fontSize: layout.font(14),
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            footer: _StaticSlider(layout: layout, label: null),
+                            footer: _SettingSlider(
+                              layout: layout,
+                              value: _brightness,
+                              leadingIcon: Icons.brightness_low,
+                              trailingIcon: Icons.brightness_high,
+                              semanticLabel: 'Độ sáng màn hình',
+                              onChanged: (value) {
+                                setState(() => _brightness = value);
+                              },
+                            ),
                           ),
                           SizedBox(height: layout.gap(15)),
                           _SettingCard(
@@ -156,6 +190,9 @@ class _UtilityHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final titleWidth = layout.s(284).clamp(212.0, 284.0);
+    final titleScale = titleWidth / 284;
+
     return Positioned(
       top: layout.y(28).clamp(18.0, 36.0),
       left: layout.horizontalScreenPadding(portrait: 20, landscape: 54),
@@ -175,15 +212,48 @@ class _UtilityHeader extends StatelessWidget {
             ),
           ),
           Center(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: const Color(0xffb07d36),
-                fontSize: layout.font(30),
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.2,
-                height: 1,
+            child: SizedBox(
+              width: titleWidth,
+              height: 33 * titleScale,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Positioned(
+                    left: 25 * titleScale,
+                    top: 11.14 * titleScale,
+                    width: 44 * titleScale,
+                    height: 15 * titleScale,
+                    child: Transform.rotate(
+                      angle: 3.141592653589793,
+                      child: const FqaAssetImage(
+                        'decor/setting_title_side_decor.png',
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 26 * titleScale,
+                    top: 11.14 * titleScale,
+                    width: 44 * titleScale,
+                    height: 15 * titleScale,
+                    child: Transform.scale(
+                      scaleY: -1,
+                      child: const FqaAssetImage(
+                        'decor/setting_title_side_decor.png',
+                      ),
+                    ),
+                  ),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color(0xffb07d36),
+                      fontSize: layout.font(30),
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.76 * titleScale,
+                      height: 33 / 30,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -286,60 +356,174 @@ class _SettingCard extends StatelessWidget {
   }
 }
 
-class _StaticSlider extends StatelessWidget {
-  const _StaticSlider({required this.layout, required this.label});
+class _SettingSwitch extends StatelessWidget {
+  const _SettingSwitch({required this.value, required this.onChanged});
 
-  final ResponsiveLayout layout;
-  final String? label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(
-          Icons.volume_down,
-          color: const Color(0xffb07d36),
-          size: layout.s(28),
-        ),
-        SizedBox(width: layout.s(10)),
-        Expanded(
-          child: Container(
-            height: 4,
-            decoration: BoxDecoration(
-              color: const Color(0xff916526),
-              borderRadius: BorderRadius.circular(10),
+    return Semantics(
+      key: const ValueKey('setting_music_switch'),
+      button: true,
+      toggled: value,
+      label: 'Nhạc nền',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => onChanged(!value),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOut,
+          width: 54,
+          height: 30,
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: value ? const Color(0xff9b6b2c) : const Color(0xff4b3420),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: value ? const Color(0xff9b6b2c) : const Color(0xff8f7a59),
+              width: 2,
+            ),
+          ),
+          child: AnimatedAlign(
+            duration: const Duration(milliseconds: 160),
+            curve: Curves.easeOut,
+            alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              width: 22,
+              height: 22,
+              decoration: const BoxDecoration(
+                color: Color(0xffd7bb75),
+                shape: BoxShape.circle,
+              ),
             ),
           ),
         ),
-        SizedBox(width: layout.s(10)),
-        Container(
-          width: layout.s(13),
-          height: layout.s(13),
-          decoration: const BoxDecoration(
-            color: Color(0xffe3d69d),
-            shape: BoxShape.circle,
-          ),
-        ),
-        if (label != null) ...[
-          SizedBox(width: layout.s(12)),
-          Text(
-            label!,
-            style: TextStyle(
-              color: const Color(0xffad9e79),
-              fontSize: layout.font(14),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ],
+      ),
     );
   }
 }
 
-class _TextSizeSegment extends StatelessWidget {
-  const _TextSizeSegment({required this.layout});
+class _SettingSlider extends StatelessWidget {
+  const _SettingSlider({
+    required this.layout,
+    required this.value,
+    required this.leadingIcon,
+    required this.semanticLabel,
+    required this.onChanged,
+    this.enabled = true,
+    this.trailingIcon,
+    this.valueLabel,
+  });
 
   final ResponsiveLayout layout;
+  final double value;
+  final IconData leadingIcon;
+  final String semanticLabel;
+  final ValueChanged<double> onChanged;
+  final bool enabled;
+  final IconData? trailingIcon;
+  final String? valueLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final iconColor = enabled
+        ? const Color(0xffb07d36)
+        : const Color(0xff765c36);
+    final textColor = enabled
+        ? const Color(0xffad9e79)
+        : const Color(0xff765c36);
+
+    return SizedBox(
+      height: layout.s(34).clamp(30.0, 38.0),
+      child: Row(
+        children: [
+          Icon(leadingIcon, color: iconColor, size: layout.s(24)),
+          SizedBox(width: layout.s(8)),
+          Expanded(
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 4,
+                activeTrackColor: const Color(0xffb07d36),
+                inactiveTrackColor: const Color(0xff916526),
+                disabledActiveTrackColor: const Color(0xff72522a),
+                disabledInactiveTrackColor: const Color(0xff4d351d),
+                thumbColor: const Color(0xffe3d69d),
+                disabledThumbColor: const Color(0xff806b46),
+                overlayColor: const Color(0x33e3d69d),
+                thumbShape: RoundSliderThumbShape(
+                  enabledThumbRadius: layout.s(7).clamp(6.0, 8.0),
+                  disabledThumbRadius: layout.s(7).clamp(6.0, 8.0),
+                ),
+                overlayShape: RoundSliderOverlayShape(
+                  overlayRadius: layout.s(14).clamp(12.0, 16.0),
+                ),
+              ),
+              child: Semantics(
+                label: semanticLabel,
+                value: '${value.round()}%',
+                child: Slider(
+                  key: ValueKey('setting_slider_$semanticLabel'),
+                  value: value,
+                  min: 0,
+                  max: 100,
+                  divisions: 100,
+                  onChanged: enabled ? onChanged : null,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: layout.s(8)),
+          SizedBox(
+            width: layout.s(42).clamp(36.0, 44.0),
+            child: valueLabel != null
+                ? Text(
+                    valueLabel!,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: layout.font(13),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )
+                : trailingIcon != null
+                ? Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      trailingIcon,
+                      color: iconColor,
+                      size: layout.s(24),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+enum _TextSizeSetting {
+  small('Nhỏ'),
+  medium('Trung bình'),
+  large('Lớn');
+
+  const _TextSizeSetting(this.label);
+
+  final String label;
+}
+
+class _TextSizeSegment extends StatelessWidget {
+  const _TextSizeSegment({
+    required this.layout,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final ResponsiveLayout layout;
+  final _TextSizeSetting selected;
+  final ValueChanged<_TextSizeSetting> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -351,9 +535,13 @@ class _TextSizeSegment extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _TextSizeOption(layout: layout, label: 'Nhỏ'),
-          _TextSizeOption(layout: layout, label: 'Trung bình', selected: true),
-          _TextSizeOption(layout: layout, label: 'Lớn'),
+          for (final option in _TextSizeSetting.values)
+            _TextSizeOption(
+              layout: layout,
+              option: option,
+              selected: selected == option,
+              onTap: () => onChanged(option),
+            ),
         ],
       ),
     );
@@ -363,29 +551,40 @@ class _TextSizeSegment extends StatelessWidget {
 class _TextSizeOption extends StatelessWidget {
   const _TextSizeOption({
     required this.layout,
-    required this.label,
-    this.selected = false,
+    required this.option,
+    required this.selected,
+    required this.onTap,
   });
 
   final ResponsiveLayout layout;
-  final String label;
+  final _TextSizeSetting option;
   final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: selected ? const Color(0xff6e4e24) : Colors.transparent,
+      child: Semantics(
+        button: true,
+        selected: selected,
+        child: InkWell(
+          key: ValueKey('setting_text_size_${option.name}'),
           borderRadius: BorderRadius.circular(5),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: const Color(0xffddcc9e),
-              fontSize: layout.font(12),
-              fontWeight: FontWeight.w600,
+          onTap: onTap,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: selected ? const Color(0xff6e4e24) : Colors.transparent,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Center(
+              child: Text(
+                option.label,
+                style: TextStyle(
+                  color: const Color(0xffddcc9e),
+                  fontSize: layout.font(12),
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ),

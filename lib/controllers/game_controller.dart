@@ -56,8 +56,16 @@ class GameController extends ChangeNotifier {
   }
 
   void openCollection([CollectionFilter filter = CollectionFilter.all]) {
+    _returnView = view == AppView.collection ? _returnView : view;
     view = AppView.collection;
     collectionFilter = filter;
+    pauseVisible = false;
+    notifyListeners();
+  }
+
+  void closeCollection() {
+    view = _returnView ?? AppView.home;
+    _returnView = null;
     pauseVisible = false;
     notifyListeners();
   }
