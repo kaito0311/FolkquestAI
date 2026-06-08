@@ -133,8 +133,8 @@ class _CollectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final top = layout.isLandscape
         ? layout.gap(24)
-        : layout.y(28).clamp(18.0, 28);
-    final height = layout.s(70).clamp(60.0, 70);
+        : layout.y(28.765625).clamp(18.0, 28.765625);
+    final height = layout.s(70.84375).clamp(60.0, 70.84375);
     final titleWidth = layout.s(284).clamp(212.0, 284.0);
     final titleScale = titleWidth / 284;
 
@@ -159,7 +159,7 @@ class _CollectionHeader extends StatelessWidget {
           Center(
             child: SizedBox(
               width: titleWidth,
-              height: 70 * titleScale,
+              height: 70.84375 * titleScale,
               child: Stack(
                 alignment: Alignment.topCenter,
                 children: [
@@ -167,30 +167,36 @@ class _CollectionHeader extends StatelessWidget {
                     left: 24 * titleScale,
                     top: 4 * titleScale,
                     width: 236 * titleScale,
-                    height: 17 * titleScale,
-                    child: const FqaAssetImage('decor/collection_title_top_line.png'),
+                    height: 17.09375 * titleScale,
+                    child: const FqaAssetImage(
+                      'decor/collection_title_top_line.png',
+                    ),
                   ),
                   Positioned(
-                    left: 12 * titleScale,
-                    top: 32 * titleScale,
+                    left: 12.125 * titleScale,
+                    top: 31.65625 * titleScale,
                     width: 44 * titleScale,
-                    height: 20 * titleScale,
-                    child: const FqaAssetImage('decor/collection_title_side_decor.png'),
+                    height: 19.859375 * titleScale,
+                    child: const FqaAssetImage(
+                      'decor/collection_title_side_decor.png',
+                    ),
                   ),
                   Positioned(
-                    right: 12 * titleScale,
-                    top: 32 * titleScale,
+                    right: 12.125 * titleScale,
+                    top: 31.4921875 * titleScale,
                     width: 44 * titleScale,
                     height: 20 * titleScale,
                     child: Transform.scale(
                       scaleX: -1,
-                      child: const FqaAssetImage('decor/collection_title_side_decor.png'),
+                      child: const FqaAssetImage(
+                        'decor/collection_title_side_decor.png',
+                      ),
                     ),
                   ),
                   Positioned(
                     left: 0,
                     right: 0,
-                    top: 25 * titleScale,
+                    top: 25.09375 * titleScale,
                     height: 33 * titleScale,
                     child: Text(
                       'Bộ sưu tập',
@@ -199,17 +205,19 @@ class _CollectionHeader extends StatelessWidget {
                         color: const Color(0xfff0dca0),
                         fontSize: layout.font(22),
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 2 * titleScale,
+                        letterSpacing: 1.76 * titleScale,
                         height: 33 / 22,
                       ),
                     ),
                   ),
                   Positioned(
                     left: 24 * titleScale,
-                    top: 56 * titleScale,
+                    top: 56.09375 * titleScale,
                     width: 236 * titleScale,
-                    height: 14 * titleScale,
-                    child: const FqaAssetImage('decor/collection_title_bottom_line.png'),
+                    height: 14.75 * titleScale,
+                    child: const FqaAssetImage(
+                      'decor/collection_title_bottom_line.png',
+                    ),
                   ),
                 ],
               ),

@@ -54,6 +54,32 @@ void main() {
     expect(find.text('Bộ sưu tập'), findsOneWidget);
   });
 
+  testWidgets('collection back returns to the previous screen', (tester) async {
+    final controller = await _controller();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.text('Bộ sưu tập'));
+    await tester.pump();
+    expect(controller.view, AppView.collection);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await tester.pump();
+    expect(controller.view, AppView.home);
+
+    controller.currentNodeId = 'feather_unlock';
+    controller.startOrResume();
+    await tester.pump();
+
+    await tester.tap(find.text('Xem bộ sưu tập'));
+    await tester.pump();
+    expect(controller.view, AppView.collection);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await tester.pump();
+    expect(controller.view, AppView.story);
+    expect(controller.currentNodeId, 'feather_unlock');
+  });
+
   testWidgets('discussion continue advances to options', (tester) async {
     final controller = await _controller();
     controller.startOrResume();
@@ -180,6 +206,47 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
     await tester.pump();
     expect(controller.view, AppView.home);
+  });
+
+  testWidgets('settings controls are interactive', (tester) async {
+    final controller = await _controller();
+    controller.openSettings();
+    await _pumpApp(tester, controller);
+
+    final musicSwitchFinder = find.byKey(
+      const ValueKey('setting_music_switch'),
+    );
+    expect(musicSwitchFinder, findsOneWidget);
+    expect(
+      tester.widget<Semantics>(musicSwitchFinder).properties.toggled,
+      isTrue,
+    );
+
+    await tester.tap(musicSwitchFinder);
+    await tester.pump();
+    expect(
+      tester.widget<Semantics>(musicSwitchFinder).properties.toggled,
+      isFalse,
+    );
+
+    expect(find.byType(Slider), findsNWidgets(2));
+    expect(
+      find.byKey(const ValueKey('setting_text_size_small')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('setting_text_size_medium')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('setting_text_size_large')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('setting_text_size_large')));
+    await tester.pump();
+    final largeText = tester.widget<Text>(find.text('Lớn'));
+    expect(largeText.style?.fontWeight, FontWeight.w800);
   });
 
   testWidgets('pause settings and help open real screens from story', (
