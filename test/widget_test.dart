@@ -9,6 +9,7 @@ import 'package:fqa/models/story_node_type.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/stores/memory_progress_store.dart';
 import 'package:fqa/widgets/collection/collectible_card.dart';
+import 'package:fqa/widgets/fqa_asset_image.dart';
 
 Future<GameController> _controller() async {
   final controller = GameController(MemoryProgressStore());
@@ -515,6 +516,23 @@ void main() {
       find.byKey(const ValueKey('ending_unlocked_starfruit')),
       findsNothing,
     );
+  });
+
+  testWidgets('final ending cover matches first ending background', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'player_bad_summary'
+      ..completedEndingId = 'player_bad';
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    final cover = tester.widget<FqaAssetImage>(
+      find.byKey(const ValueKey('final_ending_cover_image')),
+    );
+    expect(cover.assetName, 'backgrounds/011_player_bad_ending.png');
+    expect(cover.alignment, const Alignment(0, -0.25));
   });
 
   testWidgets('final restart clears current run state', (tester) async {

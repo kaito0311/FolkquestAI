@@ -53,6 +53,13 @@ class FinalEndingScreen extends StatelessWidget {
                 bottom: contentBottom,
                 child: _FinalEndingContent(
                   ending: ending,
+                  coverBackground:
+                      controller.currentNode.background ??
+                      'backgrounds/first_positive_ending_bg.png',
+                  coverAlignment: Alignment(
+                    controller.currentNode.coverAlignmentX,
+                    controller.currentNode.coverAlignmentY,
+                  ),
                   karma: controller.karma,
                   selectedChoices: controller.selectedChoices,
                   unlockedCollectibles: opened,
@@ -79,6 +86,8 @@ class FinalEndingScreen extends StatelessWidget {
 class _FinalEndingContent extends StatelessWidget {
   const _FinalEndingContent({
     required this.ending,
+    required this.coverBackground,
+    required this.coverAlignment,
     required this.karma,
     required this.selectedChoices,
     required this.unlockedCollectibles,
@@ -87,6 +96,8 @@ class _FinalEndingContent extends StatelessWidget {
   });
 
   final Ending ending;
+  final String coverBackground;
+  final AlignmentGeometry coverAlignment;
   final int karma;
   final List<String> selectedChoices;
   final List<Collectible> unlockedCollectibles;
@@ -102,6 +113,8 @@ class _FinalEndingContent extends StatelessWidget {
           _FinalEndingTitles(ending: ending, layout: layout),
           SizedBox(height: layout.gap(20)),
           _FinalEndingCover(
+            background: coverBackground,
+            alignment: coverAlignment,
             layout: layout,
             horizontalPadding: horizontalPadding,
           ),
@@ -174,10 +187,14 @@ class _FinalEndingTitles extends StatelessWidget {
 
 class _FinalEndingCover extends StatelessWidget {
   const _FinalEndingCover({
+    required this.background,
+    required this.alignment,
     required this.layout,
     required this.horizontalPadding,
   });
 
+  final String background;
+  final AlignmentGeometry alignment;
   final ResponsiveLayout layout;
   final double horizontalPadding;
 
@@ -190,9 +207,11 @@ class _FinalEndingCover extends StatelessWidget {
       child: SizedBox(
         width: width,
         height: width * 0.5,
-        child: const FqaAssetImage(
-          'backgrounds/first_positive_ending_bg.png',
+        child: FqaAssetImage(
+          background,
+          key: const ValueKey('final_ending_cover_image'),
           fit: BoxFit.cover,
+          alignment: alignment,
         ),
       ),
     );
