@@ -42,25 +42,25 @@ class StoryRepository {
       id: 'half',
       name: 'Nửa tài sản',
       description: 'Một khả năng khác trong cuộc chia gia tài.',
-      assetName: 'collectibles/item_bag12.png',
+      assetName: 'collectibles/unlock_item.png',
     ),
     Collectible(
       id: 'mystery1',
       name: '???',
       description: 'Chưa mở khóa.',
-      assetName: 'collectibles/item_bag12.png',
+      assetName: 'collectibles/unlock_item.png',
     ),
     Collectible(
       id: 'mystery2',
       name: '???',
       description: 'Chưa mở khóa.',
-      assetName: 'collectibles/item_bag12.png',
+      assetName: 'collectibles/unlock_item.png',
     ),
     Collectible(
       id: 'mystery3',
       name: '???',
       description: 'Chưa mở khóa.',
-      assetName: 'collectibles/item_bag12.png',
+      assetName: 'collectibles/unlock_item.png',
     ),
   ];
 
@@ -144,6 +144,22 @@ class StoryRepository {
           unlockCollectibleIds: ['half'],
         ),
       ],
+    ),
+    'starfruit_unlock': StoryNode(
+      id: 'starfruit_unlock',
+      title: 'Đã mở khóa',
+      type: StoryNodeType.unlock,
+      text: 'Gia tài nhỏ mở ra con đường mới.',
+      nextId: 'accept_starfruit_tree',
+      unlockCollectibleId: 'starfruit',
+    ),
+    'half_unlock': StoryNode(
+      id: 'half_unlock',
+      title: 'Đã mở khóa',
+      type: StoryNodeType.unlock,
+      text: 'Một khả năng khác trong cuộc chia gia tài.',
+      nextId: 'inheritance_argument',
+      unlockCollectibleId: 'half',
     ),
     'accept_starfruit_tree': StoryNode(
       id: 'accept_starfruit_tree',
@@ -313,6 +329,22 @@ class StoryRepository {
         ),
       ],
     ),
+    'bag3_unlock': StoryNode(
+      id: 'bag3_unlock',
+      title: 'Đã mở khóa',
+      type: StoryNodeType.unlock,
+      text: 'Biểu tượng của sự vừa đủ.',
+      nextId: 'feather_unlock',
+      unlockCollectibleId: 'bag3',
+    ),
+    'bag12_unlock': StoryNode(
+      id: 'bag12_unlock',
+      title: 'Đã mở khóa',
+      type: StoryNodeType.unlock,
+      text: 'Lời nhắc về lòng tham.',
+      nextId: 'gold_island_large',
+      unlockCollectibleId: 'bag12',
+    ),
     'gold_island': StoryNode(
       id: 'gold_island',
       title: 'Đảo vàng',
@@ -385,8 +417,9 @@ class StoryRepository {
     ),
     'brother_bad_ending': StoryNode(
       id: 'brother_bad_ending',
-      title: 'Kết cục của người anh',
-      type: StoryNodeType.firstEnding,
+      title: 'Người anh',
+      speaker: 'Người kể chuyện',
+      type: StoryNodeType.dialogue,
       background: 'backgrounds/014_brother_bad_ending.png',
       text:
           'Chiếc túi quá nặng kéo người anh chao đảo giữa trời. Vàng rơi tung tóe xuống biển, còn hắn hoảng hốt nhận ra lòng tham đã trở thành gánh nặng không thể giữ nổi.',
@@ -404,7 +437,7 @@ class StoryRepository {
     'keep_tree_ending': StoryNode(
       id: 'keep_tree_ending',
       title: 'Giữ lấy cây khế',
-      type: StoryNodeType.firstEnding,
+      type: StoryNodeType.dialogue,
       background: 'backgrounds/009_younger_brother_prospers.png',
       text:
           'Người em mỉm cười từ chối. Cây khế không chỉ là của cải, mà là bài học về sự vừa đủ và lòng biết ơn cậu muốn tự mình gìn giữ.',
@@ -505,7 +538,7 @@ class StoryRepository {
       title: 'Kết cục của bạn',
       type: StoryNodeType.ending,
       text: 'Kết cục của người anh',
-      endingId: 'brother_bad',
+      endingId: 'enough',
     ),
     'keep_tree_summary': StoryNode(
       id: 'keep_tree_summary',
@@ -515,6 +548,17 @@ class StoryRepository {
       endingId: 'keep_tree',
     ),
   };
+
+  static String unlockNodeIdForCollectible(String collectibleId) {
+    return switch (collectibleId) {
+      'starfruit' => 'starfruit_unlock',
+      'half' => 'half_unlock',
+      'bag3' => 'bag3_unlock',
+      'bag12' => 'bag12_unlock',
+      'feather' => 'feather_unlock',
+      _ => 'feather_unlock',
+    };
+  }
 
   static StoryNode node(String id) => nodes[id] ?? nodes[startNodeId]!;
 }
