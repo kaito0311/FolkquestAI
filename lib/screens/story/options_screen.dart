@@ -22,7 +22,7 @@ class OptionsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final node = controller.currentNode;
     return FqaScaffold(
-      background: 'backgrounds/options_bg.png',
+      background: node.background ?? 'backgrounds/options_bg.png',
       child: LayoutBuilder(
         builder: (context, constraints) {
           final layout = ResponsiveLayout.of(constraints);

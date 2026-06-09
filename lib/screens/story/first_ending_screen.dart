@@ -15,7 +15,7 @@ class FirstEndingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final node = controller.currentNode;
     return FqaScaffold(
-      background: 'backgrounds/first_positive_ending_bg.png',
+      background: node.background ?? 'backgrounds/first_positive_ending_bg.png',
       overlay: const _FirstEndingOverlay(),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -194,10 +194,14 @@ class _FirstEndingDialog extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _FirstEndingQuote(text: quote, layout: layout),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: _FirstEndingQuote(text: quote, layout: layout),
+                      ),
+                    ),
                     SizedBox(height: layout.gap(12)),
                     _FirstEndingDecorativeLine(layout: layout),
-                    const Spacer(),
+                    SizedBox(height: layout.gap(12)),
                     _FirstEndingContinueButton(
                       width: buttonWidth,
                       height: buttonHeight,

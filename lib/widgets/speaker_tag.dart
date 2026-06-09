@@ -11,17 +11,17 @@ class SpeakerTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: 24,
+      left: 30,
       top: 0,
-      width: 150,
-      height: 35,
+      width: 200,
+      height: 40,
       child: Stack(
         fit: StackFit.expand,
         children: [
           const FqaAssetImage('panels/speaker_tag.png', fit: BoxFit.fill),
           Center(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: 3),
               child: Text(
                 speaker,
                 style: const TextStyle(
