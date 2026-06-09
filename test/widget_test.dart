@@ -251,7 +251,7 @@ void main() {
     },
   );
 
-  testWidgets('brother exchange path reaches brother bad ending', (
+  testWidgets('brother exchange path reaches first ending before karma', (
     tester,
   ) async {
     final controller = await _controller();
@@ -269,6 +269,25 @@ void main() {
 
     expect(controller.currentNode.id, 'brother_bad_ending');
     expect(controller.currentNode.type, StoryNodeType.dialogue);
+
+    controller.advance();
+    await tester.pump();
+
+    expect(controller.currentNode.id, 'brother_bad_first_ending');
+    expect(controller.currentNode.type, StoryNodeType.firstEnding);
+    expect(controller.currentNode.background, 'backgrounds/ending_bg.png');
+
+    controller.advance();
+    await tester.pump();
+
+    expect(controller.currentNode.id, 'brother_bad_reflection');
+    expect(controller.currentNode.type, StoryNodeType.karma);
+
+    controller.advance();
+    await tester.pump();
+
+    expect(controller.currentNode.id, 'brother_bad_summary');
+    expect(controller.currentNode.endingId, 'brother_bad');
   });
 
   testWidgets('keep tree path shows dialogue before karma reflection', (
