@@ -42,25 +42,25 @@ class StoryRepository {
       id: 'half',
       name: 'Nửa tài sản',
       description: 'Một khả năng khác trong cuộc chia gia tài.',
-      assetName: 'collectibles/unlock_item.png',
+      assetName: 'collectibles/item_unlock.png',
     ),
     Collectible(
       id: 'mystery1',
       name: '???',
       description: 'Chưa mở khóa.',
-      assetName: 'collectibles/unlock_item.png',
+      assetName: 'collectibles/item_unlock.png',
     ),
     Collectible(
       id: 'mystery2',
       name: '???',
       description: 'Chưa mở khóa.',
-      assetName: 'collectibles/unlock_item.png',
+      assetName: 'collectibles/item_unlock.png',
     ),
     Collectible(
       id: 'mystery3',
       name: '???',
       description: 'Chưa mở khóa.',
-      assetName: 'collectibles/unlock_item.png',
+      assetName: 'collectibles/item_unlock.png',
     ),
   ];
 
@@ -423,6 +423,15 @@ class StoryRepository {
       background: 'backgrounds/014_brother_bad_ending.png',
       text:
           'Chiếc túi quá nặng kéo người anh chao đảo giữa trời. Vàng rơi tung tóe xuống biển, còn hắn hoảng hốt nhận ra lòng tham đã trở thành gánh nặng không thể giữ nổi.',
+      nextId: 'brother_bad_first_ending',
+    ),
+    'brother_bad_first_ending': StoryNode(
+      id: 'brother_bad_first_ending',
+      title: 'Kết cục',
+      type: StoryNodeType.firstEnding,
+      background: 'backgrounds/ending_bg.png',
+      text:
+          'Người em đứng lặng nhìn về phía trước, hiểu rằng có những mất mát không thể níu lại. Câu chuyện của người anh khép lại bằng cái giá của lòng tham, để người ở lại phải tự giữ lấy phần sáng trong lòng mình.',
       nextId: 'brother_bad_reflection',
     ),
     'player_bad_ending': StoryNode(
@@ -538,7 +547,7 @@ class StoryRepository {
       title: 'Kết cục của bạn',
       type: StoryNodeType.ending,
       text: 'Kết cục của người anh',
-      endingId: 'enough',
+      endingId: 'brother_bad',
     ),
     'keep_tree_summary': StoryNode(
       id: 'keep_tree_summary',

@@ -92,6 +92,8 @@ The web mirror exists because Flutter web debug requests assets under `/assets/a
 
 - Prefer the existing lightweight Flutter architecture before adding packages.
 - Keep story data replaceable; placeholder script content should stay isolated in the story repository section.
+- After a story branch leaves the normal dialogue/options flow, the ending sequence must be: `firstEnding` -> `karma` -> `unlock` -> `ending`.
+- Do not route directly from a dialogue/options ending node to a karma reflection node. For example, `brother_bad_ending` should not jump straight to `brother_bad_reflection`; it needs the younger brother first-ending screen before karma, using the `ending_bg` background asset from `assets/images/figma/`.
 - Preserve Vietnamese UI text and check for wrapping/overflow on a 426x899 reference layout.
 - Treat 426x899 as the Figma design baseline, not as a hard runtime aspect ratio. Do not globally force the app into a fixed portrait `AspectRatio`.
 - Build responsive UI from the real viewport constraints. Portrait should stay close to the Figma composition; landscape/tablet should use an adaptive full-screen canvas rather than a centered 426px phone frame.
