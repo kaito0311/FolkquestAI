@@ -363,6 +363,67 @@ void main() {
     expect(controller.view, AppView.collection);
   });
 
+  testWidgets('karma screen uses score-specific badge variants', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'enough_reflection'
+      ..karma = -3;
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    var badge = tester.widget<FqaAssetImage>(
+      find.byKey(const ValueKey('karma_badge_image')),
+    );
+    var background = tester.widget<FqaAssetImage>(
+      find.byKey(const ValueKey('fqa_scaffold_background_image')),
+    );
+    var score = tester.widget<Text>(
+      find.byKey(const ValueKey('karma_score_text')),
+    );
+    expect(background.assetName, 'backgrounds/karma_bg_negative.png');
+    expect(badge.assetName, 'panels/karma_badge_negative.png');
+    expect(score.data, '-3');
+    expect(score.style?.color, const Color(0xffe0554c));
+
+    controller
+      ..currentNodeId = 'enough_reflection'
+      ..karma = 0;
+    controller.startOrResume();
+    await tester.pump();
+
+    badge = tester.widget<FqaAssetImage>(
+      find.byKey(const ValueKey('karma_badge_image')),
+    );
+    background = tester.widget<FqaAssetImage>(
+      find.byKey(const ValueKey('fqa_scaffold_background_image')),
+    );
+    score = tester.widget<Text>(find.byKey(const ValueKey('karma_score_text')));
+    expect(background.assetName, 'backgrounds/karma_bg_neutral.png');
+    expect(badge.assetName, 'panels/karma_badge_neutral.png');
+    expect(score.data, '0');
+    expect(score.style?.color, const Color(0xfff5e8c8));
+    expect(find.text('Người đã biết dừng lại.'), findsNothing);
+
+    controller
+      ..currentNodeId = 'enough_reflection'
+      ..karma = 3;
+    controller.startOrResume();
+    await tester.pump();
+
+    badge = tester.widget<FqaAssetImage>(
+      find.byKey(const ValueKey('karma_badge_image')),
+    );
+    background = tester.widget<FqaAssetImage>(
+      find.byKey(const ValueKey('fqa_scaffold_background_image')),
+    );
+    score = tester.widget<Text>(find.byKey(const ValueKey('karma_score_text')));
+    expect(background.assetName, 'backgrounds/karma_bg.png');
+    expect(badge.assetName, 'panels/karma_badge.png');
+    expect(score.data, '+3');
+  });
+
   testWidgets('bird preset question opens conversation', (tester) async {
     final controller = await _controller();
     controller
