@@ -157,7 +157,7 @@ class _BirdBubble extends StatelessWidget {
                     text,
                     style: TextStyle(
                       color: const Color(0xffd4b072),
-                      fontSize: layout.font(11),
+                      fontSize: layout.font(14),
                       height: 1.35,
                       fontWeight: FontWeight.w700,
                     ),
@@ -214,7 +214,7 @@ class _UserBubble extends StatelessWidget {
                     text,
                     style: TextStyle(
                       color: const Color(0xffd8c58f),
-                      fontSize: layout.font(10),
+                      fontSize: layout.font(14),
                       height: 1.5,
                       fontWeight: FontWeight.w700,
                     ),

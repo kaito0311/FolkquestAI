@@ -35,7 +35,8 @@ class OptionsScreen extends StatelessWidget {
               ? layout.contentWidth(362, landscapeValue: 420)
               : layout.maxWidth(362, padding: horizontalPadding);
           final choiceHeight = layout.s(60).clamp(52.0, 60.0);
-          final portraitPromptTop = layout.y(464);
+          final portraitPromptOffset = node.choices.length <= 2 ? 488.0 : 464.0;
+          final portraitPromptTop = layout.y(portraitPromptOffset);
           final portraitPromptMax = constraints.maxHeight * 0.56;
           final safePortraitPromptTop = portraitPromptMax < 390
               ? portraitPromptMax
@@ -43,7 +44,8 @@ class OptionsScreen extends StatelessWidget {
           final promptTop = layout.isLandscape
               ? layout.y(214).clamp(150.0, constraints.maxHeight * 0.36)
               : safePortraitPromptTop;
-          final portraitChoicesTop = promptTop + layout.y(164);
+          final portraitChoiceOffset = node.choices.length <= 2 ? 180.0 : 188.0;
+          final portraitChoicesTop = promptTop + layout.y(portraitChoiceOffset);
           final portraitChoicesMin = promptTop + 140;
           final portraitChoicesMax = constraints.maxHeight - 220;
           final safePortraitChoicesTop = portraitChoicesMax < portraitChoicesMin
@@ -82,7 +84,10 @@ class OptionsScreen extends StatelessWidget {
                 right: layout.isLandscape ? 0 : horizontalPadding,
                 top: choicesTop,
                 bottom: layout.gap(18),
-                child: Center(
+                child: Align(
+                  alignment: layout.isLandscape
+                      ? Alignment.center
+                      : Alignment.topCenter,
                   child: SizedBox(
                     width: layout.isLandscape ? contentWidth : null,
                     child: SingleChildScrollView(
