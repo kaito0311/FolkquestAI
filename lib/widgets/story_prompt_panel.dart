@@ -40,7 +40,7 @@ class StoryPromptPanel extends StatelessWidget {
           Positioned(
             left: 46,
             right: 46,
-            top: 58,
+            top: 45,
             child: Text(
               text,
               style: const TextStyle(

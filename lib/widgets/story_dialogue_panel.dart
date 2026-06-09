@@ -43,7 +43,7 @@ class StoryDialoguePanel extends StatelessWidget {
           Positioned(
             left: 44,
             right: 88,
-            top: 64,
+            top: 55,
             child: Text(
               text,
               key: const ValueKey('story_dialogue_text'),
