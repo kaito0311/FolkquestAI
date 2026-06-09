@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:fqa/models/app_view.dart';
+import 'package:fqa/models/bird_conversation_message.dart';
 import 'package:fqa/models/collectible.dart';
 import 'package:fqa/models/collection_filter.dart';
 import 'package:fqa/models/ending.dart';
@@ -26,7 +27,14 @@ class GameController extends ChangeNotifier {
   bool pauseVisible = false;
   CollectionFilter collectionFilter = CollectionFilter.all;
   AppView? _returnView;
-  String birdQuestion = '';
+  List<BirdConversationMessage> birdMessages = [];
+
+  String get birdQuestion {
+    for (final message in birdMessages.reversed) {
+      if (message.isUser) return message.text;
+    }
+    return '';
+  }
 
   StoryNode get currentNode => StoryRepository.node(currentNodeId);
 
@@ -109,19 +117,35 @@ class GameController extends ChangeNotifier {
   }
 
   void openBirdChat() {
-    birdQuestion = '';
+    birdMessages = [];
     view = AppView.birdChat;
     pauseVisible = false;
     notifyListeners();
   }
 
-  void submitBirdQuestion(String question) {
+  bool submitBirdQuestion(String question) {
     final normalizedQuestion = question.trim();
-    if (normalizedQuestion.isEmpty) return;
-    birdQuestion = normalizedQuestion;
+    if (normalizedQuestion.isEmpty) return false;
+    final nextMessages = [
+      if (birdMessages.isEmpty)
+        const BirdConversationMessage(
+          text:
+              'Con cứ hỏi điều còn băn khoăn. Ta sẽ cùng con nhìn lại câu chuyện.',
+          isUser: false,
+        ),
+      ...birdMessages,
+      BirdConversationMessage(text: normalizedQuestion, isUser: true),
+      const BirdConversationMessage(
+        text:
+            'Khi lòng tham lớn hơn sự biết đủ, con người dễ đánh mất những gì mình đang có.',
+        isUser: false,
+      ),
+    ];
+    birdMessages = nextMessages;
     view = AppView.birdConversation;
     pauseVisible = false;
     notifyListeners();
+    return true;
   }
 
   void backFromBirdConversation() {
@@ -132,6 +156,14 @@ class GameController extends ChangeNotifier {
 
   void closeBirdChat() {
     view = AppView.story;
+    pauseVisible = false;
+    notifyListeners();
+  }
+
+  void continueBirdConversationToCollection() {
+    _returnView = AppView.story;
+    view = AppView.collection;
+    collectionFilter = CollectionFilter.opened;
     pauseVisible = false;
     notifyListeners();
   }
@@ -166,7 +198,7 @@ class GameController extends ChangeNotifier {
     completedEndingId = null;
     view = AppView.story;
     _returnView = null;
-    birdQuestion = '';
+    birdMessages = [];
     pauseVisible = false;
     _persist();
     notifyListeners();
