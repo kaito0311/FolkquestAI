@@ -202,7 +202,7 @@ class GameController extends ChangeNotifier {
   }
 
   void _goToNode(String nodeId) {
-    final next = StoryRepository.node(nodeId);
+    final next = StoryRepository.node(_resolveNodeId(nodeId));
     currentNodeId = next.id;
     if (next.type == StoryNodeType.karma) {
       karma += next.karmaDelta;
@@ -232,5 +232,21 @@ class GameController extends ChangeNotifier {
         ),
       ),
     );
+  }
+
+  String _resolveNodeId(String nodeId) {
+    var resolvedId = nodeId;
+    final visitedIds = <String>{};
+    while (visitedIds.add(resolvedId)) {
+      final node = StoryRepository.node(resolvedId);
+      final routes = node.karmaRoutes;
+      if (routes.isEmpty) return resolvedId;
+      final route = routes.firstWhere(
+        (candidate) => candidate.matches(karma),
+        orElse: () => routes.last,
+      );
+      resolvedId = route.nextId;
+    }
+    return StoryRepository.startNodeId;
   }
 }

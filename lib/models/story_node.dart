@@ -8,8 +8,10 @@ class StoryNode {
     required this.type,
     required this.text,
     this.speaker,
+    this.background,
     this.nextId,
     this.choices = const [],
+    this.karmaRoutes = const [],
     this.karmaDelta = 0,
     this.reflectionTitle = '',
     this.unlockCollectibleId,
@@ -21,10 +23,26 @@ class StoryNode {
   final StoryNodeType type;
   final String text;
   final String? speaker;
+  final String? background;
   final String? nextId;
   final List<StoryChoice> choices;
+  final List<KarmaRoute> karmaRoutes;
   final int karmaDelta;
   final String reflectionTitle;
   final String? unlockCollectibleId;
   final String? endingId;
+}
+
+class KarmaRoute {
+  const KarmaRoute({required this.nextId, this.minKarma, this.maxKarma});
+
+  final String nextId;
+  final int? minKarma;
+  final int? maxKarma;
+
+  bool matches(int karma) {
+    final aboveMinimum = minKarma == null || karma >= minKarma!;
+    final belowMaximum = maxKarma == null || karma <= maxKarma!;
+    return aboveMinimum && belowMaximum;
+  }
 }

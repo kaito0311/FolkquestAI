@@ -5,7 +5,7 @@ import 'package:fqa/models/story_node.dart';
 import 'package:fqa/models/story_node_type.dart';
 
 class StoryRepository {
-  static const startNodeId = 'inheritance_intro';
+  static const startNodeId = 'start_intro';
 
   static const collectibles = [
     Collectible(
@@ -70,140 +70,399 @@ class StoryRepository {
       .toSet();
 
   static const endings = {
+    'early_bad': Ending(
+      id: 'early_bad',
+      title: 'Mất cây khế',
+      karmaSummary: 'Lòng tham khiến cơ duyên khép lại quá sớm.',
+    ),
+    'no_promise': Ending(
+      id: 'no_promise',
+      title: 'Chim Thần rời đi',
+      karmaSummary: 'Cơ hội tốt cần được giữ bằng sự tử tế.',
+    ),
     'enough': Ending(
       id: 'enough',
       title: 'Con đường biết đủ',
       karmaSummary: 'Người đã biết dừng lại.',
     ),
-    'fairness': Ending(
-      id: 'fairness',
-      title: 'Con đường công bằng',
-      karmaSummary: 'Người đã chọn nói điều cần nói.',
+    'player_bad': Ending(
+      id: 'player_bad',
+      title: 'Người em rơi xuống biển',
+      karmaSummary: 'Chiếc túi quá lớn kéo cả lòng người xuống thấp.',
     ),
-    'leaving': Ending(
-      id: 'leaving',
-      title: 'Con đường tự lập',
-      karmaSummary: 'Người đã rời đi để giữ lòng bình yên.',
+    'brother_bad': Ending(
+      id: 'brother_bad',
+      title: 'Kết cục của người anh',
+      karmaSummary: 'Lòng tham của người anh tự chuốc lấy hậu quả.',
+    ),
+    'keep_tree': Ending(
+      id: 'keep_tree',
+      title: 'Giữ lấy cây khế',
+      karmaSummary: 'Người em biết bảo vệ điều quý giá bằng lòng bình an.',
     ),
   };
 
   static const nodes = {
-    // Placeholder story data: replace these nodes with the final script later.
-    'inheritance_intro': StoryNode(
-      id: 'inheritance_intro',
-      title: 'Chia gia tài',
+    'start_intro': StoryNode(
+      id: 'start_intro',
+      title: 'Mở đầu truyện',
       type: StoryNodeType.dialogue,
-      speaker: 'Người anh',
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/001_start_intro.png',
       text:
-          'Từ nay, chú hãy ra ở riêng. Ta chia cho chú cây khế sau nhà, còn ruộng vườn ta giữ lại.',
-      nextId: 'inheritance_choice',
+          'Ngày xưa, trong một ngôi làng nhỏ, có hai anh em sống nương tựa vào nhau. Bạn sẽ bước vào câu chuyện trong vai người em, hiền lành nhưng phải tự chọn cách giữ lấy lòng mình.',
+      nextId: 'father_passes_away',
     ),
-    'inheritance_choice': StoryNode(
-      id: 'inheritance_choice',
-      title: 'Lựa chọn',
-      type: StoryNodeType.options,
-      speaker: 'Người em',
+    'father_passes_away': StoryNode(
+      id: 'father_passes_away',
+      title: 'Cha qua đời',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/002_father_passes_away.png',
       text:
-          'Người em nên đáp lại thế nào trước lời chia gia tài của người anh?',
+          'Sau khi cha mất, căn nhà vắng đi tiếng dặn dò quen thuộc. Hai anh em đứng trước phần gia tài còn lại và một cuộc chia chác không dễ nói thành lời.',
+      nextId: 'divide_inheritance',
+    ),
+    'divide_inheritance': StoryNode(
+      id: 'divide_inheritance',
+      title: 'Chia gia tài',
+      type: StoryNodeType.options,
+      speaker: 'Người anh',
+      background: 'backgrounds/003_divide_inheritance.png',
+      text:
+          'Từ nay, chú hãy ra ở riêng. Ruộng vườn, nhà cửa để anh giữ. Sau vườn còn một cây khế, chú nhận lấy mà sống.',
       choices: [
         StoryChoice(
-          label: 'Nhận cây khế',
-          nextId: 'bag_choice',
+          label: 'Chấp nhận cây khế',
+          nextId: 'accept_starfruit_tree',
           karmaDelta: 1,
           unlockCollectibleIds: ['starfruit'],
         ),
         StoryChoice(
-          label: 'Xin chia lại',
-          nextId: 'fairness_reflection',
-          karmaDelta: 0,
+          label: 'Yêu cầu chia công bằng',
+          nextId: 'inheritance_argument',
           unlockCollectibleIds: ['half'],
         ),
+      ],
+    ),
+    'accept_starfruit_tree': StoryNode(
+      id: 'accept_starfruit_tree',
+      title: 'Chấp nhận cây khế',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người em',
+      background: 'backgrounds/003_divide_inheritance.png',
+      text:
+          'Người em cúi đầu nhận phần ít ỏi. Cậu không muốn anh em vì của cải mà mất tình thân, chỉ mong cây khế sau nhà còn đủ để nuôi ngày tháng tới.',
+      nextId: 'starfruit_tree',
+    ),
+    'inheritance_argument': StoryNode(
+      id: 'inheritance_argument',
+      title: 'Tranh chấp gia tài',
+      type: StoryNodeType.options,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/003_1_inheritance_argument.png',
+      text:
+          'Người em không muốn gây chuyện, nhưng cũng cảm thấy việc chia gia tài như vậy chưa thật công bằng.',
+      choices: [
         StoryChoice(
-          label: 'Rời đi',
-          nextId: 'leaving_reflection',
+          label: 'Bình tĩnh nói lý với anh',
+          nextId: 'fair_argument',
+          karmaDelta: 1,
+        ),
+        StoryChoice(
+          label: 'Nóng giận tranh giành',
+          nextId: 'angry_argument',
+          karmaDelta: -1,
+        ),
+        StoryChoice(
+          label: 'Đòi phần hơn vì mình là em',
+          nextId: 'early_bad_ending',
+          karmaDelta: -2,
+        ),
+      ],
+    ),
+    'fair_argument': StoryNode(
+      id: 'fair_argument',
+      title: 'Lời nói công bằng',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người em',
+      background: 'backgrounds/003_1_inheritance_argument.png',
+      text:
+          'Người em giữ giọng bình tĩnh. Cậu chỉ xin anh nghĩ lại cho phải đạo, rồi vẫn chấp nhận chăm cây khế khi thấy lòng anh đã quyết.',
+      nextId: 'starfruit_tree',
+    ),
+    'angry_argument': StoryNode(
+      id: 'angry_argument',
+      title: 'Cơn giận nổi lên',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/003_1_inheritance_argument.png',
+      text:
+          'Lời qua tiếng lại làm sân nhà nặng trĩu. Người em giận dữ rời đi, trong lòng vẫn còn vướng nỗi ấm ức về phần gia tài ít ỏi.',
+      nextId: 'starfruit_tree',
+    ),
+    'early_bad_ending': StoryNode(
+      id: 'early_bad_ending',
+      title: 'Mất cây khế',
+      type: StoryNodeType.firstEnding,
+      background: 'backgrounds/003_1_inheritance_argument.png',
+      text:
+          'Vì đòi phần hơn, người em đánh mất cả chút tình thân còn lại. Cây khế cũng chẳng còn thuộc về cậu, và câu chuyện vàng bạc khép lại trước khi bắt đầu.',
+      nextId: 'early_bad_reflection',
+    ),
+    'starfruit_tree': StoryNode(
+      id: 'starfruit_tree',
+      title: 'Cây khế',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/004_starfruit_tree.png',
+      text:
+          'Từ ngày nhận cây khế, người em ngày ngày chăm sóc nó. Cây lớn lên xanh tốt, mùa nào cũng sai quả.',
+      nextId: 'bird_appears',
+    ),
+    'bird_appears': StoryNode(
+      id: 'bird_appears',
+      title: 'Chim Thần',
+      type: StoryNodeType.options,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/005_bird_appears.png',
+      text:
+          'Một hôm, có một con chim lớn bay đến đậu trên cây khế. Chim ăn từng quả chín vàng, khiến người em vừa ngạc nhiên vừa lo lắng.',
+      choices: [
+        StoryChoice(
+          label: 'Nhẹ nhàng than với Chim Thần',
+          nextId: 'gentle_complaint',
+          karmaDelta: 1,
+        ),
+        StoryChoice(
+          label: 'Vác gậy đuổi chim đi',
+          nextId: 'chase_bird',
           karmaDelta: -1,
         ),
       ],
     ),
-    'bag_choice': StoryNode(
-      id: 'bag_choice',
-      title: 'Lựa chọn',
+    'gentle_complaint': StoryNode(
+      id: 'gentle_complaint',
+      title: 'Gặp Chim Thần',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người em',
+      background: 'backgrounds/005_bird_appears.png',
+      text:
+          'Người em chắp tay thưa nhẹ: Chim ăn hết khế, nhà con sống sao? Nếu chim cần khế, xin hãy để lại cho con một đường sinh nhai.',
+      nextId: 'karma_check',
+    ),
+    'chase_bird': StoryNode(
+      id: 'chase_bird',
+      title: 'Đuổi Chim Thần',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/005_1_chase_bird.png',
+      text:
+          'Người em nóng lòng vì sợ mất hết khế, liền vác gậy chạy ra đuổi chim. Chim Thần bay lên, ánh mắt trầm xuống như đang nhìn thấu lòng người.',
+      nextId: 'karma_check',
+    ),
+    'karma_check': StoryNode(
+      id: 'karma_check',
+      title: 'Nghiệp lực',
+      type: StoryNodeType.dialogue,
+      text: '',
+      karmaRoutes: [
+        KarmaRoute(maxKarma: -2, nextId: 'no_promise_ending'),
+        KarmaRoute(minKarma: -1, nextId: 'bird_promise'),
+      ],
+    ),
+    'no_promise_ending': StoryNode(
+      id: 'no_promise_ending',
+      title: 'Chim Thần rời đi',
+      type: StoryNodeType.firstEnding,
+      speaker: 'Chim Thần',
+      background: 'backgrounds/006_1_no_promise_ending.png',
+      text:
+          'Lòng người còn đầy nóng giận và tham cầu. Cơ hội tốt nếu không được giữ bằng sự tử tế, cũng sẽ bay đi như cánh chim trước gió.',
+      nextId: 'no_promise_reflection',
+    ),
+    'bird_promise': StoryNode(
+      id: 'bird_promise',
+      title: 'Chim Thần đáp',
+      type: StoryNodeType.dialogue,
+      speaker: 'Chim Thần',
+      background: 'backgrounds/006_bird_promise.png',
+      text: 'Ăn một quả, trả cục vàng. May túi ba gang, mang đi mà đựng.',
+      nextId: 'choose_bag',
+    ),
+    'choose_bag': StoryNode(
+      id: 'choose_bag',
+      title: 'Chọn túi',
       type: StoryNodeType.options,
-      speaker: 'Chim thần',
-      text: 'Chim thần hứa trả vàng và bảo người em chuẩn bị một chiếc túi.',
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/007_choose_bag.png',
+      text:
+          'Nghe lời Chim Thần, người em chuẩn bị một chiếc túi để đi lấy vàng. Nhưng trong lòng cậu vẫn phải tự quyết: nên mang vừa đủ, hay mang thật nhiều?',
       choices: [
         StoryChoice(
-          label: 'Chọn túi ba gang',
-          nextId: 'gold_choice',
+          label: 'May túi 3 gang',
+          nextId: 'gold_island',
           karmaDelta: 1,
           unlockCollectibleIds: ['bag3', 'feather'],
         ),
         StoryChoice(
-          label: 'Chọn túi 12 gang',
-          nextId: 'greed_reflection',
-          karmaDelta: -2,
+          label: 'May túi 12 gang',
+          nextId: 'gold_island_large',
+          karmaDelta: -1,
           unlockCollectibleIds: ['bag12'],
         ),
       ],
     ),
-    'gold_choice': StoryNode(
-      id: 'gold_choice',
-      title: 'Lựa chọn',
-      type: StoryNodeType.options,
-      speaker: 'Người em',
+    'gold_island': StoryNode(
+      id: 'gold_island',
+      title: 'Đảo vàng',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/008_gold_island.png',
       text:
-          'Đứng trước kho vàng, người em cần quyết định có lấy thêm hay không.',
+          'Chim Thần cõng người em bay qua núi cao, biển rộng, rồi đáp xuống một hòn đảo lấp lánh ánh vàng.',
+      nextId: 'younger_brother_prospers',
+    ),
+    'gold_island_large': StoryNode(
+      id: 'gold_island_large',
+      title: 'Đảo vàng',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/008_gold_island.png',
+      text:
+          'Chim Thần cõng người em đến đảo vàng. Trước ánh vàng lấp lánh, chiếc túi mười hai gang bỗng trở nên quá hấp dẫn để dừng lại.',
+      nextId: 'player_bad_ending',
+    ),
+    'younger_brother_prospers': StoryNode(
+      id: 'younger_brother_prospers',
+      title: 'Người em phát đạt',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/009_younger_brother_prospers.png',
+      text:
+          'Người em trở về với túi vàng vừa đủ. Từ đó, cậu sửa lại mái nhà, giúp đỡ người nghèo và sống một cuộc đời yên ổn.',
+      nextId: 'brother_returns',
+    ),
+    'brother_returns': StoryNode(
+      id: 'brother_returns',
+      title: 'Người anh quay lại',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/012_brother_returns.png',
+      text:
+          'Thấy người em trở nên khá giả, người anh sinh lòng tò mò. Hắn quay lại, nhìn cây khế sai quả rồi nở một nụ cười đầy tính toán.',
+      nextId: 'player_decides_exchange',
+    ),
+    'player_decides_exchange': StoryNode(
+      id: 'player_decides_exchange',
+      title: 'Có đổi cây khế không?',
+      type: StoryNodeType.options,
+      speaker: 'Người anh',
+      background: 'backgrounds/009_younger_brother_prospers.png',
+      text:
+          'Chú đổi cây khế cho anh đi. Anh trả lại ruộng vườn ngày trước, còn cây khế này để anh chăm thử một mùa.',
       choices: [
         StoryChoice(
-          label: 'Không lấy thêm vàng',
-          nextId: 'first_positive_ending',
-          karmaDelta: 1,
-          unlockCollectibleIds: ['gold'],
+          label: 'Đồng ý đổi cây khế',
+          nextId: 'brother_greed_cutscene',
         ),
         StoryChoice(
-          label: 'Lấy thêm một ít',
-          nextId: 'greed_reflection',
-          karmaDelta: -1,
-          unlockCollectibleIds: ['gold'],
+          label: 'Không đồng ý đổi cây khế',
+          nextId: 'keep_tree_ending',
+          karmaDelta: 1,
         ),
       ],
     ),
-    'enough_reflection': StoryNode(
-      id: 'enough_reflection',
-      title: 'Nghiệp Lực',
-      type: StoryNodeType.karma,
-      text: 'Điều khó nhất trên đời không phải là kiếm được, mà là biết đủ.',
-      nextId: 'feather_unlock',
-      karmaDelta: 1,
-      reflectionTitle: 'Người đã biết dừng lại.',
+    'brother_greed_cutscene': StoryNode(
+      id: 'brother_greed_cutscene',
+      title: 'Chiếc túi quá lớn',
+      type: StoryNodeType.dialogue,
+      speaker: 'Người kể chuyện',
+      background: 'backgrounds/013_brother_greed_cutscene.png',
+      text:
+          'Sau khi đổi được cây khế, người anh không may túi ba gang như lời dặn. Hắn lén may một chiếc túi thật lớn, mong mang về nhiều vàng hơn người em.',
+      nextId: 'brother_bad_ending',
     ),
-    'fairness_reflection': StoryNode(
-      id: 'fairness_reflection',
-      title: 'Nghiệp Lực',
-      type: StoryNodeType.karma,
-      text: 'Có những lúc công bằng bắt đầu bằng một lời nói bình tĩnh.',
-      nextId: 'fairness_ending',
-      karmaDelta: 1,
-      reflectionTitle: 'Người đã giữ tiếng nói của mình.',
+    'brother_bad_ending': StoryNode(
+      id: 'brother_bad_ending',
+      title: 'Kết cục của người anh',
+      type: StoryNodeType.firstEnding,
+      background: 'backgrounds/014_brother_bad_ending.png',
+      text:
+          'Chiếc túi quá nặng kéo người anh chao đảo giữa trời. Vàng rơi tung tóe xuống biển, còn hắn hoảng hốt nhận ra lòng tham đã trở thành gánh nặng không thể giữ nổi.',
+      nextId: 'brother_bad_reflection',
     ),
-    'leaving_reflection': StoryNode(
-      id: 'leaving_reflection',
-      title: 'Nghiệp Lực',
-      type: StoryNodeType.karma,
-      text: 'Rời đi không phải lúc nào cũng là thua cuộc.',
-      nextId: 'leaving_ending',
-      karmaDelta: 0,
-      reflectionTitle: 'Người đã chọn bình yên.',
+    'player_bad_ending': StoryNode(
+      id: 'player_bad_ending',
+      title: 'Lòng tham của người em',
+      type: StoryNodeType.firstEnding,
+      background: 'backgrounds/011_player_bad_ending.png',
+      text:
+          'Người em chọn chiếc túi quá lớn và cố nhét thật nhiều vàng. Khi Chim Thần bay qua biển, chiếc túi nặng khiến cậu không còn giữ được thăng bằng.',
+      nextId: 'player_bad_reflection',
     ),
-    'greed_reflection': StoryNode(
-      id: 'greed_reflection',
-      title: 'Nghiệp Lực',
+    'keep_tree_ending': StoryNode(
+      id: 'keep_tree_ending',
+      title: 'Giữ lấy cây khế',
+      type: StoryNodeType.firstEnding,
+      background: 'backgrounds/009_younger_brother_prospers.png',
+      text:
+          'Người em mỉm cười từ chối. Cây khế không chỉ là của cải, mà là bài học về sự vừa đủ và lòng biết ơn cậu muốn tự mình gìn giữ.',
+      nextId: 'keep_tree_reflection',
+    ),
+    'early_bad_reflection': StoryNode(
+      id: 'early_bad_reflection',
+      title: 'Nghiệp lực',
       type: StoryNodeType.karma,
       text:
-          'Khi chiếc túi lớn hơn điều cần thiết, đường về cũng trở nên nặng hơn.',
+          'Khi phần hơn trở thành điều duy nhất được nhìn thấy, con đường tốt đẹp cũng mất đi trước mắt.',
+      reflectionTitle: 'Người đã để lòng tham đi trước tình thân.',
+      nextId: 'early_bad_summary',
+    ),
+    'no_promise_reflection': StoryNode(
+      id: 'no_promise_reflection',
+      title: 'Nghiệp lực',
+      type: StoryNodeType.karma,
+      text:
+          'Không phải cơ hội nào cũng quay lại. Có lúc một lời nóng giận đủ làm cánh cửa lành bay xa.',
+      reflectionTitle: 'Người đã đánh rơi cơ duyên với Chim Thần.',
+      nextId: 'no_promise_summary',
+    ),
+    'enough_reflection': StoryNode(
+      id: 'enough_reflection',
+      title: 'Nghiệp lực',
+      type: StoryNodeType.karma,
+      text:
+          'Điều khó nhất trên đời không phải là kiếm được thật nhiều, mà là biết khi nào đã đủ.',
+      reflectionTitle: 'Người đã biết dừng lại.',
       nextId: 'enough_ending',
-      karmaDelta: -1,
-      reflectionTitle: 'Người đã nhìn thấy giới hạn.',
+    ),
+    'player_bad_reflection': StoryNode(
+      id: 'player_bad_reflection',
+      title: 'Nghiệp lực',
+      type: StoryNodeType.karma,
+      text:
+          'Chiếc túi càng lớn, đường về càng nặng. Lòng tham đôi khi bắt đầu từ một ý nghĩ rất nhỏ.',
+      reflectionTitle: 'Người đã để vàng nặng hơn mạng sống.',
+      nextId: 'player_bad_summary',
+    ),
+    'brother_bad_reflection': StoryNode(
+      id: 'brother_bad_reflection',
+      title: 'Nghiệp lực',
+      type: StoryNodeType.karma,
+      text:
+          'Có những hậu quả không đến từ lựa chọn của ta, nhưng vẫn nhắc ta vì sao cần giữ lòng mình sáng.',
+      reflectionTitle: 'Người đã chứng kiến cái giá của lòng tham.',
+      nextId: 'brother_bad_summary',
+    ),
+    'keep_tree_reflection': StoryNode(
+      id: 'keep_tree_reflection',
+      title: 'Nghiệp lực',
+      type: StoryNodeType.karma,
+      text:
+          'Biết chia sẻ không có nghĩa là trao đi mọi điều quý giá. Có khi giữ lại cũng là một cách sống có trách nhiệm.',
+      reflectionTitle: 'Người đã giữ được điều cần giữ.',
+      nextId: 'keep_tree_summary',
     ),
     'feather_unlock': StoryNode(
       id: 'feather_unlock',
@@ -213,12 +472,19 @@ class StoryRepository {
       nextId: 'enough_ending',
       unlockCollectibleId: 'feather',
     ),
-    'first_positive_ending': StoryNode(
-      id: 'first_positive_ending',
-      title: 'Kết thúc tốt đẹp',
-      type: StoryNodeType.firstEnding,
-      text: 'Người biết đủ sẽ luôn nhận được những điều xứng đáng.',
-      nextId: 'enough_reflection',
+    'early_bad_summary': StoryNode(
+      id: 'early_bad_summary',
+      title: 'Kết cục của bạn',
+      type: StoryNodeType.ending,
+      text: 'Mất cây khế',
+      endingId: 'early_bad',
+    ),
+    'no_promise_summary': StoryNode(
+      id: 'no_promise_summary',
+      title: 'Kết cục của bạn',
+      type: StoryNodeType.ending,
+      text: 'Chim Thần rời đi',
+      endingId: 'no_promise',
     ),
     'enough_ending': StoryNode(
       id: 'enough_ending',
@@ -227,19 +493,26 @@ class StoryRepository {
       text: 'Con đường biết đủ',
       endingId: 'enough',
     ),
-    'fairness_ending': StoryNode(
-      id: 'fairness_ending',
+    'player_bad_summary': StoryNode(
+      id: 'player_bad_summary',
       title: 'Kết cục của bạn',
       type: StoryNodeType.ending,
-      text: 'Con đường công bằng',
-      endingId: 'fairness',
+      text: 'Người em rơi xuống biển',
+      endingId: 'player_bad',
     ),
-    'leaving_ending': StoryNode(
-      id: 'leaving_ending',
+    'brother_bad_summary': StoryNode(
+      id: 'brother_bad_summary',
       title: 'Kết cục của bạn',
       type: StoryNodeType.ending,
-      text: 'Con đường tự lập',
-      endingId: 'leaving',
+      text: 'Kết cục của người anh',
+      endingId: 'brother_bad',
+    ),
+    'keep_tree_summary': StoryNode(
+      id: 'keep_tree_summary',
+      title: 'Kết cục của bạn',
+      type: StoryNodeType.ending,
+      text: 'Giữ lấy cây khế',
+      endingId: 'keep_tree',
     ),
   };
 

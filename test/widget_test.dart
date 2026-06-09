@@ -44,7 +44,7 @@ void main() {
     await tester.tap(find.text('Bắt đầu'));
     await tester.pump();
     expect(controller.view, AppView.story);
-    expect(find.text('Chia gia tài'), findsOneWidget);
+    expect(find.text('Mở đầu truyện'), findsOneWidget);
 
     controller.exitToHome();
     await tester.pump();
@@ -80,16 +80,22 @@ void main() {
     expect(controller.currentNodeId, 'feather_unlock');
   });
 
-  testWidgets('discussion continue advances to options', (tester) async {
+  testWidgets('discussion continue advances to inheritance options', (
+    tester,
+  ) async {
     final controller = await _controller();
     controller.startOrResume();
     await _pumpApp(tester, controller);
 
     await tester.tap(find.byKey(const ValueKey('icon_Tiếp tục')));
     await tester.pump();
+    expect(controller.currentNode.id, 'father_passes_away');
+
+    await tester.tap(find.byKey(const ValueKey('icon_Tiếp tục')));
+    await tester.pump();
 
     expect(controller.currentNode.type, StoryNodeType.options);
-    expect(find.text('Nhận cây khế'), findsOneWidget);
+    expect(find.text('Chấp nhận cây khế'), findsOneWidget);
   });
 
   testWidgets('option choice changes karma and records selected choice', (
@@ -98,38 +104,127 @@ void main() {
     final controller = await _controller();
     controller.startOrResume();
     controller.advance();
+    controller.advance();
     await _pumpApp(tester, controller);
 
-    await tester.tap(find.text('Nhận cây khế'));
+    await tester.tap(find.text('Chấp nhận cây khế'));
     await tester.pump();
 
     expect(controller.karma, 1);
-    expect(controller.selectedChoices, contains('Nhận cây khế'));
+    expect(controller.selectedChoices, contains('Chấp nhận cây khế'));
     expect(controller.unlockedCollectibleIds, contains('starfruit'));
-    expect(controller.currentNode.id, 'bag_choice');
+    expect(controller.currentNode.id, 'accept_starfruit_tree');
   });
 
-  testWidgets('positive path shows first ending before karma reflection', (
+  test('karma check routes to no promise when karma is low', () async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'gentle_complaint'
+      ..karma = -2;
+
+    controller.advance();
+
+    expect(controller.currentNode.id, 'no_promise_ending');
+    expect(controller.currentNode.type, StoryNodeType.firstEnding);
+  });
+
+  test(
+    'karma check routes to bird promise when karma is above threshold',
+    () async {
+      final controller = await _controller();
+      controller
+        ..currentNodeId = 'chase_bird'
+        ..karma = -1;
+
+      controller.advance();
+
+      expect(controller.currentNode.id, 'bird_promise');
+      expect(controller.currentNode.type, StoryNodeType.dialogue);
+    },
+  );
+
+  testWidgets('choosing three-span bag unlocks bag and feather', (
     tester,
   ) async {
     final controller = await _controller();
     controller
-      ..currentNodeId = 'gold_choice'
+      ..currentNodeId = 'choose_bag'
       ..karma = 2;
     controller.startOrResume();
     await _pumpApp(tester, controller);
 
-    await tester.tap(find.text('Không lấy thêm vàng'));
+    await tester.tap(find.text('May túi 3 gang'));
+    await tester.pump();
+
+    expect(controller.karma, 3);
+    expect(controller.unlockedCollectibleIds, contains('bag3'));
+    expect(controller.unlockedCollectibleIds, contains('feather'));
+    expect(controller.currentNode.id, 'gold_island');
+  });
+
+  testWidgets('choosing twelve-span bag reaches player bad ending', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller.currentNodeId = 'choose_bag';
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.text('May túi 12 gang'));
+    await tester.pump();
+
+    expect(controller.karma, -1);
+    expect(controller.unlockedCollectibleIds, contains('bag12'));
+    expect(controller.currentNode.id, 'gold_island_large');
+
+    controller.advance();
+    await tester.pump();
+
+    expect(controller.currentNode.id, 'player_bad_ending');
+    expect(controller.currentNode.type, StoryNodeType.firstEnding);
+  });
+
+  testWidgets('brother exchange path reaches brother bad ending', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller.currentNodeId = 'player_decides_exchange';
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.text('Đồng ý đổi cây khế'));
+    await tester.pump();
+
+    expect(controller.currentNode.id, 'brother_greed_cutscene');
+
+    controller.advance();
+    await tester.pump();
+
+    expect(controller.currentNode.id, 'brother_bad_ending');
+    expect(controller.currentNode.type, StoryNodeType.firstEnding);
+  });
+
+  testWidgets('keep tree path shows first ending before karma reflection', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'player_decides_exchange'
+      ..karma = 2;
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.text('Không đồng ý đổi cây khế'));
     await tester.pump();
 
     expect(controller.currentNode.type, StoryNodeType.firstEnding);
-    expect(controller.currentNode.id, 'first_positive_ending');
-    expect(find.text('Kết thúc tốt đẹp'), findsOneWidget);
+    expect(controller.currentNode.id, 'keep_tree_ending');
+    expect(find.text('Giữ lấy cây khế'), findsOneWidget);
 
     await tester.tap(find.text('Tiếp tục'));
     await tester.pump();
 
-    expect(controller.currentNode.id, 'enough_reflection');
+    expect(controller.currentNode.id, 'keep_tree_reflection');
     expect(controller.currentNode.type, StoryNodeType.karma);
     expect(find.text('Hỏi Chim Thần'), findsOneWidget);
   });
