@@ -72,7 +72,7 @@ class StoryRepository {
   static const endings = {
     'early_bad': Ending(
       id: 'early_bad',
-      title: 'Mất cây khế',
+      title: 'Cơ hội khép lại',
       karmaSummary: 'Lòng tham khiến cơ duyên khép lại quá sớm.',
     ),
     'no_promise': Ending(
@@ -219,7 +219,7 @@ class StoryRepository {
     ),
     'early_bad_ending': StoryNode(
       id: 'early_bad_ending',
-      title: 'Mất cây khế',
+      title: 'Cơ hội khép lại',
       type: StoryNodeType.firstEnding,
       background: 'backgrounds/003_1_inheritance_argument.png',
       text:
