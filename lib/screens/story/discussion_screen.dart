@@ -15,7 +15,7 @@ class DiscussionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final node = controller.currentNode;
     return FqaScaffold(
-      background: 'backgrounds/story_bg.png',
+      background: node.background ?? 'backgrounds/story_bg.png',
       child: LayoutBuilder(
         builder: (context, constraints) {
           final layout = ResponsiveLayout.of(constraints);
