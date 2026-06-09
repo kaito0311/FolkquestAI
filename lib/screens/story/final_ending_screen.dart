@@ -20,7 +20,10 @@ class FinalEndingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ending = controller.currentEnding;
     final opened = StoryRepository.collectibles
-        .where(controller.isUnlocked)
+        .where(
+          (collectible) =>
+              controller.runUnlockedCollectibleIds.contains(collectible.id),
+        )
         .take(3)
         .toList(growable: false);
 
@@ -292,7 +295,10 @@ class _FinalEndingUnlockedCollection extends StatelessWidget {
                 child: SizedBox(
                   width: itemSize,
                   height: itemSize,
-                  child: FqaAssetImage(item.assetName),
+                  child: FqaAssetImage(
+                    item.assetName,
+                    key: ValueKey('ending_unlocked_${item.id}'),
+                  ),
                 ),
               ),
           ],

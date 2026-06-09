@@ -492,7 +492,29 @@ void main() {
     await tester.pump();
 
     expect(controller.unlockedCollectibleIds, contains('feather'));
+    expect(controller.runUnlockedCollectibleIds, contains('feather'));
     expect(store.snapshot?.unlockedCollectibles, contains('feather'));
+    expect(store.snapshot?.runUnlockedCollectibles, contains('feather'));
+  });
+
+  testWidgets('final ending shows collectibles unlocked in current run only', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'player_bad_summary'
+      ..completedEndingId = 'player_bad'
+      ..unlockedCollectibleIds = {'bag3', 'starfruit', 'bag12'}
+      ..runUnlockedCollectibleIds = {'bag12'};
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    expect(find.byKey(const ValueKey('ending_unlocked_bag12')), findsOneWidget);
+    expect(find.byKey(const ValueKey('ending_unlocked_bag3')), findsNothing);
+    expect(
+      find.byKey(const ValueKey('ending_unlocked_starfruit')),
+      findsNothing,
+    );
   });
 
   testWidgets('final restart clears current run state', (tester) async {
@@ -501,6 +523,7 @@ void main() {
       ..currentNodeId = 'enough_ending'
       ..completedEndingId = 'enough'
       ..karma = 3
+      ..runUnlockedCollectibleIds = {'bag3'}
       ..selectedChoices = ['Nhận cây khế'];
     controller.startOrResume();
     await _pumpApp(tester, controller);
@@ -511,6 +534,7 @@ void main() {
     expect(controller.currentNodeId, StoryRepository.startNodeId);
     expect(controller.karma, 0);
     expect(controller.selectedChoices, isEmpty);
+    expect(controller.runUnlockedCollectibleIds, isEmpty);
     expect(controller.view, AppView.story);
   });
 

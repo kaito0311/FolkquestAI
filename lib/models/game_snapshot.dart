@@ -6,6 +6,7 @@ class GameSnapshot {
     required this.karma,
     required this.selectedChoices,
     required this.unlockedCollectibles,
+    this.runUnlockedCollectibles = const {},
     this.completedEndingId,
   });
 
@@ -13,6 +14,7 @@ class GameSnapshot {
   final int karma;
   final List<String> selectedChoices;
   final Set<String> unlockedCollectibles;
+  final Set<String> runUnlockedCollectibles;
   final String? completedEndingId;
 
   Map<String, Object?> toJson() => {
@@ -20,6 +22,7 @@ class GameSnapshot {
     'karma': karma,
     'selectedChoices': selectedChoices,
     'unlockedCollectibles': unlockedCollectibles.toList(),
+    'runUnlockedCollectibles': runUnlockedCollectibles.toList(),
     'completedEndingId': completedEndingId,
   };
 
@@ -33,6 +36,10 @@ class GameSnapshot {
           .toList(),
       unlockedCollectibles:
           (json['unlockedCollectibles'] as List<dynamic>? ?? const [])
+              .map((value) => value.toString())
+              .toSet(),
+      runUnlockedCollectibles:
+          (json['runUnlockedCollectibles'] as List<dynamic>? ?? const [])
               .map((value) => value.toString())
               .toSet(),
       completedEndingId: json['completedEndingId'] as String?,
