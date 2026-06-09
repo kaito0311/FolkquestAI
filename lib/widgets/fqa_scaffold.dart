@@ -25,6 +25,7 @@ class FqaScaffold extends StatelessWidget {
           children: [
             FqaAssetImage(
               background,
+              key: const ValueKey('fqa_scaffold_background_image'),
               fit: BoxFit.cover,
               fallback: const DecoratedBox(
                 decoration: BoxDecoration(

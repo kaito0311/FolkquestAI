@@ -15,9 +15,9 @@ class KarmaReflectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final node = controller.currentNode;
-    final sign = controller.karma >= 0 ? '+' : '';
+    final variant = _KarmaReflectionVariant.fromKarma(controller.karma);
     return FqaScaffold(
-      background: 'backgrounds/karma_bg.png',
+      background: variant.backgroundAsset,
       overlay: const DecoratedBox(
         decoration: BoxDecoration(color: Color(0x55080706)),
       ),
@@ -90,12 +90,16 @@ class KarmaReflectionScreen extends StatelessWidget {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            const FqaAssetImage('panels/karma_badge.png'),
+                            FqaAssetImage(
+                              variant.badgeAsset,
+                              key: const ValueKey('karma_badge_image'),
+                            ),
                             Center(
                               child: Text(
-                                '$sign${controller.karma}',
+                                variant.scoreText(controller.karma),
+                                key: const ValueKey('karma_score_text'),
                                 style: TextStyle(
-                                  color: FqaColors.gold,
+                                  color: variant.scoreColor,
                                   fontSize: layout.font(48),
                                   fontWeight: FontWeight.w900,
                                   height: 1,
@@ -106,16 +110,19 @@ class KarmaReflectionScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: layout.gap(20)),
-                      Text(
-                        node.reflectionTitle,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: const Color(0xfff2d39a),
-                          fontSize: layout.font(18),
-                          fontWeight: FontWeight.w900,
+                      if (variant.showsReflectionTitle) ...[
+                        Text(
+                          node.reflectionTitle,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: const Color(0xfff2d39a),
+                            fontSize: layout.font(18),
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: layout.gap(16)),
+                        SizedBox(height: layout.gap(16)),
+                      ] else
+                        SizedBox(height: layout.gap(42)),
                       SizedBox(
                         width: layout.contentWidth(250, landscapeValue: 420),
                         child: Text(
@@ -167,6 +174,55 @@ class KarmaReflectionScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _KarmaReflectionVariant {
+  const _KarmaReflectionVariant({
+    required this.backgroundAsset,
+    required this.badgeAsset,
+    required this.scoreColor,
+    required this.showsReflectionTitle,
+    required this.prefixPositiveSign,
+  });
+
+  final String backgroundAsset;
+  final String badgeAsset;
+  final Color scoreColor;
+  final bool showsReflectionTitle;
+  final bool prefixPositiveSign;
+
+  String scoreText(int karma) {
+    if (prefixPositiveSign && karma > 0) return '+$karma';
+    return '$karma';
+  }
+
+  static _KarmaReflectionVariant fromKarma(int karma) {
+    if (karma < 0) {
+      return const _KarmaReflectionVariant(
+        backgroundAsset: 'backgrounds/karma_bg_negative.png',
+        badgeAsset: 'panels/karma_badge_negative.png',
+        scoreColor: Color(0xffe0554c),
+        showsReflectionTitle: true,
+        prefixPositiveSign: false,
+      );
+    }
+    if (karma == 0) {
+      return const _KarmaReflectionVariant(
+        backgroundAsset: 'backgrounds/karma_bg_neutral.png',
+        badgeAsset: 'panels/karma_badge_neutral.png',
+        scoreColor: Color(0xfff5e8c8),
+        showsReflectionTitle: false,
+        prefixPositiveSign: false,
+      );
+    }
+    return const _KarmaReflectionVariant(
+      backgroundAsset: 'backgrounds/karma_bg.png',
+      badgeAsset: 'panels/karma_badge.png',
+      scoreColor: FqaColors.gold,
+      showsReflectionTitle: true,
+      prefixPositiveSign: true,
     );
   }
 }
