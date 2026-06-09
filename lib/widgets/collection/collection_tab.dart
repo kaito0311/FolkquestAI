@@ -27,14 +27,15 @@ class CollectionTab extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 30,
-              height: 30,
+              width: 40,
+              height: 40,
               child: FqaAssetImage(
                 assetName,
+                fit: BoxFit.contain,
                 fallback: Icon(
                   selected ? Icons.auto_awesome : Icons.lock_open,
                   color: selected ? FqaColors.gold : const Color(0xffc8ad6b),
-                  size: 24,
+                  size: 40,
                 ),
               ),
             ),

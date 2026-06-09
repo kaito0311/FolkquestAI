@@ -28,6 +28,8 @@ class GameController extends ChangeNotifier {
   CollectionFilter collectionFilter = CollectionFilter.all;
   AppView? _returnView;
   List<BirdConversationMessage> birdMessages = [];
+  List<String> _pendingUnlockCollectibleIds = [];
+  String? _nodeAfterPendingUnlocks;
 
   String get birdQuestion {
     for (final message in birdMessages.reversed) {
@@ -113,6 +115,12 @@ class GameController extends ChangeNotifier {
   void advance() {
     final nextId = currentNode.nextId;
     if (nextId == null) return;
+    if (currentNode.type == StoryNodeType.karma &&
+        _pendingUnlockCollectibleIds.isNotEmpty) {
+      _nodeAfterPendingUnlocks = nextId;
+      _goToNextPendingUnlock();
+      return;
+    }
     _goToNode(nextId);
   }
 
@@ -171,6 +179,10 @@ class GameController extends ChangeNotifier {
   void choose(StoryChoice choice) {
     karma += choice.karmaDelta;
     selectedChoices = [...selectedChoices, choice.label];
+    _pendingUnlockCollectibleIds = [
+      ..._pendingUnlockCollectibleIds,
+      ...choice.unlockCollectibleIds,
+    ];
     unlockedCollectibleIds = {
       ...unlockedCollectibleIds,
       ...choice.unlockCollectibleIds,
@@ -185,6 +197,14 @@ class GameController extends ChangeNotifier {
     }
     if (openCollectionFirst) {
       openCollection(CollectionFilter.opened);
+    } else if (_nodeAfterPendingUnlocks != null) {
+      if (_pendingUnlockCollectibleIds.isNotEmpty) {
+        _goToNextPendingUnlock();
+      } else {
+        final nextId = _nodeAfterPendingUnlocks;
+        _nodeAfterPendingUnlocks = null;
+        _goToNode(nextId!);
+      }
     } else {
       advance();
     }
@@ -199,6 +219,8 @@ class GameController extends ChangeNotifier {
     view = AppView.story;
     _returnView = null;
     birdMessages = [];
+    _pendingUnlockCollectibleIds = [];
+    _nodeAfterPendingUnlocks = null;
     pauseVisible = false;
     _persist();
     notifyListeners();
@@ -250,6 +272,14 @@ class GameController extends ChangeNotifier {
     }
     _persist();
     notifyListeners();
+  }
+
+  void _goToNextPendingUnlock() {
+    final collectibleId = _pendingUnlockCollectibleIds.first;
+    _pendingUnlockCollectibleIds = _pendingUnlockCollectibleIds
+        .skip(1)
+        .toList();
+    _goToNode(StoryRepository.unlockNodeIdForCollectible(collectibleId));
   }
 
   void _persist() {
