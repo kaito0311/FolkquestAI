@@ -256,6 +256,24 @@ void main() {
     expect(controller.view, AppView.birdConversation);
     expect(controller.birdQuestion, question);
     expect(find.text(question), findsOneWidget);
+
+    const followUp = 'Con muốn hỏi thêm.';
+    await tester.enterText(
+      find.byKey(const ValueKey('bird_followup_input')),
+      followUp,
+    );
+    await tester.tap(find.byKey(const ValueKey('bird_followup_send')));
+    await tester.pumpAndSettle();
+
+    expect(controller.birdMessages.length, 5);
+    expect(controller.birdQuestion, followUp);
+    expect(find.text(question), findsOneWidget);
+    expect(find.text(followUp), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('button_Tiếp tục câu chuyện')));
+    await tester.pump();
+
+    expect(controller.view, AppView.collection);
   });
 
   testWidgets('bird preset question opens conversation', (tester) async {

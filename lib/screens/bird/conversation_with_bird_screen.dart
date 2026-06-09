@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/fqa_colors.dart';
+import 'package:fqa/models/bird_conversation_message.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_image_button.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/story_top_bar.dart';
@@ -20,21 +22,37 @@ class ConversationWithBirdScreen extends StatefulWidget {
 class _ConversationWithBirdScreenState
     extends State<ConversationWithBirdScreen> {
   final _messageController = TextEditingController();
+  final _scrollController = ScrollController();
 
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _submit(String question) {
-    widget.controller.submitBirdQuestion(question);
+    final submitted = widget.controller.submitBirdQuestion(question);
+    if (!submitted) return;
     _messageController.clear();
+    _scrollToLatestMessage();
+  }
+
+  void _scrollToLatestMessage() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final question = widget.controller.birdQuestion;
+    final messages = widget.controller.birdMessages;
+    _scrollToLatestMessage();
 
     return FqaScaffold(
       background: 'backgrounds/bird_chat_bg.png',
@@ -44,9 +62,14 @@ class _ConversationWithBirdScreenState
           final layout = ResponsiveLayout.of(constraints);
           final inputBottom = layout.gap(20);
           final inputHeight = layout.s(52).clamp(46.0, 52.0);
+          final continueButtonBottom =
+              inputBottom + inputHeight + layout.gap(14);
+          final continueButtonHeight = layout.s(38).clamp(34.0, 42.0);
           final threadTop = layout.isLandscape
               ? layout.y(176).clamp(132.0, 200.0)
               : layout.y(410).clamp(276.0, 410.0);
+          final threadBottom =
+              continueButtonBottom + continueButtonHeight + layout.gap(16);
 
           return Stack(
             children: [
@@ -65,24 +88,26 @@ class _ConversationWithBirdScreenState
                   landscape: 70,
                 ),
                 top: threadTop,
-                bottom: inputBottom + inputHeight + layout.gap(18),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _BirdBubble(
-                        layout: layout,
-                        text:
-                            'Con cứ hỏi điều còn băn khoăn. Ta sẽ cùng con nhìn lại câu chuyện.',
-                      ),
-                      SizedBox(height: layout.gap(24)),
-                      _UserBubble(layout: layout, text: question),
-                      SizedBox(height: layout.gap(24)),
-                      _BirdBubble(
-                        layout: layout,
-                        text:
-                            'Khi lòng tham lớn hơn sự biết đủ, con người dễ đánh mất những gì mình đang có.',
-                      ),
-                    ],
+                bottom: threadBottom,
+                child: _ConversationThread(
+                  controller: _scrollController,
+                  layout: layout,
+                  messages: messages,
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: continueButtonBottom,
+                child: Center(
+                  child: FqaImageButton(
+                    label: 'Tiếp tục câu chuyện',
+                    width: layout.contentWidth(194, landscapeValue: 220),
+                    height: continueButtonHeight,
+                    fontSize: layout.font(14),
+                    assetName: 'buttons/unlock_button.png',
+                    onPressed:
+                        widget.controller.continueBirdConversationToCollection,
                   ),
                 ),
               ),
@@ -107,6 +132,45 @@ class _ConversationWithBirdScreenState
           );
         },
       ),
+    );
+  }
+}
+
+class _ConversationThread extends StatelessWidget {
+  const _ConversationThread({
+    required this.controller,
+    required this.layout,
+    required this.messages,
+  });
+
+  final ScrollController controller;
+  final ResponsiveLayout layout;
+  final List<BirdConversationMessage> messages;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          controller: controller,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                for (final message in messages) ...[
+                  if (message.isUser)
+                    _UserBubble(layout: layout, text: message.text)
+                  else
+                    _BirdBubble(layout: layout, text: message.text),
+                  if (message != messages.last)
+                    SizedBox(height: layout.gap(24)),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

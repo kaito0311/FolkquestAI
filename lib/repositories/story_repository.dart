@@ -335,7 +335,7 @@ class StoryRepository {
     ),
     'younger_brother_prospers': StoryNode(
       id: 'younger_brother_prospers',
-      title: 'Người em phát đạt',
+      title: 'Phát đạt',
       type: StoryNodeType.dialogue,
       speaker: 'Người kể chuyện',
       background: 'backgrounds/009_younger_brother_prospers.png',
@@ -345,7 +345,7 @@ class StoryRepository {
     ),
     'brother_returns': StoryNode(
       id: 'brother_returns',
-      title: 'Người anh quay lại',
+      title: 'Người anh',
       type: StoryNodeType.dialogue,
       speaker: 'Người kể chuyện',
       background: 'backgrounds/012_brother_returns.png',
@@ -355,7 +355,7 @@ class StoryRepository {
     ),
     'player_decides_exchange': StoryNode(
       id: 'player_decides_exchange',
-      title: 'Có đổi cây khế không?',
+      title: 'Đổi cây khế',
       type: StoryNodeType.options,
       speaker: 'Người anh',
       background: 'backgrounds/009_younger_brother_prospers.png',
@@ -375,7 +375,7 @@ class StoryRepository {
     ),
     'brother_greed_cutscene': StoryNode(
       id: 'brother_greed_cutscene',
-      title: 'Chiếc túi quá lớn',
+      title: 'Túi lớn',
       type: StoryNodeType.dialogue,
       speaker: 'Người kể chuyện',
       background: 'backgrounds/013_brother_greed_cutscene.png',
