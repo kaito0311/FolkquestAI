@@ -23,6 +23,7 @@ class GameController extends ChangeNotifier {
   int karma = 0;
   List<String> selectedChoices = [];
   Set<String> unlockedCollectibleIds = StoryRepository.initialUnlockedIds;
+  Set<String> runUnlockedCollectibleIds = {};
   String? completedEndingId;
   bool pauseVisible = false;
   CollectionFilter collectionFilter = CollectionFilter.all;
@@ -56,6 +57,7 @@ class GameController extends ChangeNotifier {
       ...StoryRepository.initialUnlockedIds,
       ...snapshot.unlockedCollectibles,
     };
+    runUnlockedCollectibleIds = snapshot.runUnlockedCollectibles;
     completedEndingId = snapshot.completedEndingId;
   }
 
@@ -187,6 +189,10 @@ class GameController extends ChangeNotifier {
       ...unlockedCollectibleIds,
       ...choice.unlockCollectibleIds,
     };
+    runUnlockedCollectibleIds = {
+      ...runUnlockedCollectibleIds,
+      ...choice.unlockCollectibleIds,
+    };
     _goToNode(choice.nextId);
   }
 
@@ -194,6 +200,7 @@ class GameController extends ChangeNotifier {
     final collectibleId = currentNode.unlockCollectibleId;
     if (collectibleId != null) {
       unlockedCollectibleIds = {...unlockedCollectibleIds, collectibleId};
+      runUnlockedCollectibleIds = {...runUnlockedCollectibleIds, collectibleId};
     }
     if (openCollectionFirst) {
       openCollection(CollectionFilter.opened);
@@ -215,6 +222,7 @@ class GameController extends ChangeNotifier {
     currentNodeId = StoryRepository.startNodeId;
     karma = 0;
     selectedChoices = [];
+    runUnlockedCollectibleIds = {};
     completedEndingId = null;
     view = AppView.story;
     _returnView = null;
@@ -266,6 +274,10 @@ class GameController extends ChangeNotifier {
         ...unlockedCollectibleIds,
         next.unlockCollectibleId!,
       };
+      runUnlockedCollectibleIds = {
+        ...runUnlockedCollectibleIds,
+        next.unlockCollectibleId!,
+      };
     }
     if (next.type == StoryNodeType.ending) {
       completedEndingId = next.endingId;
@@ -290,6 +302,7 @@ class GameController extends ChangeNotifier {
           karma: karma,
           selectedChoices: selectedChoices,
           unlockedCollectibles: unlockedCollectibleIds,
+          runUnlockedCollectibles: runUnlockedCollectibleIds,
           completedEndingId: completedEndingId,
         ),
       ),

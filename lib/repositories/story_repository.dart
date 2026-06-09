@@ -447,6 +447,7 @@ class StoryRepository {
       id: 'keep_tree_ending',
       title: 'Giữ lấy cây khế',
       type: StoryNodeType.dialogue,
+      speaker: "Người kể chuyện",
       background: 'backgrounds/009_younger_brother_prospers.png',
       text:
           'Người em mỉm cười từ chối. Cây khế không chỉ là của cải, mà là bài học về sự vừa đủ và lòng biết ơn cậu muốn tự mình gìn giữ.',
