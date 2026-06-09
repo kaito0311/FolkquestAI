@@ -9,6 +9,8 @@ class StoryNode {
     required this.text,
     this.speaker,
     this.background,
+    this.coverAlignmentX = 0,
+    this.coverAlignmentY = 0,
     this.nextId,
     this.choices = const [],
     this.karmaRoutes = const [],
@@ -24,6 +26,8 @@ class StoryNode {
   final String text;
   final String? speaker;
   final String? background;
+  final double coverAlignmentX;
+  final double coverAlignmentY;
   final String? nextId;
   final List<StoryChoice> choices;
   final List<KarmaRoute> karmaRoutes;

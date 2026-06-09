@@ -6,12 +6,14 @@ class FqaAssetImage extends StatelessWidget {
   const FqaAssetImage(
     this.assetName, {
     this.fit = BoxFit.contain,
+    this.alignment = Alignment.center,
     this.fallback,
     super.key,
   });
 
   final String assetName;
   final BoxFit fit;
+  final AlignmentGeometry alignment;
   final Widget? fallback;
 
   @override
@@ -19,6 +21,7 @@ class FqaAssetImage extends StatelessWidget {
     return Image.asset(
       FqaAssets.image(assetName),
       fit: fit,
+      alignment: alignment,
       errorBuilder: (context, error, stackTrace) {
         return fallback ??
             DecoratedBox(
