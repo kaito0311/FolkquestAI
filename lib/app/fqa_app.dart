@@ -10,7 +10,6 @@ import 'package:fqa/screens/home_screen.dart';
 import 'package:fqa/screens/settings_screen.dart';
 import 'package:fqa/screens/story/story_screen.dart';
 import 'package:fqa/screens/tutorial_screen.dart';
-import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/pause_overlay.dart';
 
 class FqaApp extends StatelessWidget {

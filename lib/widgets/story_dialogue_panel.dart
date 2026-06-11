@@ -44,14 +44,20 @@ class StoryDialoguePanel extends StatelessWidget {
             left: 44,
             right: 88,
             top: 55,
-            child: Text(
-              text,
-              key: const ValueKey('story_dialogue_text'),
-              style: const TextStyle(
-                color: FqaColors.cream,
-                fontSize: 17,
-                height: 1.55,
-                fontWeight: FontWeight.w500,
+            bottom: 36,
+            child: ClipRect(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  text,
+                  key: const ValueKey('story_dialogue_text'),
+                  style: const TextStyle(
+                    color: FqaColors.cream,
+                    fontSize: 17,
+                    height: 1.55,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
           ),

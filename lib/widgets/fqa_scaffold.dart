@@ -42,10 +42,40 @@ class FqaScaffold extends StatelessWidget {
               ),
             ),
             ?overlay,
-            child,
+            _SafeContentPadding(child: child),
           ],
         ),
       ),
     );
+  }
+}
+
+class _SafeContentPadding extends StatelessWidget {
+  const _SafeContentPadding({required this.child});
+
+  static const _designedTopClearance = 28.0;
+  static const _designedBottomClearance = 24.0;
+  static const _designedSideClearance = 16.0;
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final viewPadding = MediaQuery.viewPaddingOf(context);
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: _extraPaddingFor(viewPadding.left, _designedSideClearance),
+        top: _extraPaddingFor(viewPadding.top, _designedTopClearance),
+        right: _extraPaddingFor(viewPadding.right, _designedSideClearance),
+        bottom: _extraPaddingFor(viewPadding.bottom, _designedBottomClearance),
+      ),
+      child: child,
+    );
+  }
+
+  double _extraPaddingFor(double safeInset, double designedClearance) {
+    final extra = safeInset - designedClearance;
+    return extra > 0 ? extra : 0;
   }
 }
