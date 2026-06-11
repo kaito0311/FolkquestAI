@@ -18,10 +18,10 @@ class CollectionScreen extends StatelessWidget {
     final items = controller.filteredCollectibles().toList(growable: false);
     return FqaScaffold(
       background: 'backgrounds/collection_bg.png',
-      overlay: const FqaAssetImage(
-        'backgrounds/collection_overlay.png',
-        fit: BoxFit.cover,
-      ),
+      // overlay: const FqaAssetImage(
+      //   'backgrounds/collection_overlay.png',
+      //   fit: BoxFit.cover,
+      // ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final layout = ResponsiveLayout.of(constraints);
