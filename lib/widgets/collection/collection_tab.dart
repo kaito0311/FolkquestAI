@@ -27,8 +27,8 @@ class CollectionTab extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 40,
-              height: 40,
+              width: 36,
+              height: 36,
               child: FqaAssetImage(
                 assetName,
                 fit: BoxFit.contain,

@@ -8,6 +8,8 @@ import 'package:fqa/stores/shared_preferences_progress_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  PaintingBinding.instance.imageCache.maximumSize = 40;
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 40 << 20;
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   final prefs = await SharedPreferences.getInstance();
   final controller = GameController(SharedPreferencesProgressStore(prefs));

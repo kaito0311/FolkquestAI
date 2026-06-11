@@ -50,11 +50,11 @@ class FqaApp extends StatelessWidget {
               }
             },
           ),
-        const Positioned.fill(
-          child: IgnorePointer(
-            child: FqaAssetImage('panels/screen_frame.png', fit: BoxFit.fill),
-          ),
-        ),
+        // const Positioned.fill(
+        //   child: IgnorePointer(
+        //     child: FqaAssetImage('panels/screen_frame.png', fit: BoxFit.fill),
+        //   ),
+        // ),
       ],
     );
   }
