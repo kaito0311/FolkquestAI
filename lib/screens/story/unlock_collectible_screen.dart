@@ -34,9 +34,7 @@ class UnlockCollectibleScreen extends StatelessWidget {
           final artSize = layout.isLandscape
               ? layout.s(180).clamp(132.0, 180.0)
               : layout.s(208).clamp(160.0, 208.0);
-          final titleTop = layout.isLandscape
-              ? layout.gap(24)
-              : layout.y(39).clamp(28.0, 39.0);
+          final titleTop = layout.ceremonyTitleTop();
           final artTop = layout.isLandscape
               ? layout.gap(70)
               : layout.y(106).clamp(82.0, 106.0);

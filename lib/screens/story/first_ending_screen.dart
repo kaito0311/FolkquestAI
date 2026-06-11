@@ -21,9 +21,7 @@ class FirstEndingScreen extends StatelessWidget {
         builder: (context, constraints) {
           final layout = ResponsiveLayout.of(constraints);
           final horizontalPadding = layout.horizontalPadding(30);
-          final titleTop = layout.isLandscape
-              ? layout.gap(28)
-              : layout.y(39).clamp(28.0, 39.0);
+          final titleTop = layout.ceremonyTitleTop();
           final dialogBottom = layout.isLandscape
               ? layout.gap(28)
               : layout.y(61).clamp(28.0, 61.0);

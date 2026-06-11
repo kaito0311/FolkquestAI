@@ -58,6 +58,10 @@ class ResponsiveLayout {
     return math.min(value, math.max(16, size.width * 0.08));
   }
 
+  double ceremonyTitleTop({double portrait = 39, double landscape = 28}) {
+    return isLandscape ? gap(landscape) : y(portrait).clamp(28.0, portrait);
+  }
+
   double maxWidth(double value, {double padding = 0}) {
     return math.min(value, math.max(0, size.width - padding * 2));
   }
