@@ -163,7 +163,7 @@ class StoryRepository {
     ),
     'accept_starfruit_tree': StoryNode(
       id: 'accept_starfruit_tree',
-      title: 'Chấp nhận cây khế',
+      title: 'Chấp nhận',
       type: StoryNodeType.dialogue,
       speaker: 'Người em',
       background: 'backgrounds/003_divide_inheritance.png',

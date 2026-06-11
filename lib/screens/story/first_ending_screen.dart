@@ -123,7 +123,7 @@ class _FirstEndingTitle extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: const Color(0xfff4dda2),
-                      fontSize: layout.font(15),
+                      fontSize: layout.font(21),
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.2,
                       height: 1.5,
