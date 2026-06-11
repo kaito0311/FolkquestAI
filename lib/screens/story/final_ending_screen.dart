@@ -43,6 +43,7 @@ class FinalEndingScreen extends StatelessWidget {
           final buttonHeight = layout.s(56).clamp(48.0, 56.0);
           final actionHeight = buttonHeight * 2 + layout.gap(14);
           final contentBottom = buttonBottom + actionHeight + layout.gap(24);
+          final titleTop = layout.ceremonyTitleTop();
 
           return Stack(
             children: [
@@ -65,6 +66,7 @@ class FinalEndingScreen extends StatelessWidget {
                   unlockedCollectibles: opened,
                   layout: layout,
                   horizontalPadding: horizontalPadding,
+                  topPadding: titleTop,
                 ),
               ),
               _FinalEndingActions(
@@ -93,6 +95,7 @@ class _FinalEndingContent extends StatelessWidget {
     required this.unlockedCollectibles,
     required this.layout,
     required this.horizontalPadding,
+    required this.topPadding,
   });
 
   final Ending ending;
@@ -103,13 +106,14 @@ class _FinalEndingContent extends StatelessWidget {
   final List<Collectible> unlockedCollectibles;
   final ResponsiveLayout layout;
   final double horizontalPadding;
+  final double topPadding;
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
-          SizedBox(height: layout.gap(12)),
+          SizedBox(height: topPadding),
           _FinalEndingTitles(ending: ending, layout: layout),
           SizedBox(height: layout.gap(20)),
           _FinalEndingCover(
