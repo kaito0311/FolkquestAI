@@ -5,6 +5,7 @@ import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_image_button.dart';
+import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 
@@ -86,7 +87,7 @@ class UnlockCollectibleScreen extends StatelessWidget {
                 right: horizontalPadding,
                 top: textTop,
                 bottom: buttonBottom + buttonHeight * 2 + layout.gap(30),
-                child: SingleChildScrollView(
+                child: FqaScrollHint(
                   child: Column(
                     children: [
                       Text(

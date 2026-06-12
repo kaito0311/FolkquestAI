@@ -7,6 +7,7 @@ import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/widgets/choice_bullet.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_image_button.dart';
+import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/section_title.dart';
@@ -110,7 +111,7 @@ class _FinalEndingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return FqaScrollHint(
       child: Column(
         children: [
           SizedBox(height: topPadding),

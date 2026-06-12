@@ -4,6 +4,7 @@ import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_image_button.dart';
+import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 
@@ -77,7 +78,7 @@ class KarmaReflectionScreen extends StatelessWidget {
                     buttonHeight * 2 +
                     buttonGap +
                     layout.gap(16),
-                child: SingleChildScrollView(
+                child: FqaScrollHint(
                   child: Column(
                     children: [
                       SizedBox(

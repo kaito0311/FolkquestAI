@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/speaker_tag.dart';
 
 class StoryPromptPanel extends StatelessWidget {
@@ -41,13 +42,16 @@ class StoryPromptPanel extends StatelessWidget {
             left: 46,
             right: 46,
             top: 45,
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: FqaColors.cream,
-                fontSize: 17,
-                height: 1.55,
-                fontWeight: FontWeight.w500,
+            bottom: 10,
+            child: FqaScrollHint(
+              child: Text(
+                text,
+                style: const TextStyle(
+                  color: FqaColors.cream,
+                  fontSize: 17,
+                  height: 1.55,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
