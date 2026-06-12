@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:fqa/models/app_view.dart';
+import 'package:fqa/models/auth_user.dart';
 import 'package:fqa/models/bird_conversation_message.dart';
 import 'package:fqa/models/collectible.dart';
 import 'package:fqa/models/collection_filter.dart';
@@ -12,12 +13,21 @@ import 'package:fqa/models/story_choice.dart';
 import 'package:fqa/models/story_node.dart';
 import 'package:fqa/models/story_node_type.dart';
 import 'package:fqa/repositories/story_repository.dart';
+import 'package:fqa/services/auth_service.dart';
 import 'package:fqa/stores/progress_store.dart';
 
 class GameController extends ChangeNotifier {
-  GameController(this.store);
+  GameController(this.store, {AuthService? authService})
+    : authService = authService ?? const NoopAuthService() {
+    currentUser = this.authService.currentUser;
+    _authSubscription = this.authService.authStateChanges.listen((user) {
+      currentUser = user;
+      notifyListeners();
+    });
+  }
 
   final ProgressStore store;
+  final AuthService authService;
   AppView view = AppView.home;
   String currentNodeId = StoryRepository.startNodeId;
   int karma = 0;
@@ -31,6 +41,12 @@ class GameController extends ChangeNotifier {
   List<BirdConversationMessage> birdMessages = [];
   List<String> _pendingUnlockCollectibleIds = [];
   String? _nodeAfterPendingUnlocks;
+  AuthUser? currentUser;
+  bool authBusy = false;
+  String? authError;
+  StreamSubscription<AuthUser?>? _authSubscription;
+
+  bool get isSignedIn => currentUser != null;
 
   String get birdQuestion {
     for (final message in birdMessages.reversed) {
@@ -48,6 +64,52 @@ class GameController extends ChangeNotifier {
   Future<void> load() async {
     final snapshot = await store.load();
     if (snapshot == null) return;
+    _applySnapshot(snapshot);
+  }
+
+  Future<void> signInWithGoogle() async {
+    if (authBusy) return;
+    authBusy = true;
+    authError = null;
+    notifyListeners();
+    try {
+      final user = await authService.signInWithGoogle();
+      currentUser = user ?? authService.currentUser;
+      final snapshot = await store.load();
+      if (snapshot != null) {
+        _applySnapshot(snapshot);
+        _persist();
+      }
+    } catch (error) {
+      authError = 'Không thể đăng nhập bằng Google. Vui lòng thử lại.';
+    } finally {
+      authBusy = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> signOut() async {
+    if (authBusy) return;
+    authBusy = true;
+    authError = null;
+    notifyListeners();
+    try {
+      await authService.signOut();
+      currentUser = authService.currentUser;
+    } catch (error) {
+      authError = 'Không thể đăng xuất. Vui lòng thử lại.';
+    } finally {
+      authBusy = false;
+      notifyListeners();
+    }
+  }
+
+  void clearAuthError() {
+    authError = null;
+    notifyListeners();
+  }
+
+  void _applySnapshot(GameSnapshot snapshot) {
     currentNodeId = StoryRepository.nodes.containsKey(snapshot.currentNodeId)
         ? snapshot.currentNodeId
         : StoryRepository.startNodeId;
@@ -321,5 +383,11 @@ class GameController extends ChangeNotifier {
       resolvedId = route.nextId;
     }
     return StoryRepository.startNodeId;
+  }
+
+  @override
+  void dispose() {
+    unawaited(_authSubscription?.cancel());
+    super.dispose();
   }
 }

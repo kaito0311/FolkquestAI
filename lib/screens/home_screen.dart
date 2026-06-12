@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:fqa/app/fqa_app.dart';
@@ -112,11 +114,35 @@ class HomeScreen extends StatelessWidget {
                       onTap: controller.openSettings,
                     ),
                     SizedBox(width: utilityGap),
-                    UtilityIcon(
-                      assetName: 'icons/login_icon.png',
-                      semanticLabel: 'Đăng nhập',
-                      size: utilitySize,
-                      onTap: () => showPlaceholder(context, 'Đăng nhập'),
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        UtilityIcon(
+                          assetName: 'icons/login_icon.png',
+                          semanticLabel: controller.isSignedIn
+                              ? 'Tài khoản'
+                              : 'Đăng nhập',
+                          size: utilitySize,
+                          onTap: controller.authBusy
+                              ? () {}
+                              : () {
+                                  if (controller.isSignedIn) {
+                                    controller.openSettings();
+                                    return;
+                                  }
+                                  unawaited(_signIn(context));
+                                },
+                        ),
+                        if (controller.authBusy)
+                          SizedBox(
+                            width: utilitySize * 0.62,
+                            height: utilitySize * 0.62,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 3,
+                              color: FqaColors.gold,
+                            ),
+                          ),
+                      ],
                     ),
                   ],
                 ),
@@ -126,5 +152,14 @@ class HomeScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<void> _signIn(BuildContext context) async {
+    await controller.signInWithGoogle();
+    if (!context.mounted || controller.authError == null) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(controller.authError!)));
+    controller.clearAuthError();
   }
 }

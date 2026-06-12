@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
@@ -138,13 +140,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             showChevron: true,
                           ),
                           SizedBox(height: layout.gap(15)),
+                          if (widget.controller.isSignedIn) ...[
+                            _SettingCard(
+                              layout: layout,
+                              height: 80,
+                              icon: Icons.account_circle_outlined,
+                              title: widget.controller.currentUser!.label,
+                              subtitle:
+                                  widget.controller.currentUser!.email ??
+                                  'Đang đồng bộ tiến trình',
+                            ),
+                            SizedBox(height: layout.gap(15)),
+                          ],
                           _SettingCard(
                             layout: layout,
                             height: 80,
                             icon: Icons.logout,
                             title: 'Đăng xuất',
-                            subtitle: 'Đăng xuất khỏi tài khoản hiện tại',
-                            showChevron: true,
+                            subtitle: widget.controller.isSignedIn
+                                ? 'Đăng xuất khỏi tài khoản hiện tại'
+                                : 'Chưa đăng nhập tài khoản Google',
+                            showChevron: widget.controller.isSignedIn,
+                            enabled:
+                                widget.controller.isSignedIn &&
+                                !widget.controller.authBusy,
+                            onTap: widget.controller.isSignedIn
+                                ? () => unawaited(_signOut())
+                                : null,
                           ),
                           SizedBox(height: layout.gap(20)),
                           SizedBox(
@@ -174,6 +196,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         },
       ),
     );
+  }
+
+  Future<void> _signOut() async {
+    await widget.controller.signOut();
+    if (!mounted || widget.controller.authError == null) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(widget.controller.authError!)));
+    widget.controller.clearAuthError();
   }
 }
 
@@ -273,6 +304,8 @@ class _SettingCard extends StatelessWidget {
     this.trailing,
     this.footer,
     this.showChevron = false,
+    this.enabled = true,
+    this.onTap,
   });
 
   final ResponsiveLayout layout;
@@ -283,74 +316,90 @@ class _SettingCard extends StatelessWidget {
   final Widget? trailing;
   final Widget? footer;
   final bool showChevron;
+  final bool enabled;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: layout.s(height).clamp(height == 80 ? 72.0 : 108.0, height),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          const FqaAssetImage('panels/setting_frame.png', fit: BoxFit.fill),
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              layout.s(18),
-              layout.s(14),
-              layout.s(18),
-              layout.s(12),
-            ),
-            child: Column(
-              children: [
-                Row(
+      child: Semantics(
+        button: onTap != null,
+        enabled: enabled,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: enabled ? onTap : null,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              const FqaAssetImage('panels/setting_frame.png', fit: BoxFit.fill),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  layout.s(18),
+                  layout.s(14),
+                  layout.s(18),
+                  layout.s(12),
+                ),
+                child: Column(
                   children: [
-                    Icon(
-                      icon,
-                      color: const Color(0xffb07d36),
-                      size: layout.s(34).clamp(28.0, 38.0),
-                    ),
-                    SizedBox(width: layout.s(14)),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title.toUpperCase(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: const Color(0xffb79e6c),
-                              fontSize: layout.font(14),
-                              fontWeight: FontWeight.w800,
-                            ),
+                    Row(
+                      children: [
+                        Icon(
+                          icon,
+                          color: enabled
+                              ? const Color(0xffb07d36)
+                              : const Color(0xff765c36),
+                          size: layout.s(34).clamp(28.0, 38.0),
+                        ),
+                        SizedBox(width: layout.s(14)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title.toUpperCase(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: enabled
+                                      ? const Color(0xffb79e6c)
+                                      : const Color(0xff765c36),
+                                  fontSize: layout.font(14),
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(height: layout.s(3)),
+                              Text(
+                                subtitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: enabled
+                                      ? const Color(0xffe5d4a5)
+                                      : const Color(0xff806b46),
+                                  fontSize: layout.font(11),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(height: layout.s(3)),
-                          Text(
-                            subtitle,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: const Color(0xffe5d4a5),
-                              fontSize: layout.font(11),
-                              fontWeight: FontWeight.w700,
-                            ),
+                        ),
+                        ?trailing,
+                        if (showChevron)
+                          Icon(
+                            Icons.chevron_right,
+                            color: const Color(0xffb07d36),
+                            size: layout.s(32),
                           ),
-                        ],
-                      ),
+                      ],
                     ),
-                    ?trailing,
-                    if (showChevron)
-                      Icon(
-                        Icons.chevron_right,
-                        color: const Color(0xffb07d36),
-                        size: layout.s(32),
-                      ),
+                    if (footer != null) ...[const Spacer(), footer!],
                   ],
                 ),
-                if (footer != null) ...[const Spacer(), footer!],
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
