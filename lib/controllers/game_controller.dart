@@ -44,9 +44,14 @@ class GameController extends ChangeNotifier {
   AuthUser? currentUser;
   bool authBusy = false;
   String? authError;
+  AppTextSize textSize = AppTextSize.medium;
+  double screenBrightness = 100;
   StreamSubscription<AuthUser?>? _authSubscription;
 
   bool get isSignedIn => currentUser != null;
+  double get textScaleFactor => textSize.scale;
+  double get brightnessOverlayOpacity =>
+      ((100 - screenBrightness) / 100 * 0.68).clamp(0.0, 0.68).toDouble();
 
   String get birdQuestion {
     for (final message in birdMessages.reversed) {
@@ -106,6 +111,16 @@ class GameController extends ChangeNotifier {
 
   void clearAuthError() {
     authError = null;
+    notifyListeners();
+  }
+
+  void setTextSize(AppTextSize value) {
+    textSize = value;
+    notifyListeners();
+  }
+
+  void setScreenBrightness(double value) {
+    screenBrightness = value.clamp(0, 100).toDouble();
     notifyListeners();
   }
 
@@ -390,4 +405,15 @@ class GameController extends ChangeNotifier {
     unawaited(_authSubscription?.cancel());
     super.dispose();
   }
+}
+
+enum AppTextSize {
+  small('Nhỏ', 0.9),
+  medium('Trung bình', 1),
+  large('Lớn', 1.12);
+
+  const AppTextSize(this.label, this.scale);
+
+  final String label;
+  final double scale;
 }

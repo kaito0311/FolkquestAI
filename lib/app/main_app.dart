@@ -22,6 +22,27 @@ class MainApp extends StatelessWidget {
             fontFamily: 'Roboto',
             useMaterial3: true,
           ),
+          builder: (context, child) {
+            final mediaQuery = MediaQuery.of(context);
+            final scaledChild = MediaQuery(
+              data: mediaQuery.copyWith(
+                textScaler: TextScaler.linear(controller.textScaleFactor),
+              ),
+              child: child ?? const SizedBox.shrink(),
+            );
+            final opacity = controller.brightnessOverlayOpacity;
+            if (opacity == 0) return scaledChild;
+            return Stack(
+              children: [
+                scaledChild,
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: ColoredBox(color: Color.fromRGBO(0, 0, 0, opacity)),
+                  ),
+                ),
+              ],
+            );
+          },
           home: FqaApp(controller: controller),
         );
       },

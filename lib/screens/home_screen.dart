@@ -118,16 +118,18 @@ class HomeScreen extends StatelessWidget {
                       alignment: Alignment.center,
                       children: [
                         UtilityIcon(
-                          assetName: 'icons/login_icon.png',
+                          assetName: controller.isSignedIn
+                              ? 'icons/logout_icon.png'
+                              : 'icons/login_icon.png',
                           semanticLabel: controller.isSignedIn
-                              ? 'Tài khoản'
+                              ? 'Đăng xuất'
                               : 'Đăng nhập',
                           size: utilitySize,
                           onTap: controller.authBusy
                               ? () {}
                               : () {
                                   if (controller.isSignedIn) {
-                                    controller.openSettings();
+                                    unawaited(_signOut(context));
                                     return;
                                   }
                                   unawaited(_signIn(context));
@@ -156,6 +158,15 @@ class HomeScreen extends StatelessWidget {
 
   Future<void> _signIn(BuildContext context) async {
     await controller.signInWithGoogle();
+    if (!context.mounted || controller.authError == null) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(controller.authError!)));
+    controller.clearAuthError();
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    await controller.signOut();
     if (!context.mounted || controller.authError == null) return;
     ScaffoldMessenger.of(
       context,
