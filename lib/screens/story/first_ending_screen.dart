@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_image_button.dart';
+import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 
@@ -193,7 +194,7 @@ class _FirstEndingDialog extends StatelessWidget {
                 child: Column(
                   children: [
                     Expanded(
-                      child: SingleChildScrollView(
+                      child: FqaScrollHint(
                         child: _FirstEndingQuote(text: quote, layout: layout),
                       ),
                     ),

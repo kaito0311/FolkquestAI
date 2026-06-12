@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/speaker_tag.dart';
 import 'package:fqa/widgets/utility_icon.dart';
 
@@ -44,19 +45,16 @@ class StoryDialoguePanel extends StatelessWidget {
             left: 44,
             right: 88,
             top: 55,
-            bottom: 36,
-            child: ClipRect(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(
-                  text,
-                  key: const ValueKey('story_dialogue_text'),
-                  style: const TextStyle(
-                    color: FqaColors.cream,
-                    fontSize: 17,
-                    height: 1.55,
-                    fontWeight: FontWeight.w500,
-                  ),
+            bottom: 26,
+            child: FqaScrollHint(
+              child: Text(
+                text,
+                key: const ValueKey('story_dialogue_text'),
+                style: const TextStyle(
+                  color: FqaColors.cream,
+                  fontSize: 17,
+                  height: 1.55,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
