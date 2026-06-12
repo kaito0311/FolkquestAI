@@ -67,7 +67,7 @@ class _ConversationWithBirdScreenState
           final continueButtonHeight = layout.s(38).clamp(34.0, 42.0);
           final threadTop = layout.isLandscape
               ? layout.y(176).clamp(132.0, 200.0)
-              : layout.y(410).clamp(276.0, 410.0);
+              : layout.y(150).clamp(150.0, 410.0);
           final threadBottom =
               continueButtonBottom + continueButtonHeight + layout.gap(16);
 
@@ -158,13 +158,26 @@ class _ConversationThread extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                for (final message in messages) ...[
-                  if (message.isUser)
-                    _UserBubble(layout: layout, text: message.text)
-                  else
-                    _BirdBubble(layout: layout, text: message.text),
-                  if (message != messages.last)
-                    SizedBox(height: layout.gap(24)),
+                for (final entry in messages.asMap().entries) ...[
+                  Builder(
+                    builder: (context) {
+                      final message = entry.value;
+                      if (message.isUser) {
+                        return _UserBubble(
+                          layout: layout,
+                          text: message.text,
+                          createdAt: message.createdAt,
+                        );
+                      }
+                      return _BirdBubble(
+                        layout: layout,
+                        text: message.text,
+                        createdAt: message.createdAt,
+                      );
+                    },
+                  ),
+                  if (entry.key < messages.length - 1)
+                    SizedBox(height: layout.gap(15)),
                 ],
               ],
             ),
@@ -175,11 +188,42 @@ class _ConversationThread extends StatelessWidget {
   }
 }
 
+String _formatMessageTime(DateTime time) {
+  final hour = time.hour.toString().padLeft(2, '0');
+  final minute = time.minute.toString().padLeft(2, '0');
+  return '$hour:$minute';
+}
+
+class _MessageTime extends StatelessWidget {
+  const _MessageTime({required this.time, required this.layout});
+
+  final DateTime time;
+  final ResponsiveLayout layout;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      _formatMessageTime(time),
+      style: TextStyle(
+        color: const Color(0xffa48955),
+        fontSize: layout.font(10),
+        height: 1.2,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+}
+
 class _BirdBubble extends StatelessWidget {
-  const _BirdBubble({required this.layout, required this.text});
+  const _BirdBubble({
+    required this.layout,
+    required this.text,
+    required this.createdAt,
+  });
 
   final ResponsiveLayout layout;
   final String text;
+  final DateTime createdAt;
 
   @override
   Widget build(BuildContext context) {
@@ -192,44 +236,54 @@ class _BirdBubble extends StatelessWidget {
           child: const FqaAssetImage('icons/bird_avatar.png'),
         ),
         SizedBox(width: layout.s(11)),
-        SizedBox(
-          width: layout.contentWidth(212, landscapeValue: 320),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: layout.s(45).clamp(40.0, 45.0),
-            ),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: _BubbleFrame(
-                    assetName: 'panels/bird_chat_frame.png',
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(layout.s(15)),
-                      topRight: Radius.circular(layout.s(15)),
-                      bottomRight: Radius.circular(layout.s(15)),
-                    ),
-                  ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: layout.contentWidth(212, landscapeValue: 320),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: layout.s(45).clamp(40.0, 45.0),
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    layout.s(16),
-                    layout.s(10),
-                    layout.s(14),
-                    layout.s(10),
-                  ),
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: const Color(0xffd4b072),
-                      fontSize: layout.font(14),
-                      height: 1.35,
-                      fontWeight: FontWeight.w700,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: _BubbleFrame(
+                        assetName: 'panels/bird_chat_frame.png',
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(layout.s(15)),
+                          topRight: Radius.circular(layout.s(15)),
+                          bottomRight: Radius.circular(layout.s(15)),
+                        ),
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        layout.s(16),
+                        layout.s(10),
+                        layout.s(14),
+                        layout.s(10),
+                      ),
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          color: const Color(0xffd4b072),
+                          fontSize: layout.font(14),
+                          height: 1.35,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            SizedBox(height: layout.gap(4)),
+            Padding(
+              padding: EdgeInsets.only(left: layout.s(6)),
+              child: _MessageTime(time: createdAt, layout: layout),
+            ),
+          ],
         ),
         const Spacer(),
       ],
@@ -238,10 +292,15 @@ class _BirdBubble extends StatelessWidget {
 }
 
 class _UserBubble extends StatelessWidget {
-  const _UserBubble({required this.layout, required this.text});
+  const _UserBubble({
+    required this.layout,
+    required this.text,
+    required this.createdAt,
+  });
 
   final ResponsiveLayout layout;
   final String text;
+  final DateTime createdAt;
 
   @override
   Widget build(BuildContext context) {
@@ -249,44 +308,54 @@ class _UserBubble extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         const Spacer(),
-        SizedBox(
-          width: layout.contentWidth(212, landscapeValue: 320),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: layout.s(45).clamp(40.0, 45.0),
-            ),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: _BubbleFrame(
-                    assetName: 'panels/user_chat_frame.png',
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(layout.s(15)),
-                      topRight: Radius.circular(layout.s(15)),
-                      bottomLeft: Radius.circular(layout.s(15)),
-                    ),
-                  ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            SizedBox(
+              width: layout.contentWidth(212, landscapeValue: 320),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: layout.s(45).clamp(40.0, 45.0),
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    layout.s(18),
-                    layout.s(12),
-                    layout.s(13),
-                    layout.s(12),
-                  ),
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: const Color(0xffd8c58f),
-                      fontSize: layout.font(14),
-                      height: 1.5,
-                      fontWeight: FontWeight.w700,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: _BubbleFrame(
+                        assetName: 'panels/user_chat_frame.png',
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(layout.s(15)),
+                          topRight: Radius.circular(layout.s(15)),
+                          bottomLeft: Radius.circular(layout.s(15)),
+                        ),
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        layout.s(18),
+                        layout.s(12),
+                        layout.s(13),
+                        layout.s(12),
+                      ),
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          color: const Color(0xffd8c58f),
+                          fontSize: layout.font(14),
+                          height: 1.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            SizedBox(height: layout.gap(4)),
+            Padding(
+              padding: EdgeInsets.only(right: layout.s(6)),
+              child: _MessageTime(time: createdAt, layout: layout),
+            ),
+          ],
         ),
         SizedBox(width: layout.s(12)),
         SizedBox(

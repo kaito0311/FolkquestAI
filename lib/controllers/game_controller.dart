@@ -138,14 +138,14 @@ class GameController extends ChangeNotifier {
     if (normalizedQuestion.isEmpty) return false;
     final nextMessages = [
       if (birdMessages.isEmpty)
-        const BirdConversationMessage(
+        BirdConversationMessage(
           text:
               'Con cứ hỏi điều còn băn khoăn. Ta sẽ cùng con nhìn lại câu chuyện.',
           isUser: false,
         ),
       ...birdMessages,
       BirdConversationMessage(text: normalizedQuestion, isUser: true),
-      const BirdConversationMessage(
+      BirdConversationMessage(
         text:
             'Khi lòng tham lớn hơn sự biết đủ, con người dễ đánh mất những gì mình đang có.',
         isUser: false,
