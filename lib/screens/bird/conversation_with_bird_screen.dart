@@ -107,7 +107,7 @@ class _ConversationWithBirdScreenState
                     fontSize: layout.font(14),
                     assetName: 'buttons/unlock_button.png',
                     onPressed:
-                        widget.controller.continueBirdConversationToCollection,
+                        widget.controller.continueBirdConversationToKarma,
                   ),
                 ),
               ),

@@ -26,7 +26,7 @@ class StoryDialoguePanel extends StatelessWidget {
         children: [
           Positioned(
             left: 24,
-            right: 40,
+            right: 24,
             top: 13,
             height: 179,
             child: FqaAssetImage(
