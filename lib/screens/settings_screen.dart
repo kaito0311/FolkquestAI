@@ -20,8 +20,6 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _musicEnabled = true;
   double _musicVolume = 100;
-  double _brightness = 100;
-  _TextSizeSetting _textSize = _TextSizeSetting.medium;
 
   @override
   Widget build(BuildContext context) {
@@ -89,10 +87,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             subtitle: 'Điều chỉnh kích thước chữ hiển thị',
                             footer: _TextSizeSegment(
                               layout: layout,
-                              selected: _textSize,
-                              onChanged: (value) {
-                                setState(() => _textSize = value);
-                              },
+                              selected: widget.controller.textSize,
+                              onChanged: widget.controller.setTextSize,
                             ),
                           ),
                           SizedBox(height: layout.gap(15)),
@@ -103,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             title: 'Độ sáng',
                             subtitle: 'Điều chỉnh độ sáng màn hình',
                             trailing: Text(
-                              '${_brightness.round()}%',
+                              '${widget.controller.screenBrightness.round()}%',
                               style: TextStyle(
                                 color: const Color(0xffad9e79),
                                 fontSize: layout.font(14),
@@ -112,13 +108,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             footer: _SettingSlider(
                               layout: layout,
-                              value: _brightness,
+                              value: widget.controller.screenBrightness,
                               leadingIcon: Icons.brightness_low,
                               trailingIcon: Icons.brightness_high,
                               semanticLabel: 'Độ sáng màn hình',
-                              onChanged: (value) {
-                                setState(() => _brightness = value);
-                              },
+                              onChanged: widget.controller.setScreenBrightness,
                             ),
                           ),
                           SizedBox(height: layout.gap(15)),
@@ -138,6 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             title: 'Khôi phục mặc định',
                             subtitle: 'Đưa tất cả cài đặt về mặc định ban đầu',
                             showChevron: true,
+                            onTap: _restoreDefaults,
                           ),
                           SizedBox(height: layout.gap(15)),
                           if (widget.controller.isSignedIn) ...[
@@ -205,6 +200,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context,
     ).showSnackBar(SnackBar(content: Text(widget.controller.authError!)));
     widget.controller.clearAuthError();
+  }
+
+  void _restoreDefaults() {
+    setState(() {
+      _musicEnabled = true;
+      _musicVolume = 100;
+    });
+    widget.controller
+      ..setTextSize(AppTextSize.medium)
+      ..setScreenBrightness(100);
   }
 }
 
@@ -553,16 +558,6 @@ class _SettingSlider extends StatelessWidget {
   }
 }
 
-enum _TextSizeSetting {
-  small('Nhỏ'),
-  medium('Trung bình'),
-  large('Lớn');
-
-  const _TextSizeSetting(this.label);
-
-  final String label;
-}
-
 class _TextSizeSegment extends StatelessWidget {
   const _TextSizeSegment({
     required this.layout,
@@ -571,8 +566,8 @@ class _TextSizeSegment extends StatelessWidget {
   });
 
   final ResponsiveLayout layout;
-  final _TextSizeSetting selected;
-  final ValueChanged<_TextSizeSetting> onChanged;
+  final AppTextSize selected;
+  final ValueChanged<AppTextSize> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -584,7 +579,7 @@ class _TextSizeSegment extends StatelessWidget {
       ),
       child: Row(
         children: [
-          for (final option in _TextSizeSetting.values)
+          for (final option in AppTextSize.values)
             _TextSizeOption(
               layout: layout,
               option: option,
@@ -606,7 +601,7 @@ class _TextSizeOption extends StatelessWidget {
   });
 
   final ResponsiveLayout layout;
-  final _TextSizeSetting option;
+  final AppTextSize option;
   final bool selected;
   final VoidCallback onTap;
 

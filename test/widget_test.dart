@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fqa/app/main_app.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/models/app_view.dart';
+import 'package:fqa/models/auth_user.dart';
 import 'package:fqa/models/collection_filter.dart';
 import 'package:fqa/models/story_node_type.dart';
 import 'package:fqa/repositories/story_repository.dart';
@@ -510,6 +511,32 @@ void main() {
     await tester.pump();
     final largeText = tester.widget<Text>(find.text('Lớn'));
     expect(largeText.style?.fontWeight, FontWeight.w800);
+    expect(controller.textSize, AppTextSize.large);
+
+    final brightnessSlider = find
+        .byKey(const ValueKey('setting_slider_Độ sáng màn hình'))
+        .evaluate()
+        .map((element) => element.widget)
+        .whereType<Slider>()
+        .single;
+    brightnessSlider.onChanged?.call(40);
+    await tester.pump();
+    expect(controller.screenBrightness, 40);
+    expect(controller.brightnessOverlayOpacity, greaterThan(0));
+  });
+
+  testWidgets('home auth icon becomes logout when signed in', (tester) async {
+    final controller = await _controller();
+    controller.currentUser = const AuthUser(uid: 'uid', email: 'a@b.com');
+    await _pumpApp(tester, controller);
+
+    expect(find.byKey(const ValueKey('icon_Đăng xuất')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Đăng xuất')));
+    await tester.pump();
+
+    expect(controller.isSignedIn, isFalse);
+    expect(find.byKey(const ValueKey('icon_Đăng nhập')), findsOneWidget);
   });
 
   testWidgets('pause settings and help open real screens from story', (

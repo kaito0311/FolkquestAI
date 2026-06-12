@@ -38,13 +38,7 @@ class UtilityIcon extends StatelessWidget {
               ),
               child: Center(
                 child: Icon(
-                  semanticLabel == 'Quay lại'
-                      ? Icons.arrow_back
-                      : semanticLabel == 'Tạm dừng'
-                      ? Icons.pause
-                      : semanticLabel == 'Đóng'
-                      ? Icons.close
-                      : Icons.auto_awesome,
+                  _fallbackIcon,
                   color: FqaColors.gold,
                   size: size * 0.48,
                 ),
@@ -54,5 +48,17 @@ class UtilityIcon extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData get _fallbackIcon {
+    return switch (semanticLabel) {
+      'Quay lại' || 'Quay láº¡i' => Icons.arrow_back,
+      'Tạm dừng' || 'Táº¡m dá»«ng' => Icons.pause,
+      'Đóng' || 'ÄĂ³ng' => Icons.close,
+      'Đăng nhập' => Icons.login,
+      'Đăng xuất' => Icons.logout,
+      'Tài khoản' => Icons.account_circle,
+      _ => Icons.auto_awesome,
+    };
   }
 }
