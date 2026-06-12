@@ -170,10 +170,8 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void continueBirdConversationToCollection() {
-    _returnView = AppView.story;
-    view = AppView.collection;
-    collectionFilter = CollectionFilter.opened;
+  void continueBirdConversationToKarma() {
+    view = AppView.story;
     pauseVisible = false;
     notifyListeners();
   }

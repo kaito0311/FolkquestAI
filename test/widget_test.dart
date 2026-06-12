@@ -360,7 +360,9 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('button_Tiếp tục câu chuyện')));
     await tester.pump();
 
-    expect(controller.view, AppView.collection);
+    expect(controller.view, AppView.story);
+    expect(controller.currentNodeId, 'enough_reflection');
+    expect(find.text('Hỏi Chim Thần'), findsOneWidget);
   });
 
   testWidgets('karma screen uses score-specific badge variants', (

@@ -436,7 +436,7 @@ class StoryRepository {
     ),
     'player_bad_ending': StoryNode(
       id: 'player_bad_ending',
-      title: 'Lòng tham của người em',
+      title: 'Lòng tham',
       type: StoryNodeType.firstEnding,
       background: 'backgrounds/011_player_bad_ending.png',
       text:
