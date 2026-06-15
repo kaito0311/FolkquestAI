@@ -14,11 +14,16 @@ import 'package:fqa/models/story_node.dart';
 import 'package:fqa/models/story_node_type.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/services/auth_service.dart';
+import 'package:fqa/services/bird_chat_service.dart';
 import 'package:fqa/stores/progress_store.dart';
 
 class GameController extends ChangeNotifier {
-  GameController(this.store, {AuthService? authService})
-    : authService = authService ?? const NoopAuthService() {
+  GameController(
+    this.store, {
+    AuthService? authService,
+    BirdChatService? birdChatService,
+  }) : authService = authService ?? const NoopAuthService(),
+       birdChatService = birdChatService ?? const LocalBirdChatService() {
     currentUser = this.authService.currentUser;
     _authSubscription = this.authService.authStateChanges.listen((user) {
       currentUser = user;
@@ -28,6 +33,7 @@ class GameController extends ChangeNotifier {
 
   final ProgressStore store;
   final AuthService authService;
+  final BirdChatService birdChatService;
   AppView view = AppView.home;
   String currentNodeId = StoryRepository.startNodeId;
   int karma = 0;
@@ -44,6 +50,8 @@ class GameController extends ChangeNotifier {
   AuthUser? currentUser;
   bool authBusy = false;
   String? authError;
+  bool birdResponsePending = false;
+  String? birdChatError;
   AppTextSize textSize = AppTextSize.medium;
   double screenBrightness = 100;
   StreamSubscription<AuthUser?>? _authSubscription;
@@ -205,15 +213,19 @@ class GameController extends ChangeNotifier {
 
   void openBirdChat() {
     birdMessages = [];
+    birdResponsePending = false;
+    birdChatError = null;
     view = AppView.birdChat;
     pauseVisible = false;
     notifyListeners();
   }
 
-  bool submitBirdQuestion(String question) {
+  Future<bool> submitBirdQuestion(String question) async {
     final normalizedQuestion = question.trim();
     if (normalizedQuestion.isEmpty) return false;
-    final nextMessages = [
+    if (birdResponsePending) return false;
+    birdChatError = null;
+    birdMessages = [
       if (birdMessages.isEmpty)
         BirdConversationMessage(
           text:
@@ -222,16 +234,50 @@ class GameController extends ChangeNotifier {
         ),
       ...birdMessages,
       BirdConversationMessage(text: normalizedQuestion, isUser: true),
-      BirdConversationMessage(
-        text:
-            'Khi lòng tham lớn hơn sự biết đủ, con người dễ đánh mất những gì mình đang có.',
-        isUser: false,
-      ),
     ];
-    birdMessages = nextMessages;
     view = AppView.birdConversation;
     pauseVisible = false;
     notifyListeners();
+    birdResponsePending = true;
+    notifyListeners();
+
+    try {
+      final reply = await birdChatService.reply(
+        BirdChatRequest(
+          question: normalizedQuestion,
+          messages: birdMessages,
+          karma: karma,
+          storyTitle: currentNode.title,
+          selectedChoices: selectedChoices,
+        ),
+      );
+      birdMessages = [
+        ...birdMessages,
+        BirdConversationMessage(text: reply, isUser: false),
+      ];
+    } on BirdChatAuthRequiredException {
+      birdMessages = [
+        ...birdMessages,
+        BirdConversationMessage(
+          text: 'Con cần đăng nhập để Chim Thần có thể trả lời.',
+          isUser: false,
+        ),
+      ];
+      birdChatError = 'Vui lòng đăng nhập để hỏi Chim Thần.';
+    } catch (error) {
+      debugPrint('Error during bird chat: $error');
+      birdMessages = [
+        ...birdMessages,
+        BirdConversationMessage(
+          text: 'Chim Thần đang ở xa, con hãy thử lại sau.',
+          isUser: false,
+        ),
+      ];
+      birdChatError = 'Không thể kết nối với Chim Thần lúc này.';
+    } finally {
+      birdResponsePending = false;
+      notifyListeners();
+    }
     return true;
   }
 
@@ -243,6 +289,8 @@ class GameController extends ChangeNotifier {
 
   void closeBirdChat() {
     view = AppView.story;
+    birdResponsePending = false;
+    birdChatError = null;
     pauseVisible = false;
     notifyListeners();
   }
@@ -302,6 +350,8 @@ class GameController extends ChangeNotifier {
     view = AppView.story;
     _returnView = null;
     birdMessages = [];
+    birdResponsePending = false;
+    birdChatError = null;
     _pendingUnlockCollectibleIds = [];
     _nodeAfterPendingUnlocks = null;
     pauseVisible = false;

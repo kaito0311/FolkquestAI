@@ -7,6 +7,7 @@ import 'package:fqa/app/main_app.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/firebase_options.dart';
 import 'package:fqa/services/auth_service.dart';
+import 'package:fqa/services/bird_chat_service.dart';
 import 'package:fqa/services/firebase_auth_service.dart';
 import 'package:fqa/stores/hybrid_progress_store.dart';
 import 'package:fqa/stores/progress_store.dart';
@@ -26,7 +27,14 @@ void main() async {
   final ProgressStore progressStore = firebaseReady
       ? HybridProgressStore(local: localStore, authService: authService)
       : localStore;
-  final controller = GameController(progressStore, authService: authService);
+  final BirdChatService birdChatService = firebaseReady
+      ? FirebaseBirdChatService()
+      : const LocalBirdChatService();
+  final controller = GameController(
+    progressStore,
+    authService: authService,
+    birdChatService: birdChatService,
+  );
   await controller.load();
   runApp(MainApp(controller: controller));
 }
