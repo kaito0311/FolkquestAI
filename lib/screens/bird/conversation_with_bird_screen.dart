@@ -31,8 +31,8 @@ class _ConversationWithBirdScreenState
     super.dispose();
   }
 
-  void _submit(String question) {
-    final submitted = widget.controller.submitBirdQuestion(question);
+  Future<void> _submit(String question) async {
+    final submitted = await widget.controller.submitBirdQuestion(question);
     if (!submitted) return;
     _messageController.clear();
     _scrollToLatestMessage();
@@ -93,6 +93,7 @@ class _ConversationWithBirdScreenState
                   controller: _scrollController,
                   layout: layout,
                   messages: messages,
+                  responsePending: widget.controller.birdResponsePending,
                 ),
               ),
               Positioned(
@@ -125,6 +126,7 @@ class _ConversationWithBirdScreenState
                 child: _ConversationInput(
                   controller: _messageController,
                   layout: layout,
+                  enabled: !widget.controller.birdResponsePending,
                   onSubmit: _submit,
                 ),
               ),
@@ -141,11 +143,13 @@ class _ConversationThread extends StatelessWidget {
     required this.controller,
     required this.layout,
     required this.messages,
+    required this.responsePending,
   });
 
   final ScrollController controller;
   final ResponsiveLayout layout;
   final List<BirdConversationMessage> messages;
+  final bool responsePending;
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +182,14 @@ class _ConversationThread extends StatelessWidget {
                   ),
                   if (entry.key < messages.length - 1)
                     SizedBox(height: layout.gap(15)),
+                ],
+                if (responsePending) ...[
+                  if (messages.isNotEmpty) SizedBox(height: layout.gap(15)),
+                  _BirdBubble(
+                    layout: layout,
+                    text: 'Chim Thần đang suy nghĩ...',
+                    createdAt: DateTime.now(),
+                  ),
                 ],
               ],
             ),
@@ -393,11 +405,13 @@ class _ConversationInput extends StatelessWidget {
   const _ConversationInput({
     required this.controller,
     required this.layout,
+    required this.enabled,
     required this.onSubmit,
   });
 
   final TextEditingController controller;
   final ResponsiveLayout layout;
+  final bool enabled;
   final ValueChanged<String> onSubmit;
 
   @override
@@ -417,6 +431,7 @@ class _ConversationInput extends StatelessWidget {
             child: TextField(
               key: const ValueKey('bird_followup_input'),
               controller: controller,
+              enabled: enabled,
               minLines: 1,
               maxLines: 1,
               onSubmitted: onSubmit,
@@ -444,7 +459,7 @@ class _ConversationInput extends StatelessWidget {
           InkWell(
             key: const ValueKey('bird_followup_send'),
             borderRadius: BorderRadius.circular(24),
-            onTap: () => onSubmit(controller.text),
+            onTap: enabled ? () => onSubmit(controller.text) : null,
             child: SizedBox(
               width: layout.s(54).clamp(48.0, 58.0),
               child: Transform.rotate(

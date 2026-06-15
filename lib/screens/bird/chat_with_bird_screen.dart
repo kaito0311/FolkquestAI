@@ -31,8 +31,9 @@ class _ChatWithBirdScreenState extends State<ChatWithBirdScreen> {
     super.dispose();
   }
 
-  void _submit(String question) {
-    widget.controller.submitBirdQuestion(question);
+  Future<void> _submit(String question) async {
+    final submitted = await widget.controller.submitBirdQuestion(question);
+    if (submitted) _messageController.clear();
   }
 
   @override
