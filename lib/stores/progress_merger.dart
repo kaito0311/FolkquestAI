@@ -34,6 +34,9 @@ GameSnapshot? mergeProgressSnapshots(
         local.completedEndingId ??
         remote.completedEndingId ??
         stronger.completedEndingId,
+    playCount: local.playCount >= remote.playCount
+        ? local.playCount
+        : remote.playCount,
   );
 }
 

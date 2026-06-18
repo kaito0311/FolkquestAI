@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:fqa/app/fqa_app.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_image_button.dart';
@@ -84,11 +83,11 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: layout.gap(16)),
                     FqaImageButton(
-                      label: 'Thành tích',
+                      label: 'Hồ sơ',
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(22),
-                      onPressed: () => showPlaceholder(context, 'Thành tích'),
+                      onPressed: controller.openProfile,
                     ),
                   ],
                 ),
