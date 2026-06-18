@@ -7,6 +7,7 @@ import 'package:fqa/screens/bird/chat_with_bird_screen.dart';
 import 'package:fqa/screens/bird/conversation_with_bird_screen.dart';
 import 'package:fqa/screens/collection/collection_screen.dart';
 import 'package:fqa/screens/home_screen.dart';
+import 'package:fqa/screens/profile_screen.dart';
 import 'package:fqa/screens/settings_screen.dart';
 import 'package:fqa/screens/story/story_screen.dart';
 import 'package:fqa/screens/tutorial_screen.dart';
@@ -23,6 +24,7 @@ class FqaApp extends StatelessWidget {
       AppView.home => HomeScreen(controller: controller),
       AppView.story => StoryScreen(controller: controller),
       AppView.collection => CollectionScreen(controller: controller),
+      AppView.profile => ProfileScreen(controller: controller),
       AppView.settings => SettingsScreen(controller: controller),
       AppView.tutorial => TutorialScreen(controller: controller),
       AppView.birdChat => ChatWithBirdScreen(controller: controller),
@@ -40,7 +42,9 @@ class FqaApp extends StatelessWidget {
             onRestart: controller.restartRun,
             onExit: controller.exitToHome,
             onUtility: (title) {
-              if (title == 'Cài đặt') {
+              if (title == 'Hồ sơ') {
+                controller.openProfile();
+              } else if (title == 'Cài đặt') {
                 controller.openSettings();
               } else if (title == 'Trợ giúp') {
                 controller.openTutorial();
