@@ -419,6 +419,37 @@ void main() {
     );
   });
 
+  testWidgets('bird initial input does not clear after disposal', (
+    tester,
+  ) async {
+    final birdChatService = _DelayedBirdChatService();
+    final controller = await _controller(birdChatService: birdChatService);
+    controller
+      ..currentNodeId = 'enough_reflection'
+      ..karma = 3;
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.text('Hỏi Chim Thần'));
+    await tester.pump();
+
+    await tester.enterText(
+      find.byKey(const ValueKey('bird_message_input')),
+      'Hello bird',
+    );
+    await tester.tap(find.byKey(const ValueKey('bird_send')));
+    await tester.pump();
+
+    expect(controller.view, AppView.birdConversation);
+    expect(find.byKey(const ValueKey('bird_message_input')), findsNothing);
+
+    birdChatService.completer.complete('Hello child.');
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Hello child.', findRichText: true), findsOneWidget);
+  });
+
   testWidgets('bird reply times out after five seconds', (tester) async {
     final birdChatService = _DelayedBirdChatService();
     final controller = await _controller(birdChatService: birdChatService);

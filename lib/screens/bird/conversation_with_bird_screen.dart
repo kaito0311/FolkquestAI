@@ -34,6 +34,7 @@ class _ConversationWithBirdScreenState
   Future<void> _submit(String question) async {
     _messageController.clear();
     final submitted = await widget.controller.submitBirdQuestion(question);
+    if (!mounted) return;
     if (!submitted) {
       _messageController.text = question;
       return;

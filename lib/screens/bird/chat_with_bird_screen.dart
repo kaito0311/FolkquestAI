@@ -32,8 +32,10 @@ class _ChatWithBirdScreenState extends State<ChatWithBirdScreen> {
   }
 
   Future<void> _submit(String question) async {
+    _messageController.clear();
     final submitted = await widget.controller.submitBirdQuestion(question);
-    if (submitted) _messageController.clear();
+    if (!mounted) return;
+    if (!submitted) _messageController.text = question;
   }
 
   @override
