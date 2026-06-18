@@ -32,9 +32,12 @@ class _ConversationWithBirdScreenState
   }
 
   Future<void> _submit(String question) async {
-    final submitted = await widget.controller.submitBirdQuestion(question);
-    if (!submitted) return;
     _messageController.clear();
+    final submitted = await widget.controller.submitBirdQuestion(question);
+    if (!submitted) {
+      _messageController.text = question;
+      return;
+    }
     _scrollToLatestMessage();
   }
 
@@ -276,8 +279,8 @@ class _BirdBubble extends StatelessWidget {
                         layout.s(14),
                         layout.s(10),
                       ),
-                      child: Text(
-                        text,
+                      child: _BirdMessageText(
+                        text: text,
                         style: TextStyle(
                           color: const Color(0xffd4b072),
                           fontSize: layout.font(14),
@@ -301,6 +304,58 @@ class _BirdBubble extends StatelessWidget {
       ],
     );
   }
+}
+
+class _BirdMessageText extends StatelessWidget {
+  const _BirdMessageText({required this.text, required this.style});
+
+  final String text;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(style: style, children: _parseBoldMarkdown(text, style)),
+    );
+  }
+}
+
+List<TextSpan> _parseBoldMarkdown(String text, TextStyle style) {
+  final spans = <TextSpan>[];
+  var cursor = 0;
+
+  while (cursor < text.length) {
+    final start = text.indexOf('**', cursor);
+    if (start < 0) {
+      spans.add(TextSpan(text: text.substring(cursor)));
+      break;
+    }
+
+    final end = text.indexOf('**', start + 2);
+    if (end < 0) {
+      spans.add(TextSpan(text: text.substring(cursor)));
+      break;
+    }
+
+    if (start > cursor) {
+      spans.add(TextSpan(text: text.substring(cursor, start)));
+    }
+
+    final boldText = text.substring(start + 2, end);
+    if (boldText.isEmpty) {
+      spans.add(const TextSpan(text: '****'));
+    } else {
+      spans.add(
+        TextSpan(
+          text: boldText,
+          style: style.copyWith(fontWeight: FontWeight.w900),
+        ),
+      );
+    }
+    cursor = end + 2;
+  }
+
+  return spans;
 }
 
 class _UserBubble extends StatelessWidget {

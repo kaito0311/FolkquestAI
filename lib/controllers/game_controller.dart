@@ -18,6 +18,8 @@ import 'package:fqa/services/bird_chat_service.dart';
 import 'package:fqa/stores/progress_store.dart';
 
 class GameController extends ChangeNotifier {
+  static const birdChatReplyTimeout = Duration(seconds: 5);
+
   GameController(
     this.store, {
     AuthService? authService,
@@ -224,6 +226,11 @@ class GameController extends ChangeNotifier {
     final normalizedQuestion = question.trim();
     if (normalizedQuestion.isEmpty) return false;
     if (birdResponsePending) return false;
+    final replyTimer = Stopwatch()..start();
+    debugPrint(
+      'Bird chat submit: story="$currentNodeId", '
+      'karma=$karma, question="$normalizedQuestion"',
+    );
     birdChatError = null;
     birdMessages = [
       if (birdMessages.isEmpty)
@@ -242,20 +249,28 @@ class GameController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final reply = await birdChatService.reply(
-        BirdChatRequest(
-          question: normalizedQuestion,
-          messages: birdMessages,
-          karma: karma,
-          storyTitle: currentNode.title,
-          selectedChoices: selectedChoices,
-        ),
+      final reply = await birdChatService
+          .reply(
+            BirdChatRequest(
+              question: normalizedQuestion,
+              messages: birdMessages,
+              karma: karma,
+              storyTitle: currentNode.title,
+              selectedChoices: selectedChoices,
+            ),
+          )
+          .timeout(birdChatReplyTimeout);
+      debugPrint(
+        'Bird chat reply received in ${replyTimer.elapsedMilliseconds}ms.',
       );
       birdMessages = [
         ...birdMessages,
         BirdConversationMessage(text: reply, isUser: false),
       ];
     } on BirdChatAuthRequiredException {
+      debugPrint(
+        'Bird chat auth required after ${replyTimer.elapsedMilliseconds}ms.',
+      );
       birdMessages = [
         ...birdMessages,
         BirdConversationMessage(
@@ -264,8 +279,23 @@ class GameController extends ChangeNotifier {
         ),
       ];
       birdChatError = 'Vui lòng đăng nhập để hỏi Chim Thần.';
+    } on TimeoutException {
+      debugPrint(
+        'Bird chat timed out after ${replyTimer.elapsedMilliseconds}ms.',
+      );
+      birdMessages = [
+        ...birdMessages,
+        BirdConversationMessage(
+          text: 'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau.',
+          isUser: false,
+        ),
+      ];
+      birdChatError = 'Chim Thần phản hồi quá 5 giây.';
     } catch (error) {
-      debugPrint('Error during bird chat: $error');
+      debugPrint(
+        'Error during bird chat after ${replyTimer.elapsedMilliseconds}ms: '
+        '$error',
+      );
       birdMessages = [
         ...birdMessages,
         BirdConversationMessage(
@@ -275,6 +305,7 @@ class GameController extends ChangeNotifier {
       ];
       birdChatError = 'Không thể kết nối với Chim Thần lúc này.';
     } finally {
+      replyTimer.stop();
       birdResponsePending = false;
       notifyListeners();
     }
