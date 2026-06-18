@@ -8,6 +8,7 @@ class GameSnapshot {
     required this.unlockedCollectibles,
     this.runUnlockedCollectibles = const {},
     this.completedEndingId,
+    this.playCount = 0,
   });
 
   final String currentNodeId;
@@ -16,6 +17,7 @@ class GameSnapshot {
   final Set<String> unlockedCollectibles;
   final Set<String> runUnlockedCollectibles;
   final String? completedEndingId;
+  final int playCount;
 
   Map<String, Object?> toJson() => {
     'currentNodeId': currentNodeId,
@@ -24,6 +26,7 @@ class GameSnapshot {
     'unlockedCollectibles': unlockedCollectibles.toList(),
     'runUnlockedCollectibles': runUnlockedCollectibles.toList(),
     'completedEndingId': completedEndingId,
+    'playCount': playCount,
   };
 
   static GameSnapshot fromJson(Map<String, Object?> json) {
@@ -43,6 +46,7 @@ class GameSnapshot {
               .map((value) => value.toString())
               .toSet(),
       completedEndingId: json['completedEndingId'] as String?,
+      playCount: (json['playCount'] as num?)?.toInt() ?? 0,
     );
   }
 }

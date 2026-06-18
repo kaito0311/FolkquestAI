@@ -7,6 +7,8 @@ import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/utility_icon.dart';
 
+const _settingFrameCenterSlice = Rect.fromLTRB(12, 12, 786, 259);
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({required this.controller, super.key});
 
@@ -53,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
                           SizedBox(height: layout.gap(16)),
                           _StatsGrid(
                             layout: layout,
-                            karma: controller.karma,
+                            playCount: controller.playCount,
                             choices: controller.selectedChoices.length,
                             collectibles: collectibles,
                           ),
@@ -84,6 +86,9 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final titleWidth = layout.s(284).clamp(212.0, 284.0);
+    final titleScale = titleWidth / 284;
+
     return Positioned(
       top: layout.y(28).clamp(18.0, 36.0),
       left: layout.horizontalScreenPadding(portrait: 20, landscape: 54),
@@ -102,14 +107,50 @@ class _ProfileHeader extends StatelessWidget {
               onTap: onBack,
             ),
           ),
-          Text(
-            'Hồ sơ',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: const Color(0xffb07d36),
-              fontSize: layout.font(30),
-              fontWeight: FontWeight.w900,
-              height: 33 / 30,
+          Center(
+            child: SizedBox(
+              width: titleWidth,
+              height: 33 * titleScale,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Positioned(
+                    left: 25 * titleScale,
+                    top: 11.14 * titleScale,
+                    width: 44 * titleScale,
+                    height: 15 * titleScale,
+                    child: Transform.rotate(
+                      angle: 3.141592653589793,
+                      child: const FqaAssetImage(
+                        'decor/setting_title_side_decor.png',
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 26 * titleScale,
+                    top: 11.14 * titleScale,
+                    width: 44 * titleScale,
+                    height: 15 * titleScale,
+                    child: Transform.scale(
+                      scaleY: -1,
+                      child: const FqaAssetImage(
+                        'decor/setting_title_side_decor.png',
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Hồ sơ',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color(0xffb07d36),
+                      fontSize: layout.font(30),
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.76 * titleScale,
+                      height: 33 / 30,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -138,7 +179,11 @@ class _ProfileCard extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          const FqaAssetImage('panels/setting_frame.png', fit: BoxFit.fill),
+          const FqaAssetImage(
+            'panels/setting_frame.png',
+            fit: BoxFit.fill,
+            centerSlice: _settingFrameCenterSlice,
+          ),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: layout.s(22),
@@ -227,13 +272,13 @@ class _StatusPill extends StatelessWidget {
 class _StatsGrid extends StatelessWidget {
   const _StatsGrid({
     required this.layout,
-    required this.karma,
+    required this.playCount,
     required this.choices,
     required this.collectibles,
   });
 
   final ResponsiveLayout layout;
-  final int karma;
+  final int playCount;
   final int choices;
   final String collectibles;
 
@@ -244,9 +289,9 @@ class _StatsGrid extends StatelessWidget {
         Expanded(
           child: _StatTile(
             layout: layout,
-            label: 'Karma',
-            value: karma.toString(),
-            icon: Icons.auto_awesome,
+            label: 'Lượt chơi',
+            value: playCount.toString(),
+            icon: Icons.replay,
           ),
         ),
         SizedBox(width: layout.gap(10)),
@@ -292,7 +337,11 @@ class _StatTile extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          const FqaAssetImage('panels/setting_frame.png', fit: BoxFit.fill),
+          const FqaAssetImage(
+            'panels/setting_frame.png',
+            fit: BoxFit.fill,
+            centerSlice: _settingFrameCenterSlice,
+          ),
           Padding(
             padding: EdgeInsets.all(layout.s(10)),
             child: Column(
@@ -347,7 +396,11 @@ class _ProfileNote extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          const FqaAssetImage('panels/setting_frame.png', fit: BoxFit.fill),
+          const FqaAssetImage(
+            'panels/setting_frame.png',
+            fit: BoxFit.fill,
+            centerSlice: _settingFrameCenterSlice,
+          ),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: layout.s(20),

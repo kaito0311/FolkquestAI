@@ -43,6 +43,7 @@ class GameController extends ChangeNotifier {
   Set<String> unlockedCollectibleIds = StoryRepository.initialUnlockedIds;
   Set<String> runUnlockedCollectibleIds = {};
   String? completedEndingId;
+  int playCount = 0;
   bool pauseVisible = false;
   CollectionFilter collectionFilter = CollectionFilter.all;
   AppView? _returnView;
@@ -158,9 +159,17 @@ class GameController extends ChangeNotifier {
     };
     runUnlockedCollectibleIds = snapshot.runUnlockedCollectibles;
     completedEndingId = snapshot.completedEndingId;
+    playCount = snapshot.playCount;
+    if (playCount == 0 && _snapshotHasStartedRun(snapshot)) {
+      playCount = 1;
+    }
   }
 
   void startOrResume() {
+    if (playCount == 0) {
+      playCount = 1;
+      _persist();
+    }
     view = AppView.story;
     pauseVisible = false;
     notifyListeners();
@@ -394,6 +403,7 @@ class GameController extends ChangeNotifier {
     selectedChoices = [];
     runUnlockedCollectibleIds = {};
     completedEndingId = null;
+    playCount += 1;
     view = AppView.story;
     _returnView = null;
     birdMessages = [];
@@ -476,6 +486,7 @@ class GameController extends ChangeNotifier {
           unlockedCollectibles: unlockedCollectibleIds,
           runUnlockedCollectibles: runUnlockedCollectibleIds,
           completedEndingId: completedEndingId,
+          playCount: playCount,
         ),
       ),
     );
@@ -501,6 +512,13 @@ class GameController extends ChangeNotifier {
   void dispose() {
     unawaited(_authSubscription?.cancel());
     super.dispose();
+  }
+
+  bool _snapshotHasStartedRun(GameSnapshot snapshot) {
+    return snapshot.currentNodeId != StoryRepository.startNodeId ||
+        snapshot.selectedChoices.isNotEmpty ||
+        snapshot.completedEndingId != null ||
+        snapshot.runUnlockedCollectibles.isNotEmpty;
   }
 }
 

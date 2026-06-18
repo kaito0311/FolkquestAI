@@ -53,7 +53,9 @@ class _DelayedBirdChatService implements BirdChatService {
 }
 
 void main() {
-  testWidgets('home buttons route to story and collection', (tester) async {
+  testWidgets('home buttons route to story collection and profile', (
+    tester,
+  ) async {
     final controller = await _controller();
     await _pumpApp(tester, controller);
 
@@ -70,6 +72,13 @@ void main() {
     await tester.pump();
     expect(controller.view, AppView.collection);
     expect(find.text('Bộ sưu tập'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await tester.pump();
+    await tester.tap(find.text('Hồ sơ'));
+    await tester.pump();
+    expect(controller.view, AppView.profile);
+    expect(find.text('Hồ sơ'), findsOneWidget);
   });
 
   testWidgets('collection back returns to the previous screen', (tester) async {
@@ -683,6 +692,8 @@ void main() {
     expect(controller.view, AppView.profile);
     expect(controller.pauseVisible, isFalse);
     expect(find.text('Hồ sơ'), findsOneWidget);
+    expect(find.text('Lượt chơi'), findsOneWidget);
+    expect(find.text('1'), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
     await tester.pump();
@@ -785,6 +796,7 @@ void main() {
     expect(controller.karma, 0);
     expect(controller.selectedChoices, isEmpty);
     expect(controller.runUnlockedCollectibleIds, isEmpty);
+    expect(controller.playCount, 2);
     expect(controller.view, AppView.story);
   });
 

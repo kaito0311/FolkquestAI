@@ -15,6 +15,7 @@ void main() {
       selectedChoices: ['keep_tree'],
       unlockedCollectibles: {'starfruit'},
       runUnlockedCollectibles: {'starfruit'},
+      playCount: 2,
     );
     const remote = GameSnapshot(
       currentNodeId: 'remote_node',
@@ -23,6 +24,7 @@ void main() {
       unlockedCollectibles: {'bag3'},
       runUnlockedCollectibles: {'bag3'},
       completedEndingId: 'enough',
+      playCount: 5,
     );
 
     final merged = mergeProgressSnapshots(local, remote)!;
@@ -33,6 +35,7 @@ void main() {
     expect(merged.unlockedCollectibles, {'starfruit', 'bag3'});
     expect(merged.runUnlockedCollectibles, {'bag3'});
     expect(merged.completedEndingId, 'enough');
+    expect(merged.playCount, 5);
   });
 
   test('hybrid store saves locally only when signed out', () async {
