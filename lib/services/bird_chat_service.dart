@@ -68,7 +68,7 @@ class FirebaseBirdChatService implements BirdChatService {
 
     final config = await _loadOpenRouterConfig();
     final response = await _httpClient.post(
-      Uri.https('openrouter.ai', '/api/v1/chat/completions'),
+      Uri.parse('https://api.openai.com/v1/chat/completions'),
       headers: {
         'Authorization': 'Bearer ${config.apiKey}',
         'Content-Type': 'application/json',
@@ -78,8 +78,6 @@ class FirebaseBirdChatService implements BirdChatService {
       body: jsonEncode({
         'model': config.model,
         'messages': _openRouterMessages(request),
-        'temperature': 0.7,
-        'max_tokens': 260,
       }),
     );
 
@@ -112,7 +110,16 @@ class FirebaseBirdChatService implements BirdChatService {
     final data = snapshot.data();
     final apiKey = data?['apiKey']?.toString().trim();
     if (apiKey == null || apiKey.isEmpty) {
-      throw const BirdChatRemoteException('Chưa cấu hình OpenRouter API key.');
+      throw const BirdChatRemoteException('Chưa cấu hình API key.');
+    }
+
+    final hostUrl = data?['hostUrl']?.toString().trim();
+
+    if (hostUrl == null || hostUrl.isEmpty) {
+      throw const BirdChatRemoteException(
+        'Chưa cấu hình OpenRouter hostUrl. '
+        'Vui lòng xóa trường hostUrl trong Firestore app_config/openrouter.',
+      );
     }
     final model = data?['model']?.toString().trim();
     return _OpenRouterConfig(
@@ -120,6 +127,7 @@ class FirebaseBirdChatService implements BirdChatService {
       model: model == null || model.isEmpty
           ? 'nvidia/nemotron-3-nano-30b-a3b:free'
           : model,
+      hostUrl: hostUrl,
     );
   }
 
@@ -143,7 +151,7 @@ class FirebaseBirdChatService implements BirdChatService {
             'Không nhắc rằng bạn là AI hay mô hình ngôn ngữ.',
       },
       {
-        'role': 'user',
+        'role': 'system',
         'content':
             'Ngữ cảnh hiện tại: ${request.storyTitle}. '
             'Karma: ${request.karma}. '
@@ -167,8 +175,13 @@ class FirebaseBirdChatService implements BirdChatService {
 }
 
 class _OpenRouterConfig {
-  const _OpenRouterConfig({required this.apiKey, required this.model});
+  const _OpenRouterConfig({
+    required this.apiKey,
+    required this.model,
+    required this.hostUrl,
+  });
 
   final String apiKey;
   final String model;
+  final String hostUrl;
 }

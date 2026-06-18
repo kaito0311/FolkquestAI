@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -5,15 +7,20 @@ import 'package:fqa/app/main_app.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/models/app_view.dart';
 import 'package:fqa/models/auth_user.dart';
+import 'package:fqa/models/bird_conversation_message.dart';
 import 'package:fqa/models/collection_filter.dart';
 import 'package:fqa/models/story_node_type.dart';
 import 'package:fqa/repositories/story_repository.dart';
+import 'package:fqa/services/bird_chat_service.dart';
 import 'package:fqa/stores/memory_progress_store.dart';
 import 'package:fqa/widgets/collection/collectible_card.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 
-Future<GameController> _controller() async {
-  final controller = GameController(MemoryProgressStore());
+Future<GameController> _controller({BirdChatService? birdChatService}) async {
+  final controller = GameController(
+    MemoryProgressStore(),
+    birdChatService: birdChatService,
+  );
   await controller.load();
   return controller;
 }
@@ -34,6 +41,13 @@ Future<void> _pumpApp(
 void _expectNoOverflow(WidgetTester tester) {
   final exception = tester.takeException();
   expect(exception, isNull);
+}
+
+class _DelayedBirdChatService implements BirdChatService {
+  final completer = Completer<String>();
+
+  @override
+  Future<String> reply(BirdChatRequest request) => completer.future;
 }
 
 void main() {
@@ -364,6 +378,79 @@ void main() {
     expect(controller.view, AppView.story);
     expect(controller.currentNodeId, 'enough_reflection');
     expect(find.text('Hỏi Chim Thần'), findsOneWidget);
+  });
+
+  testWidgets('bird follow-up input clears while response is pending', (
+    tester,
+  ) async {
+    final birdChatService = _DelayedBirdChatService();
+    final controller = await _controller(birdChatService: birdChatService);
+    controller
+      ..currentNodeId = 'enough_reflection'
+      ..view = AppView.birdConversation
+      ..birdMessages = [
+        BirdConversationMessage(text: 'Opening answer', isUser: false),
+      ];
+    await _pumpApp(tester, controller);
+
+    const followUp = 'What do you know?';
+    await tester.enterText(
+      find.byKey(const ValueKey('bird_followup_input')),
+      followUp,
+    );
+    await tester.tap(find.byKey(const ValueKey('bird_followup_send')));
+    await tester.pump();
+
+    final input = tester.widget<TextField>(
+      find.byKey(const ValueKey('bird_followup_input')),
+    );
+    expect(input.controller?.text, isEmpty);
+    expect(controller.birdResponsePending, isTrue);
+    expect(find.text(followUp), findsOneWidget);
+
+    birdChatService.completer.complete('A **patient** answer.');
+    await tester.pumpAndSettle();
+
+    expect(controller.birdResponsePending, isFalse);
+    expect(find.text('A patient answer.', findRichText: true), findsOneWidget);
+    expect(
+      find.text('A **patient** answer.', findRichText: true),
+      findsNothing,
+    );
+  });
+
+  testWidgets('bird reply times out after five seconds', (tester) async {
+    final birdChatService = _DelayedBirdChatService();
+    final controller = await _controller(birdChatService: birdChatService);
+    controller
+      ..currentNodeId = 'enough_reflection'
+      ..view = AppView.birdConversation
+      ..birdMessages = [
+        BirdConversationMessage(text: 'Opening answer', isUser: false),
+      ];
+    await _pumpApp(tester, controller);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('bird_followup_input')),
+      'Are you there?',
+    );
+    await tester.tap(find.byKey(const ValueKey('bird_followup_send')));
+    await tester.pump();
+
+    expect(controller.birdResponsePending, isTrue);
+
+    await tester.pump(GameController.birdChatReplyTimeout);
+    await tester.pump();
+
+    expect(controller.birdResponsePending, isFalse);
+    expect(controller.birdChatError, 'Chim Thần phản hồi quá 5 giây.');
+    expect(
+      find.text(
+        'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau.',
+        findRichText: true,
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('karma screen uses score-specific badge variants', (

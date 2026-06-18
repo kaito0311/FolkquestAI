@@ -176,7 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             'phiên bản 1.0.0',
                             style: TextStyle(
                               color: const Color(0xff63431f),
-                              fontSize: layout.font(7),
+                              fontSize: layout.font(10),
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -346,6 +346,7 @@ class _SettingCard extends StatelessWidget {
                   layout.s(12),
                 ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Row(
                       children: [
