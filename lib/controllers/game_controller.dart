@@ -56,6 +56,8 @@ class GameController extends ChangeNotifier {
   String? birdChatError;
   AppTextSize textSize = AppTextSize.medium;
   double screenBrightness = 100;
+  bool musicEnabled = true;
+  double musicVolume = 100;
   StreamSubscription<AuthUser?>? _authSubscription;
 
   bool get isSignedIn => currentUser != null;
@@ -131,6 +133,16 @@ class GameController extends ChangeNotifier {
 
   void setScreenBrightness(double value) {
     screenBrightness = value.clamp(0, 100).toDouble();
+    notifyListeners();
+  }
+
+  void setMusicEnabled(bool value) {
+    musicEnabled = value;
+    notifyListeners();
+  }
+
+  void setMusicVolume(double value) {
+    musicVolume = value.clamp(0, 100).toDouble();
     notifyListeners();
   }
 
