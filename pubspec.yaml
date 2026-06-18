@@ -7,6 +7,7 @@ environment:
   sdk: ^3.11.5
 
 dependencies:
+  audioplayers: ^6.5.1
   cloud_firestore: ^6.5.0
   firebase_auth: ^6.5.2
   firebase_core: ^4.10.0
@@ -24,6 +25,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/music/
     - assets/images/figma/backgrounds/
     - assets/images/figma/buttons/
     - assets/images/figma/collectibles/

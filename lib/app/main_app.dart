@@ -1,18 +1,104 @@
+import 'dart:async';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fqa/app/fqa_app.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/fqa_colors.dart';
 
-class MainApp extends StatelessWidget {
-  const MainApp({required this.controller, super.key});
+class MainApp extends StatefulWidget {
+  const MainApp({
+    required this.controller,
+    this.enableBackgroundMusic = true,
+    super.key,
+  });
 
   final GameController controller;
+  final bool enableBackgroundMusic;
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  AudioPlayer? _backgroundPlayer;
+  bool _musicPlaying = false;
+  bool? _lastMusicEnabled;
+  double? _lastMusicVolume;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_syncBackgroundMusicIfNeeded);
+    if (widget.enableBackgroundMusic) {
+      _backgroundPlayer = AudioPlayer(playerId: 'folkquest_background_music');
+      unawaited(_backgroundPlayer!.setReleaseMode(ReleaseMode.loop));
+      unawaited(_syncBackgroundMusic(force: true));
+    }
+  }
+
+  @override
+  void didUpdateWidget(MainApp oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_syncBackgroundMusicIfNeeded);
+      widget.controller.addListener(_syncBackgroundMusicIfNeeded);
+      _lastMusicEnabled = null;
+      _lastMusicVolume = null;
+      _syncBackgroundMusicIfNeeded();
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_syncBackgroundMusicIfNeeded);
+    final player = _backgroundPlayer;
+    _backgroundPlayer = null;
+    if (player != null) {
+      unawaited(player.dispose());
+    }
+    super.dispose();
+  }
+
+  void _syncBackgroundMusicIfNeeded() {
+    final enabled = widget.controller.musicEnabled;
+    final volume = widget.controller.musicVolume;
+    if (_lastMusicEnabled == enabled && _lastMusicVolume == volume) return;
+    _lastMusicEnabled = enabled;
+    _lastMusicVolume = volume;
+    unawaited(_syncBackgroundMusic());
+  }
+
+  Future<void> _syncBackgroundMusic({bool force = false}) async {
+    final player = _backgroundPlayer;
+    if (player == null) return;
+
+    final enabled = widget.controller.musicEnabled;
+    final volume = (widget.controller.musicVolume / 100).clamp(0.0, 1.0);
+
+    try {
+      await player.setVolume(volume);
+      if (!enabled) {
+        await player.pause();
+        _musicPlaying = false;
+        return;
+      }
+
+      if (_musicPlaying && !force) return;
+
+      await player.play(AssetSource('music/TownTheme.mp3'), volume: volume);
+      _musicPlaying = true;
+    } catch (error) {
+      _musicPlaying = false;
+      debugPrint('Background music could not start: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: controller,
+      animation: widget.controller,
       builder: (context, _) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -26,11 +112,13 @@ class MainApp extends StatelessWidget {
             final mediaQuery = MediaQuery.of(context);
             final scaledChild = MediaQuery(
               data: mediaQuery.copyWith(
-                textScaler: TextScaler.linear(controller.textScaleFactor),
+                textScaler: TextScaler.linear(
+                  widget.controller.textScaleFactor,
+                ),
               ),
               child: child ?? const SizedBox.shrink(),
             );
-            final opacity = controller.brightnessOverlayOpacity;
+            final opacity = widget.controller.brightnessOverlayOpacity;
             if (opacity == 0) return scaledChild;
             return Stack(
               children: [
@@ -43,7 +131,7 @@ class MainApp extends StatelessWidget {
               ],
             );
           },
-          home: FqaApp(controller: controller),
+          home: FqaApp(controller: widget.controller),
         );
       },
     );

@@ -34,7 +34,9 @@ Future<void> _pumpApp(
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
-  await tester.pumpWidget(MainApp(controller: controller));
+  await tester.pumpWidget(
+    MainApp(controller: controller, enableBackgroundMusic: false),
+  );
   await tester.pump();
 }
 
@@ -606,12 +608,22 @@ void main() {
 
     await tester.tap(musicSwitchFinder);
     await tester.pump();
+    expect(controller.musicEnabled, isFalse);
     expect(
       tester.widget<Semantics>(musicSwitchFinder).properties.toggled,
       isFalse,
     );
 
+    await tester.tap(musicSwitchFinder);
+    await tester.pump();
+    expect(controller.musicEnabled, isTrue);
+
     expect(find.byType(Slider), findsNWidgets(2));
+    final musicSlider = tester.widgetList<Slider>(find.byType(Slider)).first;
+    musicSlider.onChanged?.call(35);
+    await tester.pump();
+    expect(controller.musicVolume, 35);
+
     expect(
       find.byKey(const ValueKey('setting_text_size_small')),
       findsOneWidget,

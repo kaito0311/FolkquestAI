@@ -18,9 +18,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _musicEnabled = true;
-  double _musicVolume = 100;
-
   @override
   Widget build(BuildContext context) {
     return FqaScaffold(
@@ -59,23 +56,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             title: 'Nhạc nền',
                             subtitle: 'Bật / tắt nhạc nền trong game',
                             trailing: _SettingSwitch(
-                              value: _musicEnabled,
-                              onChanged: (value) {
-                                setState(() => _musicEnabled = value);
-                              },
+                              value: widget.controller.musicEnabled,
+                              onChanged: widget.controller.setMusicEnabled,
                             ),
                             footer: _SettingSlider(
                               layout: layout,
-                              value: _musicVolume,
-                              enabled: _musicEnabled,
-                              leadingIcon: _musicVolume > 50
+                              value: widget.controller.musicVolume,
+                              enabled: widget.controller.musicEnabled,
+                              leadingIcon: widget.controller.musicVolume > 50
                                   ? Icons.volume_up
                                   : Icons.volume_down,
-                              valueLabel: '${_musicVolume.round()}%',
+                              valueLabel:
+                                  '${widget.controller.musicVolume.round()}%',
                               semanticLabel: 'Âm lượng nhạc nền',
-                              onChanged: (value) {
-                                setState(() => _musicVolume = value);
-                              },
+                              onChanged: widget.controller.setMusicVolume,
                             ),
                           ),
                           SizedBox(height: layout.gap(15)),
@@ -203,11 +197,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _restoreDefaults() {
-    setState(() {
-      _musicEnabled = true;
-      _musicVolume = 100;
-    });
     widget.controller
+      ..setMusicEnabled(true)
+      ..setMusicVolume(100)
       ..setTextSize(AppTextSize.medium)
       ..setScreenBrightness(100);
   }
