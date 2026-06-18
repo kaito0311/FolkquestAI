@@ -305,6 +305,8 @@ class _SettingCard extends StatelessWidget {
     this.onTap,
   });
 
+  static const _frameCenterSlice = Rect.fromLTRB(10, 10, 788, 261);
+
   final ResponsiveLayout layout;
   final double height;
   final IconData icon;
@@ -318,8 +320,12 @@ class _SettingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cardHeight = layout
+        .s(height)
+        .clamp(height == 80 ? 72.0 : 108.0, height);
+
     return SizedBox(
-      height: layout.s(height).clamp(height == 80 ? 72.0 : 108.0, height),
+      height: cardHeight,
       child: Semantics(
         button: onTap != null,
         enabled: enabled,
@@ -329,7 +335,11 @@ class _SettingCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              const FqaAssetImage('panels/setting_frame.png', fit: BoxFit.fill),
+              const FqaAssetImage(
+                'panels/setting_frame.png',
+                fit: BoxFit.fill,
+                centerSlice: _frameCenterSlice,
+              ),
               Padding(
                 padding: EdgeInsets.fromLTRB(
                   layout.s(18),

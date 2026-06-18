@@ -185,6 +185,10 @@ class GameController extends ChangeNotifier {
     _openUtility(AppView.settings);
   }
 
+  void openProfile() {
+    _openUtility(AppView.profile);
+  }
+
   void openTutorial() {
     _openUtility(AppView.tutorial);
   }

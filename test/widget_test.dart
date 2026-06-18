@@ -669,12 +669,24 @@ void main() {
     expect(find.byKey(const ValueKey('icon_Đăng nhập')), findsOneWidget);
   });
 
-  testWidgets('pause settings and help open real screens from story', (
+  testWidgets('pause profile settings and help open real screens from story', (
     tester,
   ) async {
     final controller = await _controller();
     controller.startOrResume();
     await _pumpApp(tester, controller);
+
+    controller.showPause();
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('icon_Hồ sơ')));
+    await tester.pump();
+    expect(controller.view, AppView.profile);
+    expect(controller.pauseVisible, isFalse);
+    expect(find.text('Hồ sơ'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await tester.pump();
+    expect(controller.view, AppView.story);
 
     controller.showPause();
     await tester.pump();
