@@ -155,6 +155,27 @@ void main() {
     expect(controller.currentNode.id, 'keep_tree_summary');
   });
 
+  testWidgets('fair share choice unlocks the scale collectible', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller.startOrResume();
+    controller.advance();
+    controller.advance();
+    await _pumpApp(tester, controller);
+
+    await tester.tap(find.text('Yêu cầu chia công bằng'));
+    await tester.pump();
+
+    final collectible = StoryRepository.collectibles.firstWhere(
+      (collectible) => collectible.id == 'half',
+    );
+    expect(controller.unlockedCollectibleIds, contains('half'));
+    expect(controller.currentNode.id, 'inheritance_argument');
+    expect(collectible.name, 'Cán cân công bằng');
+    expect(collectible.assetName, 'collectibles/item_fair_share_scale.png');
+  });
+
   test('karma check routes to no promise when karma is low', () async {
     final controller = await _controller();
     controller
@@ -808,7 +829,7 @@ void main() {
     controller.openCollection();
     await _pumpApp(tester, controller);
 
-    expect(find.byType(CollectibleCard), findsNWidgets(9));
+    expect(find.byType(CollectibleCard), findsNWidgets(6));
 
     await tester.tap(find.byKey(const ValueKey('filter_Đã mở')));
     await tester.pump();
@@ -818,7 +839,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('filter_Chưa mở')));
     await tester.pump();
     expect(controller.collectionFilter, CollectionFilter.locked);
-    expect(find.byType(CollectibleCard), findsNWidgets(7));
+    expect(find.byType(CollectibleCard), findsNWidgets(4));
   });
 
   for (final surfaceSize in [
