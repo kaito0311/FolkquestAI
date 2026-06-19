@@ -40,27 +40,9 @@ class StoryRepository {
     ),
     Collectible(
       id: 'half',
-      name: 'Nửa tài sản',
-      description: 'Một khả năng khác trong cuộc chia gia tài.',
-      assetName: 'collectibles/item_unlock.png',
-    ),
-    Collectible(
-      id: 'mystery1',
-      name: '???',
-      description: 'Chưa mở khóa.',
-      assetName: 'collectibles/item_unlock.png',
-    ),
-    Collectible(
-      id: 'mystery2',
-      name: '???',
-      description: 'Chưa mở khóa.',
-      assetName: 'collectibles/item_unlock.png',
-    ),
-    Collectible(
-      id: 'mystery3',
-      name: '???',
-      description: 'Chưa mở khóa.',
-      assetName: 'collectibles/item_unlock.png',
+      name: 'Cán cân công bằng',
+      description: 'Biểu tượng của lời yêu cầu chia tài sản công bằng.',
+      assetName: 'collectibles/item_fair_share_scale.png',
     ),
   ];
 
@@ -157,7 +139,7 @@ class StoryRepository {
       id: 'half_unlock',
       title: 'Đã mở khóa',
       type: StoryNodeType.unlock,
-      text: 'Một khả năng khác trong cuộc chia gia tài.',
+      text: 'Biểu tượng của lời yêu cầu chia tài sản công bằng.',
       nextId: 'inheritance_argument',
       unlockCollectibleId: 'half',
     ),

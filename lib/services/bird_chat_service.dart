@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:fqa/models/bird_conversation_message.dart';
@@ -48,14 +47,11 @@ class BirdChatRemoteException implements Exception {
 
 class FirebaseBirdChatService implements BirdChatService {
   FirebaseBirdChatService({
-    FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
     http.Client? httpClient,
-  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-       _firestore = firestore ?? FirebaseFirestore.instance,
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
        _httpClient = httpClient ?? http.Client();
 
-  final FirebaseAuth _firebaseAuth;
   final FirebaseFirestore _firestore;
   final http.Client _httpClient;
 
