@@ -47,6 +47,7 @@ class GameController extends ChangeNotifier {
   bool pauseVisible = false;
   CollectionFilter collectionFilter = CollectionFilter.all;
   AppView? _returnView;
+  AppView? _nestedUtilityReturnView;
   List<BirdConversationMessage> birdMessages = [];
   List<String> _pendingUnlockCollectibleIds = [];
   String? _nodeAfterPendingUnlocks;
@@ -202,7 +203,21 @@ class GameController extends ChangeNotifier {
     _openUtility(AppView.tutorial);
   }
 
+  void openInformation() {
+    _nestedUtilityReturnView = view;
+    view = AppView.information;
+    pauseVisible = false;
+    notifyListeners();
+  }
+
   void closeUtility() {
+    if (_nestedUtilityReturnView != null) {
+      view = _nestedUtilityReturnView!;
+      _nestedUtilityReturnView = null;
+      pauseVisible = false;
+      notifyListeners();
+      return;
+    }
     view = _returnView ?? AppView.home;
     _returnView = null;
     pauseVisible = false;
@@ -212,6 +227,7 @@ class GameController extends ChangeNotifier {
   void exitToHome() {
     view = AppView.home;
     _returnView = null;
+    _nestedUtilityReturnView = null;
     pauseVisible = false;
     notifyListeners();
   }
@@ -406,6 +422,7 @@ class GameController extends ChangeNotifier {
     playCount += 1;
     view = AppView.story;
     _returnView = null;
+    _nestedUtilityReturnView = null;
     birdMessages = [];
     birdResponsePending = false;
     birdChatError = null;
@@ -436,8 +453,11 @@ class GameController extends ChangeNotifier {
   }
 
   void _openUtility(AppView utilityView) {
+    _nestedUtilityReturnView = null;
     _returnView = switch (view) {
-      AppView.settings || AppView.tutorial => _returnView ?? AppView.home,
+      AppView.settings ||
+      AppView.information ||
+      AppView.tutorial => _returnView ?? AppView.home,
       _ => view,
     };
     view = utilityView;

@@ -4,6 +4,7 @@ enum AppView {
   collection,
   profile,
   settings,
+  information,
   tutorial,
   birdChat,
   birdConversation,
