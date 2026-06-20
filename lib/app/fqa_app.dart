@@ -7,6 +7,7 @@ import 'package:fqa/screens/bird/chat_with_bird_screen.dart';
 import 'package:fqa/screens/bird/conversation_with_bird_screen.dart';
 import 'package:fqa/screens/collection/collection_screen.dart';
 import 'package:fqa/screens/home_screen.dart';
+import 'package:fqa/screens/information_screen.dart';
 import 'package:fqa/screens/profile_screen.dart';
 import 'package:fqa/screens/settings_screen.dart';
 import 'package:fqa/screens/story/story_screen.dart';
@@ -26,6 +27,7 @@ class FqaApp extends StatelessWidget {
       AppView.collection => CollectionScreen(controller: controller),
       AppView.profile => ProfileScreen(controller: controller),
       AppView.settings => SettingsScreen(controller: controller),
+      AppView.information => InformationScreen(controller: controller),
       AppView.tutorial => TutorialScreen(controller: controller),
       AppView.birdChat => ChatWithBirdScreen(controller: controller),
       AppView.birdConversation => ConversationWithBirdScreen(

@@ -6,8 +6,8 @@ import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/utility_icon.dart';
 
-class TutorialScreen extends StatelessWidget {
-  const TutorialScreen({required this.controller, super.key});
+class InformationScreen extends StatelessWidget {
+  const InformationScreen({required this.controller, super.key});
 
   final GameController controller;
 
@@ -25,7 +25,10 @@ class TutorialScreen extends StatelessWidget {
 
           return Stack(
             children: [
-              _TutorialHeader(layout: layout, onBack: controller.closeUtility),
+              _InformationHeader(
+                layout: layout,
+                onBack: controller.closeUtility,
+              ),
               Positioned(
                 top: layout.y(115).clamp(96.0, 124.0),
                 left: 0,
@@ -47,43 +50,34 @@ class TutorialScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _TutorialIntro(layout: layout),
+                      _InformationIntro(layout: layout),
                       SizedBox(height: layout.gap(22)),
-                      _TutorialSection(
+                      _InformationSection(
                         layout: layout,
-                        title: 'Mục tiêu',
-                        bullets: const [
-                          'Theo dõi câu chuyện dân gian và chọn cách nhân vật phản ứng trong từng tình huống.',
-                          'Mỗi lựa chọn có thể thay đổi Karma, mở nhánh truyện mới và dẫn tới kết thúc khác nhau.',
-                        ],
+                        title: 'FolkQuest AI',
+                        body:
+                            'Ứng dụng giúp người chơi khám phá truyện dân gian Việt Nam qua các lựa chọn tương tác, phản hồi Karma và bộ sưu tập vật phẩm.',
                       ),
                       SizedBox(height: layout.gap(20)),
-                      _TutorialSection(
+                      _InformationSection(
                         layout: layout,
-                        title: 'Cách chơi',
-                        bullets: const [
-                          'Chạm “Tiếp tục” để đọc lời thoại và tiến qua các cảnh.',
-                          'Khi màn hình lựa chọn xuất hiện, đọc kỹ lời dẫn rồi chọn phương án bạn muốn thử.',
-                          'Sau một nhánh kết thúc, hãy xem màn hình Karma để hiểu điều lựa chọn vừa phản ánh.',
-                        ],
+                        title: 'Trải nghiệm',
+                        body:
+                            'Mỗi nhánh truyện được thiết kế để khuyến khích đọc chậm, suy nghĩ về hệ quả và thử lại nhiều hướng khác nhau.',
                       ),
                       SizedBox(height: layout.gap(20)),
-                      _TutorialSection(
+                      _InformationSection(
                         layout: layout,
-                        title: 'Vật phẩm sưu tầm',
-                        bullets: const [
-                          'Hoàn thành một số nhánh truyện sẽ mở khóa vật phẩm trong Bộ sưu tập.',
-                          'Bạn có thể quay lại trang Bộ sưu tập để xem vật phẩm, kết thúc đã gặp và tiến trình của mình.',
-                        ],
+                        title: 'Dữ liệu chơi',
+                        body:
+                            'Tiến trình, lựa chọn, vật phẩm đã mở khóa và cài đặt cá nhân được lưu để bạn có thể tiếp tục hành trình sau này.',
                       ),
                       SizedBox(height: layout.gap(20)),
-                      _TutorialSection(
+                      _InformationSection(
                         layout: layout,
-                        title: 'Mẹo nhỏ',
-                        bullets: const [
-                          'Không có lựa chọn duy nhất đúng. Hãy thử nhiều hướng để thấy câu chuyện thay đổi ra sao.',
-                          'Dùng nút tạm dừng để mở cài đặt, hướng dẫn hoặc quay về màn hình chính khi cần.',
-                        ],
+                        title: 'Phiên bản',
+                        body:
+                            'Phiên bản 1.0.0\nFQA/FolkQuest mobile experience.',
                       ),
                       SizedBox(height: layout.gap(16)),
                     ],
@@ -98,15 +92,15 @@ class TutorialScreen extends StatelessWidget {
   }
 }
 
-class _TutorialIntro extends StatelessWidget {
-  const _TutorialIntro({required this.layout});
+class _InformationIntro extends StatelessWidget {
+  const _InformationIntro({required this.layout});
 
   final ResponsiveLayout layout;
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      'FolkQuest AI là trải nghiệm kể chuyện tương tác: bạn đọc, lựa chọn, suy ngẫm và mở khóa các mảnh ghép của truyện.',
+      'FolkQuest AI kết hợp kể chuyện, lựa chọn và suy ngẫm để biến truyện dân gian thành một hành trình có thể tương tác.',
       textAlign: TextAlign.center,
       style: TextStyle(
         color: const Color(0xffe5d4a5),
@@ -118,16 +112,16 @@ class _TutorialIntro extends StatelessWidget {
   }
 }
 
-class _TutorialSection extends StatelessWidget {
-  const _TutorialSection({
+class _InformationSection extends StatelessWidget {
+  const _InformationSection({
     required this.layout,
     required this.title,
-    required this.bullets,
+    required this.body,
   });
 
   final ResponsiveLayout layout;
   final String title;
-  final List<String> bullets;
+  final String body;
 
   @override
   Widget build(BuildContext context) {
@@ -144,44 +138,13 @@ class _TutorialSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: layout.gap(8)),
-        for (final bullet in bullets) ...[
-          _TutorialBullet(layout: layout, text: bullet),
-          SizedBox(height: layout.gap(8)),
-        ],
-      ],
-    );
-  }
-}
-
-class _TutorialBullet extends StatelessWidget {
-  const _TutorialBullet({required this.layout, required this.text});
-
-  final ResponsiveLayout layout;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: layout.font(7)),
-          child: Icon(
-            Icons.diamond,
-            color: const Color(0xffb07d36),
-            size: layout.s(8).clamp(6.0, 9.0),
-          ),
-        ),
-        SizedBox(width: layout.s(9).clamp(7.0, 10.0)),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              color: const Color(0xffe5d4a5),
-              fontSize: layout.font(13),
-              height: 1.45,
-              fontWeight: FontWeight.w700,
-            ),
+        Text(
+          body,
+          style: TextStyle(
+            color: const Color(0xffe5d4a5),
+            fontSize: layout.font(13),
+            height: 1.45,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -189,8 +152,8 @@ class _TutorialBullet extends StatelessWidget {
   }
 }
 
-class _TutorialHeader extends StatelessWidget {
-  const _TutorialHeader({required this.layout, required this.onBack});
+class _InformationHeader extends StatelessWidget {
+  const _InformationHeader({required this.layout, required this.onBack});
 
   final ResponsiveLayout layout;
   final VoidCallback onBack;
@@ -217,7 +180,7 @@ class _TutorialHeader extends StatelessWidget {
           ),
           Center(
             child: Text(
-              'HƯỚNG DẪN',
+              'THÔNG TIN',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: const Color(0xffb07d36),

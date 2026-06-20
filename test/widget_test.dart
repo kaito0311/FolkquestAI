@@ -617,6 +617,15 @@ void main() {
     expect(controller.view, AppView.settings);
     expect(find.text('Cài đặt'), findsOneWidget);
 
+    await tester.tap(find.text('GIỚI THIỆU ỨNG DỤNG'));
+    await tester.pump();
+    expect(controller.view, AppView.information);
+    expect(find.text('THÔNG TIN'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await tester.pump();
+    expect(controller.view, AppView.settings);
+
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
     await tester.pump();
     expect(controller.view, AppView.home);
@@ -905,6 +914,10 @@ void main() {
       _expectNoOverflow(tester);
 
       controller.openSettings();
+      await tester.pump();
+      _expectNoOverflow(tester);
+
+      controller.openInformation();
       await tester.pump();
       _expectNoOverflow(tester);
 

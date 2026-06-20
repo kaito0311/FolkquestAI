@@ -117,6 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             title: 'Giới thiệu ứng dụng',
                             subtitle: 'Tìm hiểu thêm về FolkQuest AI',
                             showChevron: true,
+                            onTap: widget.controller.openInformation,
                           ),
                           SizedBox(height: layout.gap(15)),
                           _SettingCard(
