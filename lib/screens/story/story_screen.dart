@@ -8,6 +8,7 @@ import 'package:fqa/screens/story/first_ending_screen.dart';
 import 'package:fqa/screens/story/karma_reflection_screen.dart';
 import 'package:fqa/screens/story/options_screen.dart';
 import 'package:fqa/screens/story/unlock_collectible_screen.dart';
+import 'package:fqa/widgets/fqa_transitions.dart';
 
 class StoryScreen extends StatelessWidget {
   const StoryScreen({required this.controller, super.key});
@@ -17,7 +18,7 @@ class StoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final node = controller.currentNode;
-    return switch (node.type) {
+    final screen = switch (node.type) {
       StoryNodeType.dialogue => DiscussionScreen(controller: controller),
       StoryNodeType.options => OptionsScreen(controller: controller),
       StoryNodeType.firstEnding => FirstEndingScreen(controller: controller),
@@ -25,5 +26,15 @@ class StoryScreen extends StatelessWidget {
       StoryNodeType.unlock => UnlockCollectibleScreen(controller: controller),
       StoryNodeType.ending => FinalEndingScreen(controller: controller),
     };
+    return AnimatedSwitcher(
+      duration: FqaTransitions.durationFor(
+        context,
+        FqaTransitions.storyNodeDuration,
+      ),
+      switchInCurve: FqaTransitions.curve,
+      switchOutCurve: FqaTransitions.curve,
+      transitionBuilder: FqaTransitions.softPageTransition,
+      child: KeyedSubtree(key: ValueKey(node.id), child: screen),
+    );
   }
 }

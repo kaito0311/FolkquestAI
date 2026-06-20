@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_pressable.dart';
 
 class CollectionTab extends StatelessWidget {
   const CollectionTab({
@@ -20,8 +21,9 @@ class CollectionTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: InkWell(
+      child: FqaPressable(
         key: ValueKey('filter_$label'),
+        borderRadius: 6,
         onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

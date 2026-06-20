@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_pressable.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/story_top_bar.dart';
@@ -167,14 +168,10 @@ class _PresetQuestionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: layout.s(55).clamp(48.0, 58.0),
-      child: TextButton(
+      child: FqaPressable(
         key: ValueKey('bird_preset_$label'),
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-          foregroundColor: const Color(0xffd4b072),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        ),
-        onPressed: onTap,
+        borderRadius: 6,
+        onTap: onTap,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -260,9 +257,9 @@ class _BirdMessageInput extends StatelessWidget {
               ),
             ),
           ),
-          InkWell(
+          FqaPressable(
             key: const ValueKey('bird_send'),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: 24,
             onTap: () => onSubmit(controller.text),
             child: SizedBox(
               width: layout.s(54).clamp(48.0, 58.0),

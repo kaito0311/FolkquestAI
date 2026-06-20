@@ -12,6 +12,7 @@ import 'package:fqa/screens/profile_screen.dart';
 import 'package:fqa/screens/settings_screen.dart';
 import 'package:fqa/screens/story/story_screen.dart';
 import 'package:fqa/screens/tutorial_screen.dart';
+import 'package:fqa/widgets/fqa_transitions.dart';
 import 'package:fqa/widgets/pause_overlay.dart';
 
 class FqaApp extends StatelessWidget {
@@ -37,13 +38,35 @@ class FqaApp extends StatelessWidget {
 
     return Stack(
       children: [
-        screen,
-        if (controller.pauseVisible)
+        AnimatedSwitcher(
+          duration: FqaTransitions.durationFor(
+            context,
+            FqaTransitions.appViewDuration,
+          ),
+          switchInCurve: FqaTransitions.curve,
+          switchOutCurve: FqaTransitions.curve,
+          transitionBuilder: FqaTransitions.softPageTransition,
+          child: KeyedSubtree(key: ValueKey(controller.view), child: screen),
+        ),
+        Positioned.fill(child: _PauseOverlaySwitcher(controller: controller)),
+        if (!controller.pauseVisible && controller.pauseVisible)
           PauseOverlay(
             onContinue: controller.hidePause,
             onRestart: controller.restartRun,
             onExit: controller.exitToHome,
             onUtility: (title) {
+              if (title == 'profile') {
+                controller.openProfile();
+                return;
+              }
+              if (title == 'settings') {
+                controller.openSettings();
+                return;
+              }
+              if (title == 'tutorial') {
+                controller.openTutorial();
+                return;
+              }
               if (title == 'Hồ sơ') {
                 controller.openProfile();
               } else if (title == 'Cài đặt') {
@@ -61,6 +84,56 @@ class FqaApp extends StatelessWidget {
         //   ),
         // ),
       ],
+    );
+  }
+}
+
+class _PauseOverlaySwitcher extends StatelessWidget {
+  const _PauseOverlaySwitcher({required this.controller});
+
+  final GameController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: FqaTransitions.durationFor(
+        context,
+        FqaTransitions.overlayDuration,
+      ),
+      switchInCurve: FqaTransitions.curve,
+      switchOutCurve: FqaTransitions.curve,
+      transitionBuilder: FqaTransitions.softOverlayTransition,
+      child: controller.pauseVisible
+          ? PauseOverlay(
+              key: const ValueKey('pause_overlay'),
+              onContinue: controller.hidePause,
+              onRestart: controller.restartRun,
+              onExit: controller.exitToHome,
+              onUtility: (title) {
+                if (title == 'profile') {
+                  controller.openProfile();
+                  return;
+                }
+                if (title == 'settings') {
+                  controller.openSettings();
+                  return;
+                }
+                if (title == 'tutorial') {
+                  controller.openTutorial();
+                  return;
+                }
+                if (title == 'Há»“ sÆ¡') {
+                  controller.openProfile();
+                } else if (title == 'CĂ i Ä‘áº·t') {
+                  controller.openSettings();
+                } else if (title == 'Trá»£ giĂºp') {
+                  controller.openTutorial();
+                } else {
+                  showPlaceholder(context, title);
+                }
+              },
+            )
+          : const SizedBox.shrink(key: ValueKey('pause_hidden')),
     );
   }
 }

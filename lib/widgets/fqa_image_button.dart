@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_pressable.dart';
 
 class FqaImageButton extends StatelessWidget {
   const FqaImageButton({
@@ -28,14 +29,9 @@ class FqaImageButton extends StatelessWidget {
     return SizedBox(
       width: width,
       height: height,
-      child: TextButton(
+      child: FqaPressable(
         key: ValueKey('button_$label'),
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-          foregroundColor: FqaColors.cream,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        onPressed: onPressed,
+        onTap: onPressed,
         child: Stack(
           fit: StackFit.expand,
           alignment: Alignment.center,
