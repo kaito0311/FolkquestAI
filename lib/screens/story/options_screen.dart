@@ -35,6 +35,13 @@ class OptionsScreen extends StatelessWidget {
               ? layout.contentWidth(362, landscapeValue: 420)
               : layout.maxWidth(362, padding: horizontalPadding);
           final choiceHeight = layout.s(60).clamp(52.0, 60.0);
+          const promptHeight = 152.0;
+          final promptChoiceGap = layout.gap(layout.isLandscape ? 18 : 12);
+          final choiceGap = layout.gap(12);
+          final choicesHeight = node.choices.isEmpty
+              ? 0.0
+              : node.choices.length * choiceHeight +
+                    (node.choices.length - 1) * choiceGap;
           final portraitPromptOffset = node.choices.length <= 2 ? 488.0 : 464.0;
           final portraitPromptTop = layout.y(portraitPromptOffset);
           final portraitPromptMax = constraints.maxHeight * 0.56;
@@ -44,8 +51,12 @@ class OptionsScreen extends StatelessWidget {
           final promptTop = layout.isLandscape
               ? layout.y(214).clamp(150.0, constraints.maxHeight * 0.36)
               : safePortraitPromptTop;
-          final promptChoiceGap = layout.gap(layout.isLandscape ? 18 : 12);
-          final contentBottomInset = layout.gap(18);
+          final availableBelowPrompt =
+              constraints.maxHeight - promptTop - promptHeight;
+          final balancedOptionsGap = (availableBelowPrompt - choicesHeight) / 2;
+          final optionsGap = balancedOptionsGap < promptChoiceGap
+              ? promptChoiceGap
+              : balancedOptionsGap;
 
           return Stack(
             children: [
@@ -58,8 +69,8 @@ class OptionsScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 top: promptTop,
-                bottom: contentBottomInset,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Center(
                       child: SizedBox(
@@ -70,42 +81,31 @@ class OptionsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: promptChoiceGap),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: layout.isLandscape
-                              ? 0
-                              : horizontalPadding,
-                        ),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: SizedBox(
-                            width: layout.isLandscape ? contentWidth : null,
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  for (final entry
-                                      in node.choices.asMap().entries) ...[
-                                    if (entry.key > 0)
-                                      SizedBox(height: layout.gap(12)),
-                                    FqaImageButton(
-                                      label: entry.value.label,
-                                      width: choiceWidth,
-                                      height: choiceHeight,
-                                      fontSize: layout.font(18),
-                                      letterSpacing: 0.45,
-                                      assetName:
-                                          _choiceButtonAssets[entry.key %
-                                              _choiceButtonAssets.length],
-                                      onPressed: () =>
-                                          controller.choose(entry.value),
-                                    ),
-                                  ],
-                                ],
+                    SizedBox(height: optionsGap),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: layout.isLandscape ? 0 : horizontalPadding,
+                      ),
+                      child: SizedBox(
+                        width: layout.isLandscape ? contentWidth : null,
+                        child: Column(
+                          children: [
+                            for (final entry
+                                in node.choices.asMap().entries) ...[
+                              if (entry.key > 0) SizedBox(height: choiceGap),
+                              FqaImageButton(
+                                label: entry.value.label,
+                                width: choiceWidth,
+                                height: choiceHeight,
+                                fontSize: layout.font(18),
+                                letterSpacing: 0.45,
+                                assetName:
+                                    _choiceButtonAssets[entry.key %
+                                        _choiceButtonAssets.length],
+                                onPressed: () => controller.choose(entry.value),
                               ),
-                            ),
-                          ),
+                            ],
+                          ],
                         ),
                       ),
                     ),
