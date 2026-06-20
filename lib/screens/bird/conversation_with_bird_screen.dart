@@ -5,6 +5,7 @@ import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/models/bird_conversation_message.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_image_button.dart';
+import 'package:fqa/widgets/fqa_pressable.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/story_top_bar.dart';
@@ -512,9 +513,10 @@ class _ConversationInput extends StatelessWidget {
               ),
             ),
           ),
-          InkWell(
+          FqaPressable(
             key: const ValueKey('bird_followup_send'),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: 24,
+            enabled: enabled,
             onTap: enabled ? () => onSubmit(controller.text) : null,
             child: SizedBox(
               width: layout.s(54).clamp(48.0, 58.0),

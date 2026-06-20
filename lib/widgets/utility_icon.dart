@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_pressable.dart';
 
 class UtilityIcon extends StatelessWidget {
   const UtilityIcon({
@@ -21,9 +22,9 @@ class UtilityIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: semanticLabel,
-      child: InkWell(
+      child: FqaPressable(
         key: ValueKey('icon_$semanticLabel'),
-        borderRadius: BorderRadius.circular(size / 2),
+        borderRadius: size / 2,
         onTap: onTap,
         child: SizedBox(
           width: size,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_pressable.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/utility_icon.dart';
@@ -330,8 +331,9 @@ class _SettingCard extends StatelessWidget {
       child: Semantics(
         button: onTap != null,
         enabled: enabled,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+        child: FqaPressable(
+          borderRadius: 8,
+          semanticButton: false,
           onTap: enabled ? onTap : null,
           child: Stack(
             fit: StackFit.expand,
@@ -427,8 +429,9 @@ class _SettingSwitch extends StatelessWidget {
       button: true,
       toggled: value,
       label: 'Nhạc nền',
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+      child: FqaPressable(
+        borderRadius: 18,
+        semanticButton: false,
         onTap: () => onChanged(!value),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
@@ -615,9 +618,10 @@ class _TextSizeOption extends StatelessWidget {
       child: Semantics(
         button: true,
         selected: selected,
-        child: InkWell(
+        child: FqaPressable(
           key: ValueKey('setting_text_size_${option.name}'),
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: 5,
+          semanticButton: false,
           onTap: onTap,
           child: DecoratedBox(
             decoration: BoxDecoration(

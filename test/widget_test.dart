@@ -40,6 +40,10 @@ Future<void> _pumpApp(
   await tester.pump();
 }
 
+Future<void> _settleTransitions(WidgetTester tester) async {
+  await tester.pump(const Duration(milliseconds: 320));
+}
+
 void _expectNoOverflow(WidgetTester tester) {
   final exception = tester.takeException();
   expect(exception, isNull);
@@ -62,21 +66,21 @@ void main() {
     expect(find.text('FolkQuest'), findsOneWidget);
 
     await tester.tap(find.text('Bắt đầu'));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.story);
     expect(find.text('Mở đầu truyện'), findsOneWidget);
 
     controller.exitToHome();
-    await tester.pump();
+    await _settleTransitions(tester);
     await tester.tap(find.text('Bộ sưu tập'));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.collection);
     expect(find.text('Bộ sưu tập'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
-    await tester.pump();
+    await _settleTransitions(tester);
     await tester.tap(find.text('Hồ sơ'));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.profile);
     expect(find.text('Hồ sơ'), findsOneWidget);
   });
@@ -86,23 +90,23 @@ void main() {
     await _pumpApp(tester, controller);
 
     await tester.tap(find.text('Bộ sưu tập'));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.collection);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.home);
 
     controller.currentNodeId = 'feather_unlock';
     controller.startOrResume();
-    await tester.pump();
+    await _settleTransitions(tester);
 
     await tester.tap(find.text('Xem bộ sưu tập'));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.collection);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.story);
     expect(controller.currentNodeId, 'feather_unlock');
   });
@@ -115,11 +119,11 @@ void main() {
     await _pumpApp(tester, controller);
 
     await tester.tap(find.byKey(const ValueKey('icon_Tiếp tục')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.currentNode.id, 'father_passes_away');
 
     await tester.tap(find.byKey(const ValueKey('icon_Tiếp tục')));
-    await tester.pump();
+    await _settleTransitions(tester);
 
     expect(controller.currentNode.type, StoryNodeType.options);
     expect(find.text('Chấp nhận cây khế'), findsOneWidget);
@@ -604,30 +608,30 @@ void main() {
     await _pumpApp(tester, controller);
 
     await tester.tap(find.byKey(const ValueKey('icon_Hướng dẫn')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.tutorial);
     expect(find.text('HƯỚNG DẪN'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.home);
 
     await tester.tap(find.byKey(const ValueKey('icon_Cài đặt')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.settings);
     expect(find.text('Cài đặt'), findsOneWidget);
 
     await tester.tap(find.text('GIỚI THIỆU ỨNG DỤNG'));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.information);
     expect(find.text('THÔNG TIN'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.settings);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.home);
   });
 
@@ -716,9 +720,9 @@ void main() {
     await _pumpApp(tester, controller);
 
     controller.showPause();
-    await tester.pump();
+    await _settleTransitions(tester);
     await tester.tap(find.byKey(const ValueKey('icon_Hồ sơ')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.profile);
     expect(controller.pauseVisible, isFalse);
     expect(find.text('Hồ sơ'), findsOneWidget);
@@ -726,29 +730,29 @@ void main() {
     expect(find.text('1'), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.story);
 
     controller.showPause();
-    await tester.pump();
+    await _settleTransitions(tester);
     await tester.tap(find.byKey(const ValueKey('icon_Cài đặt')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.settings);
     expect(controller.pauseVisible, isFalse);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.story);
 
     controller.showPause();
-    await tester.pump();
+    await _settleTransitions(tester);
     await tester.tap(find.byKey(const ValueKey('icon_Trợ giúp')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.tutorial);
     expect(controller.pauseVisible, isFalse);
 
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
-    await tester.pump();
+    await _settleTransitions(tester);
     expect(controller.view, AppView.story);
   });
 
