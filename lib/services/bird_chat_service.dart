@@ -62,7 +62,7 @@ class FirebaseBirdChatService implements BirdChatService {
     //   throw BirdChatAuthRequiredException();
     // }
 
-    final config = await _loadOpenRouterConfig();
+    final config = await _loadProviderConfig();
     final response = await _httpClient.post(
       Uri.parse(config.hostUrl),
       headers: {
@@ -71,7 +71,7 @@ class FirebaseBirdChatService implements BirdChatService {
       },
       body: jsonEncode({
         'model': config.model,
-        'messages': _openRouterMessages(request),
+        'messages': _openAIChatMessages(request),
       }),
     );
 
@@ -89,14 +89,14 @@ class FirebaseBirdChatService implements BirdChatService {
         'Phản hồi từ Chim Thần không hợp lệ. Vui lòng thử lại sau.',
       );
     }
-    final reply = _extractOpenRouterReply(decoded);
+    final reply = _extractOpenAIReply(decoded);
     if (reply == null || reply.isEmpty) {
       throw const BirdChatRemoteException('Chim Thần chưa kịp trả lời.');
     }
     return reply;
   }
 
-  Future<_OpenRouterConfig> _loadOpenRouterConfig() async {
+  Future<_OpenRouterConfig> _loadProviderConfig() async {
     final snapshot = await _firestore
         .collection('app_config')
         .doc('openrouter')
@@ -125,7 +125,7 @@ class FirebaseBirdChatService implements BirdChatService {
     );
   }
 
-  List<Map<String, String>> _openRouterMessages(BirdChatRequest request) {
+  List<Map<String, String>> _openAIChatMessages(BirdChatRequest request) {
     final history = request.messages
         .take(request.messages.length.clamp(0, 8))
         .map(
@@ -156,7 +156,7 @@ class FirebaseBirdChatService implements BirdChatService {
     ];
   }
 
-  String? _extractOpenRouterReply(dynamic decoded) {
+  String? _extractOpenAIReply(dynamic decoded) {
     if (decoded is! Map<String, dynamic>) return null;
     final choices = decoded['choices'];
     if (choices is! List || choices.isEmpty) return null;
