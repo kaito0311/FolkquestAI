@@ -57,19 +57,17 @@ class FirebaseBirdChatService implements BirdChatService {
 
   @override
   Future<String> reply(BirdChatRequest request) async {
-    // TODO: Re-enable auth check when we require login for bird chat.
+    // NOTE: Re-enable auth check when we require login for bird chat.
     // if (_firebaseAuth.currentUser == null) {
     //   throw BirdChatAuthRequiredException();
     // }
 
     final config = await _loadOpenRouterConfig();
     final response = await _httpClient.post(
-      Uri.parse('https://api.openai.com/v1/chat/completions'),
+      Uri.parse(config.hostUrl),
       headers: {
         'Authorization': 'Bearer ${config.apiKey}',
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://fbfirst-c8b62.web.app',
-        'X-Title': 'FolkQuest',
+        'Content-Type': 'application/json'
       },
       body: jsonEncode({
         'model': config.model,
@@ -83,12 +81,12 @@ class FirebaseBirdChatService implements BirdChatService {
           ? decoded['error']?.toString()
           : null;
       throw BirdChatRemoteException(
-        message ?? 'Không thể trò chuyện với Chim Thần lúc này.',
+        message ?? 'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau.',
       );
     }
     if (decoded is! Map<String, dynamic>) {
       throw const BirdChatRemoteException(
-        'Phản hồi từ Chim Thần không hợp lệ.',
+        'Phản hồi từ Chim Thần không hợp lệ. Vui lòng thử lại sau.',
       );
     }
     final reply = _extractOpenRouterReply(decoded);

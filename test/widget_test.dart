@@ -15,6 +15,8 @@ import 'package:fqa/services/bird_chat_service.dart';
 import 'package:fqa/stores/memory_progress_store.dart';
 import 'package:fqa/widgets/collection/collectible_card.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_image_button.dart';
+import 'package:fqa/widgets/fqa_transitions.dart';
 
 Future<GameController> _controller({BirdChatService? birdChatService}) async {
   final controller = GameController(
@@ -41,7 +43,9 @@ Future<void> _pumpApp(
 }
 
 Future<void> _settleTransitions(WidgetTester tester) async {
-  await tester.pump(const Duration(milliseconds: 320));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 420));
+  await tester.pump();
 }
 
 void _expectNoOverflow(WidgetTester tester) {
@@ -57,6 +61,48 @@ class _DelayedBirdChatService implements BirdChatService {
 }
 
 void main() {
+  testWidgets('image button keeps callback after press feedback', (
+    tester,
+  ) async {
+    var taps = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FqaImageButton(label: 'Tap me', onPressed: () => taps++),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Tap me'));
+    await tester.pump();
+
+    expect(taps, 1);
+  });
+
+  testWidgets('transition durations respect reduced motion', (tester) async {
+    late Duration duration;
+
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: Builder(
+          builder: (context) {
+            duration = FqaTransitions.durationFor(
+              context,
+              FqaTransitions.appViewDuration,
+            );
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+
+    expect(duration, Duration.zero);
+  });
+
   testWidgets('home buttons route to story collection and profile', (
     tester,
   ) async {
