@@ -49,35 +49,6 @@ class FqaApp extends StatelessWidget {
           child: KeyedSubtree(key: ValueKey(controller.view), child: screen),
         ),
         Positioned.fill(child: _PauseOverlaySwitcher(controller: controller)),
-        if (!controller.pauseVisible && controller.pauseVisible)
-          PauseOverlay(
-            onContinue: controller.hidePause,
-            onRestart: controller.restartRun,
-            onExit: controller.exitToHome,
-            onUtility: (title) {
-              if (title == 'profile') {
-                controller.openProfile();
-                return;
-              }
-              if (title == 'settings') {
-                controller.openSettings();
-                return;
-              }
-              if (title == 'tutorial') {
-                controller.openTutorial();
-                return;
-              }
-              if (title == 'Hồ sơ') {
-                controller.openProfile();
-              } else if (title == 'Cài đặt') {
-                controller.openSettings();
-              } else if (title == 'Trợ giúp') {
-                controller.openTutorial();
-              } else {
-                showPlaceholder(context, title);
-              }
-            },
-          ),
         // const Positioned.fill(
         //   child: IgnorePointer(
         //     child: FqaAssetImage('panels/screen_frame.png', fit: BoxFit.fill),

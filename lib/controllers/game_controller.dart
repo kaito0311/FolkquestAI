@@ -18,7 +18,7 @@ import 'package:fqa/services/bird_chat_service.dart';
 import 'package:fqa/stores/progress_store.dart';
 
 class GameController extends ChangeNotifier {
-  static const birdChatReplyTimeout = Duration(seconds: 5);
+  static const birdChatReplyTimeout = Duration(seconds: 15);
 
   GameController(
     this.store, {
