@@ -548,7 +548,7 @@ class StoryRepository {
       type: StoryNodeType.ending,
       background: 'backgrounds/009_younger_brother_prospers.png',
       coverAlignmentX: -0.2,
-      coverAlignmentY: -0.25,
+      coverAlignmentY: -0.6,
       text: 'Giữ lấy cây khế',
       endingId: 'keep_tree',
     ),
