@@ -99,8 +99,10 @@ class GameController extends ChangeNotifier {
         _applySnapshot(snapshot);
         _persist();
       }
-    } catch (error) {
-      authError = 'Không thể đăng nhập bằng Google. Vui lòng thử lại.';
+    } catch (error, stackTrace) {
+      debugPrint('Google sign-in failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      authError = 'Không thể đăng nhập bằng Google. Vui lòng thử lại sau.';
     } finally {
       authBusy = false;
       notifyListeners();
