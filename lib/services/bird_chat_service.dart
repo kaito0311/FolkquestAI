@@ -49,11 +49,18 @@ class FirebaseBirdChatService implements BirdChatService {
   FirebaseBirdChatService({
     FirebaseFirestore? firestore,
     http.Client? httpClient,
+    Duration providerConfigCacheTtl = const Duration(minutes: 5),
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
-       _httpClient = httpClient ?? http.Client();
+       _httpClient = httpClient ?? http.Client(),
+       _providerConfigCacheTtl = providerConfigCacheTtl;
 
   final FirebaseFirestore _firestore;
   final http.Client _httpClient;
+  final Duration _providerConfigCacheTtl;
+
+  _OpenRouterConfig? _cachedProviderConfig;
+  DateTime? _providerConfigCachedAt;
+  Future<_OpenRouterConfig>? _providerConfigLoad;
 
   @override
   Future<String> reply(BirdChatRequest request) async {
@@ -62,18 +69,7 @@ class FirebaseBirdChatService implements BirdChatService {
     //   throw BirdChatAuthRequiredException();
     // }
 
-    final config = await _loadProviderConfig();
-    final response = await _httpClient.post(
-      Uri.parse(config.hostUrl),
-      headers: {
-        'Authorization': 'Bearer ${config.apiKey}',
-        'Content-Type': 'application/json'
-      },
-      body: jsonEncode({
-        'model': config.model,
-        'messages': _openAIChatMessages(request),
-      }),
-    );
+    final response = await _postChatRequestWithConfigRefresh(request);
 
     final decoded = jsonDecode(response.body);
     if (response.statusCode != 200) {
@@ -81,7 +77,8 @@ class FirebaseBirdChatService implements BirdChatService {
           ? decoded['error']?.toString()
           : null;
       throw BirdChatRemoteException(
-        message ?? 'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau.',
+        message ??
+            'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau.',
       );
     }
     if (decoded is! Map<String, dynamic>) {
@@ -96,7 +93,76 @@ class FirebaseBirdChatService implements BirdChatService {
     return reply;
   }
 
-  Future<_OpenRouterConfig> _loadProviderConfig() async {
+  Future<http.Response> _postChatRequestWithConfigRefresh(
+    BirdChatRequest request,
+  ) async {
+    var config = await _loadProviderConfig();
+
+    try {
+      final response = await _postChatRequest(config, request);
+      if (response.statusCode == 200) {
+        return response;
+      }
+    } catch (_) {
+      // The provider config may have changed; retry once with a fresh snapshot.
+    }
+
+    config = await _loadProviderConfig(forceRefresh: true);
+    return _postChatRequest(config, request);
+  }
+
+  Future<http.Response> _postChatRequest(
+    _OpenRouterConfig config,
+    BirdChatRequest request,
+  ) {
+    return _httpClient.post(
+      Uri.parse(config.hostUrl),
+      headers: {
+        'Authorization': 'Bearer ${config.apiKey}',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'model': config.model,
+        'messages': _openAIChatMessages(request),
+      }),
+    );
+  }
+
+  Future<_OpenRouterConfig> _loadProviderConfig({
+    bool forceRefresh = false,
+  }) async {
+    final cachedAt = _providerConfigCachedAt;
+    final cachedConfig = _cachedProviderConfig;
+    final cacheIsFresh =
+        cachedAt != null &&
+        DateTime.now().difference(cachedAt) < _providerConfigCacheTtl;
+
+    if (!forceRefresh && cachedConfig != null && cacheIsFresh) {
+      return cachedConfig;
+    }
+
+    if (!forceRefresh) {
+      final existingLoad = _providerConfigLoad;
+      if (existingLoad != null) {
+        return existingLoad;
+      }
+    }
+
+    final load = _fetchProviderConfig();
+    _providerConfigLoad = load;
+    try {
+      final config = await load;
+      _cachedProviderConfig = config;
+      _providerConfigCachedAt = DateTime.now();
+      return config;
+    } finally {
+      if (identical(_providerConfigLoad, load)) {
+        _providerConfigLoad = null;
+      }
+    }
+  }
+
+  Future<_OpenRouterConfig> _fetchProviderConfig() async {
     final snapshot = await _firestore
         .collection('app_config')
         .doc('openrouter')
