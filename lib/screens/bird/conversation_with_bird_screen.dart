@@ -180,21 +180,15 @@ class _ConversationThread extends StatelessWidget {
                       }
                       return _BirdBubble(
                         layout: layout,
-                        text: message.text,
+                        text: message.text.isEmpty && responsePending
+                            ? 'Chim Thần đang suy nghĩ...'
+                            : message.text,
                         createdAt: message.createdAt,
                       );
                     },
                   ),
                   if (entry.key < messages.length - 1)
                     SizedBox(height: layout.gap(15)),
-                ],
-                if (responsePending) ...[
-                  if (messages.isNotEmpty) SizedBox(height: layout.gap(15)),
-                  _BirdBubble(
-                    layout: layout,
-                    text: 'Chim Thần đang suy nghĩ...',
-                    createdAt: DateTime.now(),
-                  ),
                 ],
               ],
             ),
