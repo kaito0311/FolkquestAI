@@ -58,6 +58,11 @@ class _DelayedBirdChatService implements BirdChatService {
 
   @override
   Future<String> reply(BirdChatRequest request) => completer.future;
+
+  @override
+  Stream<String> streamReply(BirdChatRequest request) async* {
+    yield await completer.future;
+  }
 }
 
 void main() {

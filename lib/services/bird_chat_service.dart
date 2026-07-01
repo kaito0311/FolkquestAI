@@ -23,14 +23,26 @@ class BirdChatRequest {
 
 abstract class BirdChatService {
   Future<String> reply(BirdChatRequest request);
+
+  Stream<String> streamReply(BirdChatRequest request) async* {
+    yield await reply(request);
+  }
 }
 
 class LocalBirdChatService implements BirdChatService {
   const LocalBirdChatService();
 
+  static const _localReply =
+      'Khi lòng tham lớn hơn sự biết đủ, con người dễ đánh mất những gì mình đang có.';
+
   @override
   Future<String> reply(BirdChatRequest request) async {
-    return 'Khi lòng tham lớn hơn sự biết đủ, con người dễ đánh mất những gì mình đang có.';
+    return _localReply;
+  }
+
+  @override
+  Stream<String> streamReply(BirdChatRequest request) async* {
+    yield _localReply;
   }
 }
 
@@ -93,6 +105,45 @@ class FirebaseBirdChatService implements BirdChatService {
     return reply;
   }
 
+  @override
+  Stream<String> streamReply(BirdChatRequest request) async* {
+    final response = await _sendStreamingChatRequestWithConfigRefresh(request);
+    if (response.statusCode != 200) {
+      final body = await response.stream.bytesToString();
+      final decoded = _tryDecodeJson(body);
+      final message = decoded is Map<String, dynamic>
+          ? decoded['error']?.toString()
+          : null;
+      throw BirdChatRemoteException(
+        message ??
+            'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau.',
+      );
+    }
+
+    final reply = StringBuffer();
+    await for (final chunk
+        in response.stream
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())) {
+      final data = chunk.trim();
+      if (data.isEmpty || data.startsWith(':')) continue;
+      if (!data.startsWith('data:')) continue;
+
+      final payload = data.substring(5).trim();
+      if (payload == '[DONE]') break;
+
+      final decoded = _tryDecodeJson(payload);
+      final content = _extractOpenAIStreamDelta(decoded);
+      if (content == null || content.isEmpty) continue;
+      reply.write(content);
+      yield reply.toString().trimLeft();
+    }
+
+    if (reply.toString().trim().isEmpty) {
+      throw const BirdChatRemoteException('Chim Thần chưa kịp trả lời.');
+    }
+  }
+
   Future<http.Response> _postChatRequestWithConfigRefresh(
     BirdChatRequest request,
   ) async {
@@ -111,6 +162,24 @@ class FirebaseBirdChatService implements BirdChatService {
     return _postChatRequest(config, request);
   }
 
+  Future<http.StreamedResponse> _sendStreamingChatRequestWithConfigRefresh(
+    BirdChatRequest request,
+  ) async {
+    var config = await _loadProviderConfig();
+
+    try {
+      final response = await _sendStreamingChatRequest(config, request);
+      if (response.statusCode == 200) {
+        return response;
+      }
+    } catch (_) {
+      // The provider config may have changed; retry once with a fresh snapshot.
+    }
+
+    config = await _loadProviderConfig(forceRefresh: true);
+    return _sendStreamingChatRequest(config, request);
+  }
+
   Future<http.Response> _postChatRequest(
     _OpenRouterConfig config,
     BirdChatRequest request,
@@ -126,6 +195,23 @@ class FirebaseBirdChatService implements BirdChatService {
         'messages': _openAIChatMessages(request),
       }),
     );
+  }
+
+  Future<http.StreamedResponse> _sendStreamingChatRequest(
+    _OpenRouterConfig config,
+    BirdChatRequest request,
+  ) {
+    final chatRequest = http.Request('POST', Uri.parse(config.hostUrl))
+      ..headers.addAll({
+        'Authorization': 'Bearer ${config.apiKey}',
+        'Content-Type': 'application/json',
+      })
+      ..body = jsonEncode({
+        'model': config.model,
+        'stream': true,
+        'messages': _openAIChatMessages(request),
+      });
+    return _httpClient.send(chatRequest);
   }
 
   Future<_OpenRouterConfig> _loadProviderConfig({
@@ -231,6 +317,31 @@ class FirebaseBirdChatService implements BirdChatService {
     final message = firstChoice['message'];
     if (message is! Map<String, dynamic>) return null;
     return message['content']?.toString().trim();
+  }
+
+  Object? _tryDecodeJson(String source) {
+    try {
+      return jsonDecode(source);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String? _extractOpenAIStreamDelta(dynamic decoded) {
+    if (decoded is! Map<String, dynamic>) return null;
+    final choices = decoded['choices'];
+    if (choices is! List || choices.isEmpty) return null;
+    final firstChoice = choices.first;
+    if (firstChoice is! Map<String, dynamic>) return null;
+    final delta = firstChoice['delta'];
+    if (delta is Map<String, dynamic>) {
+      return delta['content']?.toString();
+    }
+    final message = firstChoice['message'];
+    if (message is Map<String, dynamic>) {
+      return message['content']?.toString();
+    }
+    return null;
   }
 }
 

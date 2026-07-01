@@ -55,6 +55,7 @@ class GameController extends ChangeNotifier {
   bool authBusy = false;
   String? authError;
   bool birdResponsePending = false;
+  DateTime? _streamingBirdMessageCreatedAt;
   String? birdChatError;
   AppTextSize textSize = AppTextSize.medium;
   double screenBrightness = 100;
@@ -285,6 +286,9 @@ class GameController extends ChangeNotifier {
       ...birdMessages,
       BirdConversationMessage(text: normalizedQuestion, isUser: true),
     ];
+    final streamingMessage = BirdConversationMessage(text: '', isUser: false);
+    _streamingBirdMessageCreatedAt = streamingMessage.createdAt;
+    birdMessages = [...birdMessages, streamingMessage];
     view = AppView.birdConversation;
     pauseVisible = false;
     notifyListeners();
@@ -292,67 +296,83 @@ class GameController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final reply = await birdChatService
-          .reply(
-            BirdChatRequest(
-              question: normalizedQuestion,
-              messages: birdMessages,
-              karma: karma,
-              storyTitle: currentNode.title,
-              selectedChoices: selectedChoices,
-            ),
-          )
-          .timeout(birdChatReplyTimeout);
+      final request = BirdChatRequest(
+        question: normalizedQuestion,
+        messages: birdMessages
+            .where((message) => message.text.isNotEmpty)
+            .toList(),
+        karma: karma,
+        storyTitle: currentNode.title,
+        selectedChoices: selectedChoices,
+      );
+      await for (final reply
+          in birdChatService
+              .streamReply(request)
+              .timeout(birdChatReplyTimeout)) {
+        _replaceStreamingBirdMessage(reply);
+      }
       debugPrint(
         'Bird chat reply received in ${replyTimer.elapsedMilliseconds}ms.',
       );
-      birdMessages = [
-        ...birdMessages,
-        BirdConversationMessage(text: reply, isUser: false),
-      ];
+      if (_currentStreamingBirdMessage?.text.trim().isEmpty ?? true) {
+        throw const BirdChatRemoteException('Chim Thần chưa kịp trả lời.');
+      }
     } on BirdChatAuthRequiredException {
       debugPrint(
         'Bird chat auth required after ${replyTimer.elapsedMilliseconds}ms.',
       );
-      birdMessages = [
-        ...birdMessages,
-        BirdConversationMessage(
-          text: 'Con cần đăng nhập để Chim Thần có thể trả lời.',
-          isUser: false,
-        ),
-      ];
+      _replaceStreamingBirdMessage(
+        'Con cần đăng nhập để Chim Thần có thể trả lời.',
+      );
       birdChatError = 'Vui lòng đăng nhập để hỏi Chim Thần.';
     } on TimeoutException {
       debugPrint(
         'Bird chat timed out after ${replyTimer.elapsedMilliseconds}ms.',
       );
-      birdMessages = [
-        ...birdMessages,
-        BirdConversationMessage(
-          text: 'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau.',
-          isUser: false,
-        ),
-      ];
+      _replaceStreamingBirdMessage(
+        'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau.',
+      );
       birdChatError = 'Chim Thần phản hồi quá 5 giây.';
     } catch (error) {
       debugPrint(
         'Error during bird chat after ${replyTimer.elapsedMilliseconds}ms: '
         '$error',
       );
-      birdMessages = [
-        ...birdMessages,
-        BirdConversationMessage(
-          text: 'Chim Thần đang ở xa, con hãy thử lại sau.',
-          isUser: false,
-        ),
-      ];
+      _replaceStreamingBirdMessage('Chim Thần đang ở xa, con hãy thử lại sau.');
       birdChatError = 'Không thể kết nối với Chim Thần lúc này.';
     } finally {
       replyTimer.stop();
+      _streamingBirdMessageCreatedAt = null;
       birdResponsePending = false;
       notifyListeners();
     }
     return true;
+  }
+
+  BirdConversationMessage? get _currentStreamingBirdMessage {
+    final createdAt = _streamingBirdMessageCreatedAt;
+    if (createdAt == null) return null;
+    for (final message in birdMessages.reversed) {
+      if (!message.isUser && message.createdAt == createdAt) return message;
+    }
+    return null;
+  }
+
+  void _replaceStreamingBirdMessage(String text) {
+    final createdAt = _streamingBirdMessageCreatedAt;
+    if (createdAt == null) return;
+    birdMessages = birdMessages
+        .map(
+          (message) => !message.isUser && message.createdAt == createdAt
+              ? BirdConversationMessage(
+                  text: text,
+                  isUser: false,
+                  createdAt: createdAt,
+                )
+              : message,
+        )
+        .toList();
+    notifyListeners();
   }
 
   void backFromBirdConversation() {
