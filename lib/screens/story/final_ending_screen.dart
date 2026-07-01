@@ -25,7 +25,6 @@ class FinalEndingScreen extends StatelessWidget {
           (collectible) =>
               controller.runUnlockedCollectibleIds.contains(collectible.id),
         )
-        .take(3)
         .toList(growable: false);
 
     return FqaScaffold(
@@ -310,22 +309,33 @@ class _FinalEndingUnlockedCollection extends StatelessWidget {
       children: [
         const SectionTitle('Cổ vật đã mở khóa'),
         SizedBox(height: layout.gap(8)),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            for (final item in items)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                child: SizedBox(
-                  width: itemSize,
-                  height: itemSize,
-                  child: FqaAssetImage(
-                    item.assetName,
-                    key: ValueKey('ending_unlocked_${item.id}'),
-                  ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              key: const ValueKey('ending_unlocked_scroll'),
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (final item in items)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        child: SizedBox(
+                          width: itemSize,
+                          height: itemSize,
+                          child: FqaAssetImage(
+                            item.assetName,
+                            key: ValueKey('ending_unlocked_${item.id}'),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-          ],
+            );
+          },
         ),
       ],
     );
