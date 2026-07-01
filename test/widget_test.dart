@@ -258,7 +258,7 @@ void main() {
     },
   );
 
-  testWidgets('choosing three-span bag unlocks bag and feather', (
+  testWidgets('choosing three-span bag unlocks bag, gold, and feather', (
     tester,
   ) async {
     final controller = await _controller();
@@ -273,6 +273,7 @@ void main() {
 
     expect(controller.karma, 3);
     expect(controller.unlockedCollectibleIds, contains('bag3'));
+    expect(controller.unlockedCollectibleIds, contains('gold'));
     expect(controller.currentNode.id, 'gold_island');
 
     controller.currentNodeId = 'enough_reflection';
@@ -280,6 +281,11 @@ void main() {
     await tester.pump();
 
     expect(controller.currentNode.id, 'bag3_unlock');
+
+    controller.continueFromUnlock();
+    await tester.pump();
+
+    expect(controller.currentNode.id, 'gold_unlock');
 
     controller.continueFromUnlock();
     await tester.pump();
@@ -393,7 +399,7 @@ void main() {
     expect(controller.currentNode.endingId, 'brother_bad');
   });
 
-  testWidgets('keep tree path shows dialogue before karma reflection', (
+  testWidgets('keep tree path reaches first ending before karma reflection', (
     tester,
   ) async {
     final controller = await _controller();
@@ -409,6 +415,16 @@ void main() {
     expect(controller.currentNode.type, StoryNodeType.dialogue);
     expect(controller.currentNode.id, 'keep_tree_ending');
     expect(find.text('Giữ lấy cây khế'), findsOneWidget);
+
+    controller.advance();
+    await tester.pump();
+
+    expect(controller.currentNode.id, 'keep_tree_first_ending');
+    expect(controller.currentNode.type, StoryNodeType.firstEnding);
+    expect(
+      controller.currentNode.background,
+      'backgrounds/first_positive_ending_bg.png',
+    );
 
     controller.advance();
     await tester.pump();
