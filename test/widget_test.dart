@@ -862,6 +862,42 @@ void main() {
     );
   });
 
+  testWidgets('final ending scrolls horizontally through all unlocked items', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'enough_ending'
+      ..completedEndingId = 'enough'
+      ..runUnlockedCollectibleIds = {
+        'bag3',
+        'starfruit',
+        'gold',
+        'feather',
+        'bag12',
+        'half',
+      };
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    final scroll = tester.widget<SingleChildScrollView>(
+      find.byKey(const ValueKey('ending_unlocked_scroll')),
+    );
+    expect(scroll.scrollDirection, Axis.horizontal);
+    expect(find.byKey(const ValueKey('ending_unlocked_half')), findsOneWidget);
+
+    await tester.drag(
+      find.byKey(const ValueKey('ending_unlocked_scroll')),
+      const Offset(-300, 0),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('ending_unlocked_half')).hitTestable(),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('final ending cover matches first ending background', (
     tester,
   ) async {
