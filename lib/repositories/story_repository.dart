@@ -301,7 +301,7 @@ class StoryRepository {
           label: 'May túi 3 gang',
           nextId: 'gold_island',
           karmaDelta: 1,
-          unlockCollectibleIds: ['bag3', 'feather'],
+          unlockCollectibleIds: ['bag3', 'gold', 'feather'],
         ),
         StoryChoice(
           label: 'May túi 12 gang',
@@ -316,8 +316,16 @@ class StoryRepository {
       title: 'Đã mở khóa',
       type: StoryNodeType.unlock,
       text: 'Biểu tượng của sự vừa đủ.',
-      nextId: 'feather_unlock',
+      nextId: 'gold_unlock',
       unlockCollectibleId: 'bag3',
+    ),
+    'gold_unlock': StoryNode(
+      id: 'gold_unlock',
+      title: 'Đã mở khóa',
+      type: StoryNodeType.unlock,
+      text: 'Phần thưởng thử lòng người.',
+      nextId: 'feather_unlock',
+      unlockCollectibleId: 'gold',
     ),
     'bag12_unlock': StoryNode(
       id: 'bag12_unlock',
@@ -433,6 +441,15 @@ class StoryRepository {
       background: 'backgrounds/009_younger_brother_prospers.png',
       text:
           'Người em mỉm cười từ chối. Cây khế không chỉ là của cải, mà là bài học về sự vừa đủ và lòng biết ơn cậu muốn tự mình gìn giữ.',
+      nextId: 'keep_tree_first_ending',
+    ),
+    'keep_tree_first_ending': StoryNode(
+      id: 'keep_tree_first_ending',
+      title: 'Giữ lấy cây khế',
+      type: StoryNodeType.firstEnding,
+      background: 'backgrounds/first_positive_ending_bg.png',
+      text:
+          'Người em giữ lại cây khế và tiếp tục sống một cuộc đời bình yên. Cậu hiểu rằng biết đủ không có nghĩa là từ bỏ điều quý giá, mà là biết trân trọng và bảo vệ điều thực sự thuộc về mình.',
       nextId: 'keep_tree_reflection',
     ),
     'early_bad_reflection': StoryNode(
@@ -559,6 +576,7 @@ class StoryRepository {
       'starfruit' => 'starfruit_unlock',
       'half' => 'half_unlock',
       'bag3' => 'bag3_unlock',
+      'gold' => 'gold_unlock',
       'bag12' => 'bag12_unlock',
       'feather' => 'feather_unlock',
       _ => 'feather_unlock',

@@ -24,6 +24,8 @@ class _ConversationWithBirdScreenState
     extends State<ConversationWithBirdScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
+  final _messageKeys = <DateTime, GlobalKey>{};
+  DateTime? _pinnedUserMessageCreatedAt;
 
   @override
   void dispose() {
@@ -34,22 +36,43 @@ class _ConversationWithBirdScreenState
 
   Future<void> _submit(String question) async {
     _messageController.clear();
-    final submitted = await widget.controller.submitBirdQuestion(question);
+    final submit = widget.controller.submitBirdQuestion(question);
+    _pinLatestUserMessageToTopWithRetries();
+    final submitted = await submit;
     if (!mounted) return;
     if (!submitted) {
       _messageController.text = question;
       return;
     }
-    _scrollToLatestMessage();
   }
 
-  void _scrollToLatestMessage() {
+  void _pinLatestUserMessageToTopWithRetries() {
+    for (final delay in const [
+      Duration.zero,
+      Duration(milliseconds: 40),
+      Duration(milliseconds: 120),
+      Duration(milliseconds: 240),
+    ]) {
+      Future<void>.delayed(delay, _scrollLatestUserMessageToTop);
+    }
+  }
+
+  void _scrollLatestUserMessageToTop() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_scrollController.hasClients) return;
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 240),
-        curve: Curves.easeOut,
+      if (!mounted) return;
+      final latestUserMessage = widget.controller.birdMessages.reversed
+          .where((message) => message.isUser)
+          .firstOrNull;
+      if (latestUserMessage == null) return;
+      _pinnedUserMessageCreatedAt = latestUserMessage.createdAt;
+      final key = _messageKeys[latestUserMessage.createdAt];
+      final context = key?.currentContext;
+      if (context == null) return;
+      Scrollable.ensureVisible(
+        context,
+        alignment: 0,
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic,
       );
     });
   }
@@ -57,7 +80,13 @@ class _ConversationWithBirdScreenState
   @override
   Widget build(BuildContext context) {
     final messages = widget.controller.birdMessages;
-    _scrollToLatestMessage();
+    final activeMessageTimes = messages
+        .map((message) => message.createdAt)
+        .toSet();
+    _messageKeys.removeWhere((time, _) => !activeMessageTimes.contains(time));
+    for (final message in messages) {
+      _messageKeys.putIfAbsent(message.createdAt, GlobalKey.new);
+    }
 
     return FqaScaffold(
       background: 'backgrounds/bird_chat_bg.png',
@@ -98,6 +127,8 @@ class _ConversationWithBirdScreenState
                   controller: _scrollController,
                   layout: layout,
                   messages: messages,
+                  messageKeys: _messageKeys,
+                  pinnedUserMessageCreatedAt: _pinnedUserMessageCreatedAt,
                   responsePending: widget.controller.birdResponsePending,
                 ),
               ),
@@ -148,12 +179,16 @@ class _ConversationThread extends StatelessWidget {
     required this.controller,
     required this.layout,
     required this.messages,
+    required this.messageKeys,
+    required this.pinnedUserMessageCreatedAt,
     required this.responsePending,
   });
 
   final ScrollController controller;
   final ResponsiveLayout layout;
   final List<BirdConversationMessage> messages;
+  final Map<DateTime, GlobalKey> messageKeys;
+  final DateTime? pinnedUserMessageCreatedAt;
   final bool responsePending;
 
   @override
@@ -172,24 +207,32 @@ class _ConversationThread extends StatelessWidget {
                     builder: (context) {
                       final message = entry.value;
                       if (message.isUser) {
-                        return _UserBubble(
-                          layout: layout,
-                          text: message.text,
-                          createdAt: message.createdAt,
+                        return KeyedSubtree(
+                          key: messageKeys[message.createdAt],
+                          child: _UserBubble(
+                            layout: layout,
+                            text: message.text,
+                            createdAt: message.createdAt,
+                          ),
                         );
                       }
-                      return _BirdBubble(
-                        layout: layout,
-                        text: message.text.isEmpty && responsePending
-                            ? 'Chim Thần đang suy nghĩ...'
-                            : message.text,
-                        createdAt: message.createdAt,
+                      return KeyedSubtree(
+                        key: messageKeys[message.createdAt],
+                        child: _BirdBubble(
+                          layout: layout,
+                          text: message.text.isEmpty && responsePending
+                              ? 'Chim Thần đang suy nghĩ...'
+                              : message.text,
+                          createdAt: message.createdAt,
+                        ),
                       );
                     },
                   ),
                   if (entry.key < messages.length - 1)
                     SizedBox(height: layout.gap(15)),
                 ],
+                if (pinnedUserMessageCreatedAt != null)
+                  SizedBox(height: constraints.maxHeight * 0.72),
               ],
             ),
           ),
