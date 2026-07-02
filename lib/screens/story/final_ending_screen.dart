@@ -247,7 +247,12 @@ class _FinalEndingKarma extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              const FqaAssetImage('panels/karma_score_pill.png'),
+              FqaAssetImage(
+                karma >= 0
+                    ? 'panels/karma_score_pill.png'
+                    : 'panels/red_score.png',
+                key: const ValueKey('final_ending_karma_score_image'),
+              ),
               Center(
                 child: Text(
                   karma >= 0 ? '+$karma' : '$karma',
