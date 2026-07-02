@@ -303,7 +303,9 @@ void main() {
     tester,
   ) async {
     final controller = await _controller();
-    controller.currentNodeId = 'choose_bag';
+    controller
+      ..currentNodeId = 'choose_bag'
+      ..karma = 2;
     controller.startOrResume();
     await _pumpApp(tester, controller);
 
@@ -334,6 +336,20 @@ void main() {
     await tester.pump();
 
     expect(controller.currentNode.id, 'player_bad_summary');
+  });
+
+  test('twelve-span bag preserves karma below its result ceiling', () async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'choose_bag'
+      ..karma = -2;
+
+    final choice = controller.currentNode.choices.firstWhere(
+      (choice) => choice.unlockCollectibleIds.contains('bag12'),
+    );
+    controller.choose(choice);
+
+    expect(controller.karma, -3);
   });
 
   test(
@@ -840,6 +856,28 @@ void main() {
     expect(controller.runUnlockedCollectibleIds, contains('feather'));
     expect(store.snapshot?.unlockedCollectibles, contains('feather'));
     expect(store.snapshot?.runUnlockedCollectibles, contains('feather'));
+  });
+
+  testWidgets('karma and unlock continuation buttons share bottom position', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller.currentNodeId = 'enough_reflection';
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    final karmaButtonBottom = tester
+        .getBottomRight(find.byKey(const ValueKey('button_Tiếp tục')))
+        .dy;
+
+    controller.currentNodeId = 'feather_unlock';
+    controller.startOrResume();
+    await _settleTransitions(tester);
+
+    final unlockButtonBottom = tester
+        .getBottomRight(find.byKey(const ValueKey('button_Tiếp tục')))
+        .dy;
+    expect(unlockButtonBottom, closeTo(karmaButtonBottom, 0.1));
   });
 
   testWidgets('final ending shows collectibles unlocked in current run only', (

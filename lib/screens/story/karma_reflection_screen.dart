@@ -33,9 +33,7 @@ class KarmaReflectionScreen extends StatelessWidget {
           final titleHeight = layout.s(101).clamp(82.0, 101.0);
           final titleTop = layout.ceremonyTitleTop();
           final summaryTop = titleTop + titleHeight + layout.gap(20);
-          final buttonBottom = layout.isLandscape
-              ? layout.gap(28)
-              : layout.y(61).clamp(28.0, 61.0);
+          final buttonBottom = layout.continuationButtonBottom();
           final buttonWidth = layout.contentWidth(238, landscapeValue: 238);
           final buttonHeight = layout.s(56).clamp(48.0, 56.0);
           final buttonGap = layout.gap(11);

@@ -307,6 +307,7 @@ class StoryRepository {
           label: 'May túi 12 gang',
           nextId: 'gold_island_large',
           karmaDelta: -1,
+          maxResultingKarma: -1,
           unlockCollectibleIds: ['bag12'],
         ),
       ],

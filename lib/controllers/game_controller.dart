@@ -397,6 +397,10 @@ class GameController extends ChangeNotifier {
 
   void choose(StoryChoice choice) {
     karma += choice.karmaDelta;
+    final maxResultingKarma = choice.maxResultingKarma;
+    if (maxResultingKarma != null && karma > maxResultingKarma) {
+      karma = maxResultingKarma;
+    }
     selectedChoices = [...selectedChoices, choice.label];
     _pendingUnlockCollectibleIds = [
       ..._pendingUnlockCollectibleIds,

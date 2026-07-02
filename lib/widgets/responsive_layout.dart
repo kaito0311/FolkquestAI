@@ -62,6 +62,12 @@ class ResponsiveLayout {
     return isLandscape ? gap(landscape) : y(portrait).clamp(28.0, portrait);
   }
 
+  /// Bottom inset shared by the primary continuation action across story
+  /// utility screens, so the action remains in the same place between them.
+  double continuationButtonBottom() {
+    return isLandscape ? gap(24) : y(31).clamp(24.0, 31.0);
+  }
+
   double maxWidth(double value, {double padding = 0}) {
     return math.min(value, math.max(0, size.width - padding * 2));
   }
