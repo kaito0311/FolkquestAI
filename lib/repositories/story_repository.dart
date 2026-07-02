@@ -74,8 +74,8 @@ class StoryRepository {
     ),
     'brother_bad': Ending(
       id: 'brother_bad',
-      title: 'Kết cục của người anh',
-      karmaSummary: 'Lòng tham của người anh tự chuốc lấy hậu quả.',
+      title: 'Tấm lòng vị tha',
+      karmaSummary: 'Người có một tấm lòng vị tha',
     ),
     'keep_tree': Ending(
       id: 'keep_tree',
@@ -388,11 +388,12 @@ class StoryRepository {
         StoryChoice(
           label: 'Đồng ý đổi cây khế',
           nextId: 'brother_greed_cutscene',
+          karmaDelta: 1,
         ),
         StoryChoice(
           label: 'Không đồng ý đổi cây khế',
           nextId: 'keep_tree_ending',
-          karmaDelta: 1,
+          karmaDelta: 0,
         ),
       ],
     ),
@@ -557,7 +558,7 @@ class StoryRepository {
       type: StoryNodeType.ending,
       background: 'backgrounds/ending_bg.png',
       coverAlignmentY: -0.15,
-      text: 'Kết cục của người anh',
+      text: 'Tấm lòng vị tha của người em',
       endingId: 'brother_bad',
     ),
     'keep_tree_summary': StoryNode(
