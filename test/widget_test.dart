@@ -953,6 +953,32 @@ void main() {
     expect(cover.alignment, const Alignment(0, -0.25));
   });
 
+  testWidgets('final ending uses a red score pill for negative karma', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller
+      ..currentNodeId = 'enough_ending'
+      ..completedEndingId = 'enough'
+      ..karma = 1;
+    controller.startOrResume();
+    await _pumpApp(tester, controller);
+
+    var scoreImage = tester.widget<FqaAssetImage>(
+      find.byKey(const ValueKey('final_ending_karma_score_image')),
+    );
+    expect(scoreImage.assetName, 'panels/karma_score_pill.png');
+
+    controller.karma = -1;
+    controller.notifyListeners();
+    await _settleTransitions(tester);
+
+    scoreImage = tester.widget<FqaAssetImage>(
+      find.byKey(const ValueKey('final_ending_karma_score_image')),
+    );
+    expect(scoreImage.assetName, 'panels/red_score.png');
+  });
+
   testWidgets('final restart clears current run state', (tester) async {
     final controller = await _controller();
     controller
