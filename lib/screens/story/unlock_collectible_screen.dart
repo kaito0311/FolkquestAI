@@ -40,9 +40,7 @@ class UnlockCollectibleScreen extends StatelessWidget {
               ? layout.gap(70)
               : layout.y(106).clamp(82.0, 106.0);
           final textTop = artTop + artSize + layout.gap(22);
-          final buttonBottom = layout.isLandscape
-              ? layout.gap(24)
-              : layout.y(31).clamp(24.0, 31.0);
+          final buttonBottom = layout.continuationButtonBottom();
           final buttonWidth = layout.contentWidth(238, landscapeValue: 238);
           final buttonHeight = layout.s(56).clamp(48.0, 56.0);
 
