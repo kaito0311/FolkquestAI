@@ -32,30 +32,95 @@ class HomeScreen extends StatelessWidget {
           return Stack(
             children: [
               Positioned(
-                top: layout.y(116),
+                top: layout.y(150),
                 left: 0,
                 right: 0,
                 child: Column(
                   children: [
-                    Text(
-                      'FolkQuest',
-                      style: TextStyle(
-                        color: const Color(0xffffe8a6),
-                        fontSize: layout.font(46),
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.15,
-                        height: 1,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'FolkQuest',
+                          key: const ValueKey('home_title'),
+                          style: TextStyle(
+                            color: const Color(0xffffe8a6),
+                            fontFamily: 'Georgia',
+                            fontFamilyFallback: const [
+                              'Times New Roman',
+                              'serif',
+                            ],
+                            fontSize: layout.font(40),
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.15,
+                            height: 1,
+                            shadows: _titleShadows,
+                          ),
+                        ),
+                        SizedBox(width: layout.gap(7)),
+                        Container(
+                          key: const ValueKey('home_title_ai'),
+                          width: layout.s(38).clamp(34.0, 38.0),
+                          height: layout.s(38).clamp(34.0, 38.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: const Color(0xff7f2418),
+                            border: Border.all(
+                              color: const Color.fromARGB(255, 63, 22, 17),
+                              width: 0.5,
+                            ),
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black87,
+                                blurRadius: 2,
+                                offset: Offset(1, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            'AI',
+                            style: TextStyle(
+                              color: const Color(0xffffe8c0),
+                              fontFamily: 'Georgia',
+                              fontFamilyFallback: const [
+                                'Times New Roman',
+                                'serif',
+                              ],
+                              fontSize: layout.font(23),
+                              fontWeight: FontWeight.w700,
+                              height: 1,
+                              shadows: _titleShadows,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: layout.gap(8)),
-                    Text(
-                      '· Ăn khế trả vàng ·',
-                      style: TextStyle(
-                        color: FqaColors.cream,
-                        fontSize: layout.font(15),
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 3.3,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _SubtitleRule(width: layout.s(30)),
+                        SizedBox(width: layout.gap(8)),
+                        Text(
+                          'ĂN KHẾ TRẢ VÀNG',
+                          key: const ValueKey('home_subtitle'),
+                          style: TextStyle(
+                            color: FqaColors.cream,
+                            fontFamily: 'Georgia',
+                            fontFamilyFallback: const [
+                              'Times New Roman',
+                              'serif',
+                            ],
+                            fontSize: layout.font(14),
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 2.1,
+                            shadows: _titleShadows,
+                          ),
+                        ),
+                        SizedBox(width: layout.gap(8)),
+                        _SubtitleRule(width: layout.s(30)),
+                      ],
                     ),
                   ],
                 ),
@@ -155,6 +220,17 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  static const _titleShadows = [
+    Shadow(color: Colors.black, offset: Offset(-1, -1)),
+    Shadow(color: Colors.black, offset: Offset(0, -1)),
+    Shadow(color: Colors.black, offset: Offset(1, -1)),
+    Shadow(color: Colors.black, offset: Offset(-1, 0)),
+    Shadow(color: Colors.black, offset: Offset(1, 0)),
+    Shadow(color: Colors.black, offset: Offset(-1, 1)),
+    Shadow(color: Colors.black, offset: Offset(0, 1)),
+    Shadow(color: Colors.black, offset: Offset(1, 1)),
+  ];
+
   Future<void> _signIn(BuildContext context) async {
     await controller.signInWithGoogle();
     if (!context.mounted || controller.authError == null) return;
@@ -171,5 +247,23 @@ class HomeScreen extends StatelessWidget {
       context,
     ).showSnackBar(SnackBar(content: Text(controller.authError!)));
     controller.clearAuthError();
+  }
+}
+
+class _SubtitleRule extends StatelessWidget {
+  const _SubtitleRule({required this.width});
+
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: const Divider(
+        color: Color(0xffd7ad5d),
+        thickness: 1.5,
+        height: 1.5,
+      ),
+    );
   }
 }
