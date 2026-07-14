@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/models/collection_filter.dart';
 import 'package:fqa/widgets/collection/collectible_grid.dart';
 import 'package:fqa/widgets/collection/collection_navigation.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
@@ -60,11 +61,17 @@ class CollectionScreen extends StatelessWidget {
                 child: Center(
                   child: SizedBox(
                     width: gridWidth,
-                    child: CollectibleGrid(
-                      controller: controller,
-                      items: items,
-                      crossAxisCount: gridColumns,
-                    ),
+                    child:
+                        items.isEmpty &&
+                            controller.collectionFilter != CollectionFilter.all
+                        ? _EmptyCollectionState(
+                            filter: controller.collectionFilter,
+                          )
+                        : CollectibleGrid(
+                            controller: controller,
+                            items: items,
+                            crossAxisCount: gridColumns,
+                          ),
                   ),
                 ),
               ),
@@ -113,6 +120,35 @@ class CollectionScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _EmptyCollectionState extends StatelessWidget {
+  const _EmptyCollectionState({required this.filter});
+
+  final CollectionFilter filter;
+
+  @override
+  Widget build(BuildContext context) {
+    final message = switch (filter) {
+      CollectionFilter.opened => 'Bạn chưa mở vật phẩm nào.',
+      CollectionFilter.locked => 'Bạn đã mở toàn bộ vật phẩm.',
+      CollectionFilter.all => '',
+    };
+
+    return Center(
+      child: Text(
+        message,
+        key: const ValueKey('collection_empty_state'),
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Color(0xffecdba8),
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          shadows: [Shadow(color: Color(0xff1d140b), blurRadius: 5)],
+        ),
       ),
     );
   }

@@ -1022,6 +1022,22 @@ void main() {
     expect(find.byType(CollectibleCard), findsNWidgets(4));
   });
 
+  testWidgets('collection shows a message when a filter has no items', (
+    tester,
+  ) async {
+    final controller = await _controller();
+    controller.openCollection();
+    await _pumpApp(tester, controller);
+
+    controller.setCollectionFilter(CollectionFilter.opened);
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('collection_empty_state')),
+      findsOneWidget,
+    );
+  });
+
   for (final surfaceSize in [
     const Size(426, 899),
     const Size(430, 932),
