@@ -4,6 +4,7 @@ import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/story_dialogue_panel.dart';
+import 'package:fqa/widgets/story_entrance.dart';
 import 'package:fqa/widgets/story_top_bar.dart';
 
 class DiscussionScreen extends StatelessWidget {
@@ -38,13 +39,18 @@ class DiscussionScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: panelBottom,
-                child: Center(
-                  child: SizedBox(
-                    width: panelWidth,
-                    child: StoryDialoguePanel(
-                      speaker: node.speaker ?? '',
-                      text: node.text,
-                      onContinue: controller.advance,
+                child: StoryEntrance(
+                  key: ValueKey('story_dialogue_${node.id}'),
+                  offset: const Offset(0, 0.16),
+                  delay: const Duration(milliseconds: 140),
+                  child: Center(
+                    child: SizedBox(
+                      width: panelWidth,
+                      child: StoryDialoguePanel(
+                        speaker: node.speaker ?? '',
+                        text: node.text,
+                        onContinue: controller.advance,
+                      ),
                     ),
                   ),
                 ),

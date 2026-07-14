@@ -12,6 +12,7 @@ import 'package:fqa/models/game_snapshot.dart';
 import 'package:fqa/models/story_choice.dart';
 import 'package:fqa/models/story_node.dart';
 import 'package:fqa/models/story_node_type.dart';
+import 'package:fqa/models/story_transition_kind.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/services/auth_service.dart';
 import 'package:fqa/services/bird_chat_service.dart';
@@ -38,6 +39,7 @@ class GameController extends ChangeNotifier {
   final BirdChatService birdChatService;
   AppView view = AppView.home;
   String currentNodeId = StoryRepository.startNodeId;
+  StoryTransitionKind storyTransition = StoryTransitionKind.homeToStory;
   int karma = 0;
   List<String> selectedChoices = [];
   Set<String> unlockedCollectibleIds = StoryRepository.initialUnlockedIds;
@@ -174,6 +176,7 @@ class GameController extends ChangeNotifier {
       playCount = 1;
       _persist();
     }
+    storyTransition = StoryTransitionKind.homeToStory;
     view = AppView.story;
     pauseVisible = false;
     notifyListeners();
@@ -441,6 +444,7 @@ class GameController extends ChangeNotifier {
 
   void restartRun() {
     currentNodeId = StoryRepository.startNodeId;
+    storyTransition = StoryTransitionKind.homeToStory;
     karma = 0;
     selectedChoices = [];
     runUnlockedCollectibleIds = {};
@@ -493,6 +497,7 @@ class GameController extends ChangeNotifier {
 
   void _goToNode(String nodeId) {
     final next = StoryRepository.node(_resolveNodeId(nodeId));
+    storyTransition = StoryTransitionKind.between(currentNode.type, next.type);
     currentNodeId = next.id;
     if (next.type == StoryNodeType.karma) {
       karma += next.karmaDelta;

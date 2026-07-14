@@ -33,7 +33,12 @@ class StoryScreen extends StatelessWidget {
       ),
       switchInCurve: FqaTransitions.curve,
       switchOutCurve: FqaTransitions.curve,
-      transitionBuilder: FqaTransitions.softPageTransition,
+      transitionBuilder: (child, animation) =>
+          FqaTransitions.storyNodeTransition(
+            controller.storyTransition,
+            child,
+            animation,
+          ),
       child: KeyedSubtree(key: ValueKey(node.id), child: screen),
     );
   }

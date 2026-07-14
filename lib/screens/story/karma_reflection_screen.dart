@@ -7,6 +7,7 @@ import 'package:fqa/widgets/fqa_image_button.dart';
 import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
+import 'package:fqa/widgets/story_entrance.dart';
 
 class KarmaReflectionScreen extends StatelessWidget {
   const KarmaReflectionScreen({required this.controller, super.key});
@@ -45,24 +46,29 @@ class KarmaReflectionScreen extends StatelessWidget {
                 right: horizontalPadding,
                 top: titleTop,
                 height: titleHeight,
-                child: Center(
-                  child: SizedBox(
-                    width: contentWidth,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        const FqaAssetImage('panels/karma_title.png'),
-                        Center(
-                          child: Text(
-                            'Nghiệp Lực',
-                            style: TextStyle(
-                              color: const Color(0xfff7e4b0),
-                              fontSize: layout.font(23),
-                              fontWeight: FontWeight.w900,
+                child: StoryEntrance(
+                  key: const ValueKey('karma_title_entrance'),
+                  offset: const Offset(0, -0.16),
+                  delay: const Duration(milliseconds: 80),
+                  child: Center(
+                    child: SizedBox(
+                      width: contentWidth,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          const FqaAssetImage('panels/karma_title.png'),
+                          Center(
+                            child: Text(
+                              'Nghiệp Lực',
+                              style: TextStyle(
+                                color: const Color(0xfff7e4b0),
+                                fontSize: layout.font(23),
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -76,62 +82,68 @@ class KarmaReflectionScreen extends StatelessWidget {
                     buttonHeight * 2 +
                     buttonGap +
                     layout.gap(16),
-                child: FqaScrollHint(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: layout.s(224).clamp(180.0, 224.0),
-                        height: layout.s(102).clamp(82.0, 102.0),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            FqaAssetImage(
-                              variant.badgeAsset,
-                              key: const ValueKey('karma_badge_image'),
-                            ),
-                            Center(
-                              child: Text(
-                                variant.scoreText(controller.karma),
-                                key: const ValueKey('karma_score_text'),
-                                style: TextStyle(
-                                  color: variant.scoreColor,
-                                  fontSize: layout.font(48),
-                                  fontWeight: FontWeight.w900,
-                                  height: 1,
+                child: StoryEntrance(
+                  key: ValueKey('karma_content_${node.id}'),
+                  offset: const Offset(0, 0.1),
+                  scaleBegin: 0.94,
+                  delay: const Duration(milliseconds: 150),
+                  child: FqaScrollHint(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: layout.s(224).clamp(180.0, 224.0),
+                          height: layout.s(102).clamp(82.0, 102.0),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              FqaAssetImage(
+                                variant.badgeAsset,
+                                key: const ValueKey('karma_badge_image'),
+                              ),
+                              Center(
+                                child: Text(
+                                  variant.scoreText(controller.karma),
+                                  key: const ValueKey('karma_score_text'),
+                                  style: TextStyle(
+                                    color: variant.scoreColor,
+                                    fontSize: layout.font(48),
+                                    fontWeight: FontWeight.w900,
+                                    height: 1,
+                                  ),
                                 ),
                               ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: layout.gap(20)),
+                        if (variant.showsReflectionTitle) ...[
+                          Text(
+                            node.reflectionTitle,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: const Color(0xfff2d39a),
+                              fontSize: layout.font(18),
+                              fontWeight: FontWeight.w900,
                             ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: layout.gap(20)),
-                      if (variant.showsReflectionTitle) ...[
-                        Text(
-                          node.reflectionTitle,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: const Color(0xfff2d39a),
-                            fontSize: layout.font(18),
-                            fontWeight: FontWeight.w900,
+                          ),
+                          SizedBox(height: layout.gap(16)),
+                        ] else
+                          SizedBox(height: layout.gap(42)),
+                        SizedBox(
+                          width: layout.contentWidth(250, landscapeValue: 420),
+                          child: Text(
+                            node.text,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: const Color(0xfff0d7a4),
+                              fontSize: layout.font(16),
+                              height: 1.78,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                        SizedBox(height: layout.gap(16)),
-                      ] else
-                        SizedBox(height: layout.gap(42)),
-                      SizedBox(
-                        width: layout.contentWidth(250, landscapeValue: 420),
-                        child: Text(
-                          node.text,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: const Color(0xfff0d7a4),
-                            fontSize: layout.font(16),
-                            height: 1.78,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -139,14 +151,19 @@ class KarmaReflectionScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: buttonBottom + buttonHeight + buttonGap,
-                child: Center(
-                  child: FqaImageButton(
-                    label: 'Hỏi Chim Thần',
-                    width: buttonWidth,
-                    height: buttonHeight,
-                    fontSize: layout.font(19),
-                    assetName: 'buttons/small_button.png',
-                    onPressed: controller.openBirdChat,
+                child: StoryEntrance(
+                  key: const ValueKey('karma_chat_button_entrance'),
+                  offset: const Offset(0, 0.1),
+                  delay: const Duration(milliseconds: 240),
+                  child: Center(
+                    child: FqaImageButton(
+                      label: 'Hỏi Chim Thần',
+                      width: buttonWidth,
+                      height: buttonHeight,
+                      fontSize: layout.font(19),
+                      assetName: 'buttons/small_button.png',
+                      onPressed: controller.openBirdChat,
+                    ),
                   ),
                 ),
               ),
@@ -154,14 +171,19 @@ class KarmaReflectionScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: buttonBottom,
-                child: Center(
-                  child: FqaImageButton(
-                    label: 'Tiếp tục',
-                    width: buttonWidth,
-                    height: buttonHeight,
-                    fontSize: layout.font(19),
-                    assetName: 'buttons/small_button.png',
-                    onPressed: controller.advance,
+                child: StoryEntrance(
+                  key: const ValueKey('karma_continue_button_entrance'),
+                  offset: const Offset(0, 0.1),
+                  delay: const Duration(milliseconds: 300),
+                  child: Center(
+                    child: FqaImageButton(
+                      label: 'Tiếp tục',
+                      width: buttonWidth,
+                      height: buttonHeight,
+                      fontSize: layout.font(19),
+                      assetName: 'buttons/small_button.png',
+                      onPressed: controller.advance,
+                    ),
                   ),
                 ),
               ),

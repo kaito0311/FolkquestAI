@@ -6,6 +6,7 @@ import 'package:fqa/widgets/fqa_image_button.dart';
 import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
+import 'package:fqa/widgets/story_entrance.dart';
 
 class FirstEndingScreen extends StatelessWidget {
   const FirstEndingScreen({required this.controller, super.key});
@@ -102,35 +103,40 @@ class _FirstEndingTitle extends StatelessWidget {
       left: horizontalPadding,
       right: horizontalPadding,
       top: top,
-      child: Center(
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: Stack(
-            fit: StackFit.expand,
-            alignment: Alignment.center,
-            children: [
-              const FqaAssetImage(
-                'panels/first_positive_title_frame.png',
-                fit: BoxFit.contain,
-              ),
-              Padding(
-                padding: EdgeInsets.only(bottom: layout.gap(4)),
-                child: Center(
-                  child: Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: const Color(0xfff4dda2),
-                      fontSize: layout.font(21),
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
-                      height: 1.5,
+      child: StoryEntrance(
+        key: ValueKey('first_ending_title_$title'),
+        offset: const Offset(0, -0.18),
+        delay: const Duration(milliseconds: 100),
+        child: Center(
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: Stack(
+              fit: StackFit.expand,
+              alignment: Alignment.center,
+              children: [
+                const FqaAssetImage(
+                  'panels/first_positive_title_frame.png',
+                  fit: BoxFit.contain,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: layout.gap(4)),
+                  child: Center(
+                    child: Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: const Color(0xfff4dda2),
+                        fontSize: layout.font(21),
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                        height: 1.5,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -166,51 +172,56 @@ class _FirstEndingDialog extends StatelessWidget {
       left: horizontalPadding,
       right: horizontalPadding,
       bottom: bottom,
-      child: Center(
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: const FqaAssetImage(
-                    'panels/first_positive_content_frame.png',
-                    fit: BoxFit.fill,
+      child: StoryEntrance(
+        key: ValueKey('first_ending_dialog_$quote'),
+        offset: const Offset(0, 0.15),
+        delay: const Duration(milliseconds: 180),
+        child: Center(
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black),
+                    ),
+                    child: const FqaAssetImage(
+                      'panels/first_positive_content_frame.png',
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  layout.maxWidth(44, padding: 0),
-                  layout.gap(34),
-                  layout.maxWidth(44, padding: 0),
-                  layout.gap(24),
-                ),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: FqaScrollHint(
-                        child: _FirstEndingQuote(text: quote, layout: layout),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    layout.maxWidth(44, padding: 0),
+                    layout.gap(34),
+                    layout.maxWidth(44, padding: 0),
+                    layout.gap(24),
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: FqaScrollHint(
+                          child: _FirstEndingQuote(text: quote, layout: layout),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: layout.gap(12)),
-                    _FirstEndingDecorativeLine(layout: layout),
-                    SizedBox(height: layout.gap(12)),
-                    _FirstEndingContinueButton(
-                      width: buttonWidth,
-                      height: buttonHeight,
-                      fontSize: layout.font(19),
-                      onPressed: onContinue,
-                    ),
-                  ],
+                      SizedBox(height: layout.gap(12)),
+                      _FirstEndingDecorativeLine(layout: layout),
+                      SizedBox(height: layout.gap(12)),
+                      _FirstEndingContinueButton(
+                        width: buttonWidth,
+                        height: buttonHeight,
+                        fontSize: layout.font(19),
+                        onPressed: onContinue,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
