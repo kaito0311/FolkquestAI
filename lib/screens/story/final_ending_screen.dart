@@ -11,6 +11,7 @@ import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/section_title.dart';
+import 'package:fqa/widgets/story_entrance.dart';
 
 class FinalEndingScreen extends StatelessWidget {
   const FinalEndingScreen({required this.controller, super.key});
@@ -52,21 +53,28 @@ class FinalEndingScreen extends StatelessWidget {
                 right: horizontalPadding,
                 top: 0,
                 bottom: contentBottom,
-                child: _FinalEndingContent(
-                  ending: ending,
-                  coverBackground:
-                      controller.currentNode.background ??
-                      'backgrounds/first_positive_ending_bg.png',
-                  coverAlignment: Alignment(
-                    controller.currentNode.coverAlignmentX,
-                    controller.currentNode.coverAlignmentY,
+                child: StoryEntrance(
+                  key: ValueKey('final_ending_content_${ending.id}'),
+                  offset: const Offset(0, 0.08),
+                  scaleBegin: 0.97,
+                  delay: const Duration(milliseconds: 140),
+                  duration: const Duration(milliseconds: 520),
+                  child: _FinalEndingContent(
+                    ending: ending,
+                    coverBackground:
+                        controller.currentNode.background ??
+                        'backgrounds/first_positive_ending_bg.png',
+                    coverAlignment: Alignment(
+                      controller.currentNode.coverAlignmentX,
+                      controller.currentNode.coverAlignmentY,
+                    ),
+                    karma: controller.karma,
+                    selectedChoices: controller.selectedChoices,
+                    unlockedCollectibles: opened,
+                    layout: layout,
+                    horizontalPadding: horizontalPadding,
+                    topPadding: titleTop,
                   ),
-                  karma: controller.karma,
-                  selectedChoices: controller.selectedChoices,
-                  unlockedCollectibles: opened,
-                  layout: layout,
-                  horizontalPadding: horizontalPadding,
-                  topPadding: titleTop,
                 ),
               ),
               _FinalEndingActions(
