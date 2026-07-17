@@ -74,6 +74,11 @@ class FirebaseBirdChatService implements BirdChatService {
   DateTime? _providerConfigCachedAt;
   Future<_OpenRouterConfig>? _providerConfigLoad;
 
+  /// Loads and caches the provider configuration before the first chat.
+  Future<void> preload() async {
+    await _loadProviderConfig();
+  }
+
   @override
   Future<String> reply(BirdChatRequest request) async {
     // NOTE: Re-enable auth check when we require login for bird chat.
