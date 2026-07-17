@@ -106,10 +106,12 @@ class _ConversationWithBirdScreenState extends State<ConversationWithBirdScreen>
     return FqaScaffold(
       background: 'backgrounds/bird_chat_bg.png',
       overlay: const _ConversationOverlay(),
+      resizeToAvoidBottomInset: false,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final layout = ResponsiveLayout.portraitOf(constraints);
-          final inputBottom = layout.gap(20);
+          final inputBottom =
+              MediaQuery.viewInsetsOf(context).bottom + layout.gap(20);
           final inputHeight = layout.s(52).clamp(46.0, 52.0);
           final continueButtonBottom =
               inputBottom + inputHeight + layout.gap(14);
