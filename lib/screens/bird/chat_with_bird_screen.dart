@@ -46,7 +46,7 @@ class _ChatWithBirdScreenState extends State<ChatWithBirdScreen> {
       overlay: const _BirdScreenOverlay(),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final layout = ResponsiveLayout.of(constraints);
+          final layout = ResponsiveLayout.portraitOf(constraints);
           final horizontalPadding = layout.horizontalScreenPadding(
             portrait: 27,
             landscape: 56,

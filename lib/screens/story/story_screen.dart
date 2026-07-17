@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/fqa_assets.dart';
 import 'package:fqa/models/story_node_type.dart';
+import 'package:fqa/models/story_transition_kind.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/screens/story/discussion_screen.dart';
 import 'package:fqa/screens/story/final_ending_screen.dart';
@@ -13,6 +14,7 @@ import 'package:fqa/screens/story/karma_reflection_screen.dart';
 import 'package:fqa/screens/story/options_screen.dart';
 import 'package:fqa/screens/story/unlock_collectible_screen.dart';
 import 'package:fqa/widgets/fqa_transitions.dart';
+import 'package:fqa/widgets/story_top_bar.dart';
 
 class StoryScreen extends StatefulWidget {
   const StoryScreen({required this.controller, super.key});
@@ -88,17 +90,32 @@ class _StoryScreenState extends State<StoryScreen> {
         FqaTransitions.usesStoryFlowTransition(controller.storyTransition)
         ? FqaTransitions.storyNodeDuration
         : Duration.zero;
-    return AnimatedSwitcher(
-      duration: FqaTransitions.durationFor(context, transitionDuration),
-      switchInCurve: FqaTransitions.curve,
-      switchOutCurve: FqaTransitions.curve,
-      transitionBuilder: (child, animation) =>
-          FqaTransitions.storyNodeTransition(
-            controller.storyTransition,
-            child,
-            animation,
+    final showsPersistentTopBar =
+        node.type == StoryNodeType.dialogue ||
+        node.type == StoryNodeType.options;
+    return Stack(
+      children: [
+        AnimatedSwitcher(
+          duration: FqaTransitions.durationFor(context, transitionDuration),
+          switchInCurve: FqaTransitions.curve,
+          switchOutCurve: FqaTransitions.curve,
+          transitionBuilder: (child, animation) =>
+              FqaTransitions.storyNodeTransition(
+                controller.storyTransition,
+                child,
+                animation,
+              ),
+          child: KeyedSubtree(key: ValueKey(node.id), child: screen),
+        ),
+        if (showsPersistentTopBar)
+          StoryTopBar(
+            title: node.title,
+            onBack: controller.exitToHome,
+            onPause: controller.showPause,
+            animateEntrance:
+                controller.storyTransition == StoryTransitionKind.homeToStory,
           ),
-      child: KeyedSubtree(key: ValueKey(node.id), child: screen),
+      ],
     );
   }
 }

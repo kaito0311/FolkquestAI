@@ -5,7 +5,6 @@ import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/story_dialogue_panel.dart';
 import 'package:fqa/widgets/story_entrance.dart';
-import 'package:fqa/widgets/story_top_bar.dart';
 
 class DiscussionScreen extends StatelessWidget {
   const DiscussionScreen({required this.controller, super.key});
@@ -30,11 +29,6 @@ class DiscussionScreen extends StatelessWidget {
 
           return Stack(
             children: [
-              StoryTopBar(
-                title: node.title,
-                onBack: controller.exitToHome,
-                onPause: controller.showPause,
-              ),
               Positioned(
                 left: 0,
                 right: 0,
