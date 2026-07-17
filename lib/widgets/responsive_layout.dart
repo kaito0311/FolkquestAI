@@ -5,12 +5,14 @@ import 'package:flutter/widgets.dart';
 enum FqaLayoutClass { compactPortrait, regularPortrait, landscape }
 
 class ResponsiveLayout {
-  ResponsiveLayout._(this.size)
-    : layoutClass = size.width >= size.height
-          ? FqaLayoutClass.landscape
-          : size.width < 390
-          ? FqaLayoutClass.compactPortrait
-          : FqaLayoutClass.regularPortrait,
+  ResponsiveLayout._(this.size, {FqaLayoutClass? forcedLayoutClass})
+    : layoutClass =
+          forcedLayoutClass ??
+          (size.width >= size.height
+              ? FqaLayoutClass.landscape
+              : size.width < 390
+              ? FqaLayoutClass.compactPortrait
+              : FqaLayoutClass.regularPortrait),
       widthScale = size.width / designWidth,
       heightScale = size.height / designHeight,
       minScale = math.min(size.width / designWidth, size.height / designHeight),
@@ -19,6 +21,18 @@ class ResponsiveLayout {
   factory ResponsiveLayout.of(BoxConstraints constraints) {
     return ResponsiveLayout._(
       Size(constraints.maxWidth, constraints.maxHeight),
+    );
+  }
+
+  /// Uses the portrait composition even when an on-screen keyboard leaves a
+  /// short body constraint. The keyboard should only affect vertical space.
+  factory ResponsiveLayout.portraitOf(BoxConstraints constraints) {
+    final size = Size(constraints.maxWidth, constraints.maxHeight);
+    return ResponsiveLayout._(
+      size,
+      forcedLayoutClass: size.width < 390
+          ? FqaLayoutClass.compactPortrait
+          : FqaLayoutClass.regularPortrait,
     );
   }
 

@@ -108,7 +108,7 @@ class _ConversationWithBirdScreenState extends State<ConversationWithBirdScreen>
       overlay: const _ConversationOverlay(),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final layout = ResponsiveLayout.of(constraints);
+          final layout = ResponsiveLayout.portraitOf(constraints);
           final inputBottom = layout.gap(20);
           final inputHeight = layout.s(52).clamp(46.0, 52.0);
           final continueButtonBottom =

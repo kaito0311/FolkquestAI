@@ -6,7 +6,7 @@ class FqaTransitions {
   const FqaTransitions._();
 
   static const appViewDuration = Duration(milliseconds: 280);
-  static const storyNodeDuration = Duration(milliseconds: 240);
+  static const storyNodeDuration = Duration(milliseconds: 380);
   static const overlayDuration = Duration(milliseconds: 180);
   static const curve = Curves.easeOutCubic;
 

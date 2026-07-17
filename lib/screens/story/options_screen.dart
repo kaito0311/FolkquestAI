@@ -5,7 +5,6 @@ import 'package:fqa/widgets/fqa_image_button.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/story_prompt_panel.dart';
-import 'package:fqa/widgets/story_top_bar.dart';
 
 class OptionsScreen extends StatelessWidget {
   const OptionsScreen({required this.controller, super.key});
@@ -60,11 +59,6 @@ class OptionsScreen extends StatelessWidget {
 
           return Stack(
             children: [
-              StoryTopBar(
-                title: node.title,
-                onBack: controller.exitToHome,
-                onPause: controller.showPause,
-              ),
               Positioned(
                 left: 0,
                 right: 0,
