@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +32,9 @@ void main() async {
   final BirdChatService birdChatService = firebaseReady
       ? FirebaseBirdChatService()
       : const LocalBirdChatService();
+  if (birdChatService is FirebaseBirdChatService) {
+    unawaited(_preloadBirdChatConfig(birdChatService));
+  }
   final controller = GameController(
     progressStore,
     authService: authService,
@@ -37,6 +42,14 @@ void main() async {
   );
   await controller.load();
   runApp(MainApp(controller: controller));
+}
+
+Future<void> _preloadBirdChatConfig(FirebaseBirdChatService service) async {
+  try {
+    await service.preload();
+  } catch (error) {
+    debugPrint('Bird chat configuration preload failed: $error');
+  }
 }
 
 Future<bool> _tryInitializeFirebase() async {
