@@ -10,6 +10,15 @@ class FqaTransitions {
   static const overlayDuration = Duration(milliseconds: 180);
   static const curve = Curves.easeOutCubic;
 
+  static bool usesStoryFlowTransition(StoryTransitionKind kind) {
+    return switch (kind) {
+      StoryTransitionKind.storyToStory ||
+      StoryTransitionKind.storyToOptions ||
+      StoryTransitionKind.optionsToStory => true,
+      _ => false,
+    };
+  }
+
   static Duration durationFor(BuildContext context, Duration duration) {
     return MediaQuery.maybeOf(context)?.disableAnimations ?? false
         ? Duration.zero
@@ -52,30 +61,24 @@ class FqaTransitions {
     Widget child,
     Animation<double> animation,
   ) {
-    final isCeremony = switch (kind) {
-      StoryTransitionKind.toFirstEnding ||
-      StoryTransitionKind.firstEndingToKarma ||
-      StoryTransitionKind.karmaToUnlock ||
-      StoryTransitionKind.unlockToEnding => true,
-      _ => false,
-    };
-    final curved = CurvedAnimation(
-      parent: animation,
-      curve: isCeremony ? Curves.easeInOutCubic : curve,
-    );
-    const offset = Offset(0, 0.018);
-    return FadeTransition(
-      opacity: curved,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: offset,
-          end: Offset.zero,
-        ).animate(curved),
-        child: ScaleTransition(
-          scale: Tween<double>(begin: 0.985, end: 1).animate(curved),
+    if (!usesStoryFlowTransition(kind)) return child;
+
+    // Keep the two full-screen scenes opaque. The outgoing scene leaves to
+    // the left while the incoming one enters from the right, so the app's
+    // black backdrop is never exposed during a story/option transition.
+    return AnimatedBuilder(
+      animation: animation,
+      child: child,
+      builder: (context, child) {
+        final isExiting = animation.status == AnimationStatus.reverse;
+        final horizontalOffset = isExiting
+            ? animation.value - 1
+            : 1 - animation.value;
+        return FractionalTranslation(
+          translation: Offset(horizontalOffset, 0),
           child: child,
-        ),
-      ),
+        );
+      },
     );
   }
 }
