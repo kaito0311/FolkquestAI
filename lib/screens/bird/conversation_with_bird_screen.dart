@@ -20,18 +20,33 @@ class ConversationWithBirdScreen extends StatefulWidget {
       _ConversationWithBirdScreenState();
 }
 
-class _ConversationWithBirdScreenState
-    extends State<ConversationWithBirdScreen> {
+class _ConversationWithBirdScreenState extends State<ConversationWithBirdScreen>
+    with WidgetsBindingObserver {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   final _messageKeys = <DateTime, GlobalKey>{};
   DateTime? _pinnedUserMessageCreatedAt;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || MediaQuery.viewInsetsOf(context).bottom > 0) return;
+      _scrollLatestUserMessageToTop();
+    });
   }
 
   Future<void> _submit(String question) async {
