@@ -44,6 +44,7 @@ class _ChatWithBirdScreenState extends State<ChatWithBirdScreen> {
     return FqaScaffold(
       background: 'backgrounds/bird_chat_bg.png',
       overlay: const _BirdScreenOverlay(),
+      resizeToAvoidBottomInset: false,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final layout = ResponsiveLayout.portraitOf(constraints);
@@ -52,7 +53,8 @@ class _ChatWithBirdScreenState extends State<ChatWithBirdScreen> {
             landscape: 56,
           );
           final contentWidth = layout.contentWidth(372, landscapeValue: 480);
-          final inputBottom = layout.gap(20);
+          final inputBottom =
+              MediaQuery.viewInsetsOf(context).bottom + layout.gap(20);
           final inputHeight = layout.s(52).clamp(46.0, 52.0);
           final panelTop = layout.isLandscape
               ? layout.y(216).clamp(150.0, 232.0)
