@@ -17,6 +17,7 @@ import 'package:fqa/models/story_transition_kind.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/services/auth_service.dart';
 import 'package:fqa/services/bird_chat_service.dart';
+import 'package:fqa/services/text_to_speech_service.dart';
 import 'package:fqa/stores/progress_store.dart';
 
 class GameController extends ChangeNotifier {
@@ -26,8 +27,11 @@ class GameController extends ChangeNotifier {
     this.store, {
     AuthService? authService,
     BirdChatService? birdChatService,
+    TextToSpeechService? textToSpeechService,
   }) : authService = authService ?? const NoopAuthService(),
-       birdChatService = birdChatService ?? const LocalBirdChatService() {
+       birdChatService = birdChatService ?? const LocalBirdChatService(),
+       textToSpeechService =
+           textToSpeechService ?? FlutterTextToSpeechService() {
     currentUser = this.authService.currentUser;
     _authSubscription = this.authService.authStateChanges.listen((user) {
       currentUser = user;
@@ -38,6 +42,7 @@ class GameController extends ChangeNotifier {
   final ProgressStore store;
   final AuthService authService;
   final BirdChatService birdChatService;
+  final TextToSpeechService textToSpeechService;
   AppView view = AppView.home;
   String currentNodeId = StoryRepository.startNodeId;
   StoryTransitionKind storyTransition = StoryTransitionKind.homeToStory;
@@ -63,8 +68,12 @@ class GameController extends ChangeNotifier {
   AppTextSize textSize = AppTextSize.medium;
   double screenBrightness = 100;
   bool musicEnabled = true;
-  double musicVolume = 100;
+  double musicVolume = 20;
   AppLanguage language = AppLanguage.vietnamese;
+  String? vietnameseVoiceName;
+  String? englishVoiceName;
+  List<TtsVoice> availableVoices = const [];
+  double speechRate = 0.46;
   StreamSubscription<AuthUser?>? _authSubscription;
 
   bool get isSignedIn => currentUser != null;
@@ -99,6 +108,46 @@ class GameController extends ChangeNotifier {
     if (snapshot == null) return;
     _applySnapshot(snapshot);
   }
+
+  String? get selectedVoiceName =>
+      language == AppLanguage.english ? englishVoiceName : vietnameseVoiceName;
+
+  Future<void> speakCurrentStoryText() => textToSpeechService.speak(
+    currentNode.text,
+    language: language,
+    voiceName: selectedVoiceName,
+    rate: speechRate,
+  );
+
+  Future<void> loadTtsVoices() async {
+    availableVoices = await textToSpeechService.voicesFor(language);
+    notifyListeners();
+  }
+
+  void setVoiceName(String? value) {
+    if (language == AppLanguage.english) {
+      englishVoiceName = value;
+    } else {
+      vietnameseVoiceName = value;
+    }
+    _persist();
+    notifyListeners();
+  }
+
+  void resetVoiceNames() {
+    vietnameseVoiceName = null;
+    englishVoiceName = null;
+    _persist();
+    notifyListeners();
+  }
+
+  void setSpeechRate(double value) {
+    speechRate = value.clamp(0.0, 2.0).toDouble();
+    _persist();
+    notifyListeners();
+  }
+
+  Future<void> stopSpeaking() => textToSpeechService.stop();
 
   Future<void> signInWithGoogle() async {
     if (authBusy) return;
@@ -167,8 +216,26 @@ class GameController extends ChangeNotifier {
   void setLanguage(AppLanguage value) {
     if (language == value) return;
     language = value;
+    _resetCurrentRun();
+    unawaited(stopSpeaking());
+    unawaited(loadTtsVoices());
     _persist();
     notifyListeners();
+  }
+
+  void _resetCurrentRun() {
+    currentNodeId = StoryRepository.startNodeId;
+    storyTransition = StoryTransitionKind.homeToStory;
+    karma = 0;
+    selectedChoices = [];
+    runUnlockedCollectibleIds = {};
+    completedEndingId = null;
+    birdMessages = [];
+    birdResponsePending = false;
+    birdChatError = null;
+    _pendingUnlockCollectibleIds = [];
+    _nodeAfterPendingUnlocks = null;
+    pauseVisible = false;
   }
 
   void _applySnapshot(GameSnapshot snapshot) {
@@ -177,6 +244,9 @@ class GameController extends ChangeNotifier {
         : StoryRepository.startNodeId;
     karma = snapshot.karma;
     language = snapshot.language;
+    vietnameseVoiceName = snapshot.vietnameseVoiceName;
+    englishVoiceName = snapshot.englishVoiceName;
+    speechRate = snapshot.speechRate;
     selectedChoices = snapshot.selectedChoices;
     unlockedCollectibleIds = {
       ...StoryRepository.initialUnlockedIds,
@@ -301,8 +371,9 @@ class GameController extends ChangeNotifier {
     birdMessages = [
       if (birdMessages.isEmpty)
         BirdConversationMessage(
-          text:
-              'Con cứ hỏi điều còn băn khoăn. Ta sẽ cùng con nhìn lại câu chuyện.',
+          text: language == AppLanguage.english
+              ? 'Ask anything that is still on your mind. We can look back at the story together.'
+              : 'Con cứ hỏi điều còn băn khoăn. Ta sẽ cùng con nhìn lại câu chuyện.',
           isUser: false,
         ),
       ...birdMessages,
@@ -464,22 +535,11 @@ class GameController extends ChangeNotifier {
   }
 
   void restartRun() {
-    currentNodeId = StoryRepository.startNodeId;
-    storyTransition = StoryTransitionKind.homeToStory;
-    karma = 0;
-    selectedChoices = [];
-    runUnlockedCollectibleIds = {};
-    completedEndingId = null;
+    _resetCurrentRun();
     playCount += 1;
     view = AppView.story;
     _returnView = null;
     _nestedUtilityReturnView = null;
-    birdMessages = [];
-    birdResponsePending = false;
-    birdChatError = null;
-    _pendingUnlockCollectibleIds = [];
-    _nodeAfterPendingUnlocks = null;
-    pauseVisible = false;
     _persist();
     notifyListeners();
   }
@@ -560,6 +620,9 @@ class GameController extends ChangeNotifier {
           completedEndingId: completedEndingId,
           playCount: playCount,
           language: language,
+          vietnameseVoiceName: vietnameseVoiceName,
+          englishVoiceName: englishVoiceName,
+          speechRate: speechRate,
         ),
       ),
     );
@@ -583,6 +646,7 @@ class GameController extends ChangeNotifier {
 
   @override
   void dispose() {
+    unawaited(textToSpeechService.dispose());
     unawaited(_authSubscription?.cancel());
     super.dispose();
   }

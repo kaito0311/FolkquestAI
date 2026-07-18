@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/models/collectible.dart';
 import 'package:fqa/models/ending.dart';
 import 'package:fqa/repositories/story_repository.dart';
@@ -173,7 +174,7 @@ class _FinalEndingTitles extends StatelessWidget {
     return Column(
       children: [
         Text(
-          'Kết cục của bạn',
+          context.strings.ending,
           style: TextStyle(
             color: const Color(0xffd9b86d),
             fontSize: layout.font(14),
@@ -241,7 +242,7 @@ class _FinalEndingKarma extends StatelessWidget {
     return Row(
       children: [
         Text(
-          'Nghiệp lực',
+          context.strings.karma,
           style: TextStyle(
             color: const Color(0xffd7b66f),
             fontSize: layout.font(18),
@@ -292,10 +293,10 @@ class _FinalEndingChoices extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionTitle('Những lựa chọn chính'),
+          SectionTitle(context.strings.keyChoices),
           const SizedBox(height: 6),
           for (final choice in choices.take(3)) ChoiceBullet(choice),
-          if (choices.isEmpty) const ChoiceBullet('Chưa có lựa chọn'),
+          if (choices.isEmpty) ChoiceBullet(context.strings.noChoices),
         ],
       ),
     );
@@ -320,7 +321,7 @@ class _FinalEndingUnlockedCollection extends StatelessWidget {
 
     return Column(
       children: [
-        const SectionTitle('Cổ vật đã mở khóa'),
+        SectionTitle(context.strings.unlockedItems),
         SizedBox(height: layout.gap(8)),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -338,9 +339,12 @@ class _FinalEndingUnlockedCollection extends StatelessWidget {
                         child: SizedBox(
                           width: itemSize,
                           height: itemSize,
-                          child: FqaAssetImage(
-                            item.assetName,
-                            key: ValueKey('ending_unlocked_${item.id}'),
+                          child: Transform.scale(
+                            scale: item.displayScale,
+                            child: FqaAssetImage(
+                              item.assetName,
+                              key: ValueKey('ending_unlocked_${item.id}'),
+                            ),
                           ),
                         ),
                       ),
@@ -381,7 +385,7 @@ class _FinalEndingActions extends StatelessWidget {
       child: Column(
         children: [
           FqaImageButton(
-            label: 'Chơi lại',
+            label: context.strings.playAgain,
             width: width,
             height: height,
             fontSize: layout.font(19),
@@ -390,7 +394,7 @@ class _FinalEndingActions extends StatelessWidget {
           ),
           SizedBox(height: layout.gap(14)),
           FqaImageButton(
-            label: 'Về menu chính',
+            label: context.strings.mainMenu,
             width: width,
             height: height,
             fontSize: layout.font(19),

@@ -44,6 +44,7 @@ class DiscussionScreen extends StatelessWidget {
                         speaker: node.speaker ?? '',
                         text: node.text,
                         onContinue: controller.advance,
+                        onSpeak: controller.speakCurrentStoryText,
                       ),
                     ),
                   ),

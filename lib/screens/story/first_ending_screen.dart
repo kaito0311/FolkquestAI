@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_image_button.dart';
 import 'package:fqa/widgets/fqa_scroll_hint.dart';
@@ -286,7 +287,7 @@ class _FirstEndingContinueButton extends StatelessWidget {
     return Opacity(
       opacity: 0.82,
       child: FqaImageButton(
-        label: 'Tiếp tục',
+        label: context.strings.continueLabel,
         width: width,
         height: height,
         fontSize: fontSize,

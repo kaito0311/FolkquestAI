@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_pressable.dart';
@@ -18,12 +19,6 @@ class ChatWithBirdScreen extends StatefulWidget {
 }
 
 class _ChatWithBirdScreenState extends State<ChatWithBirdScreen> {
-  static const _presetQuestions = [
-    'Vì sao phải là túi ba gang?',
-    'Chim Thần muốn dạy con điều gì?',
-    'Lòng tham ảnh hưởng thế nào?',
-  ];
-
   final _messageController = TextEditingController();
 
   @override
@@ -41,6 +36,7 @@ class _ChatWithBirdScreenState extends State<ChatWithBirdScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.strings;
     return FqaScaffold(
       background: 'backgrounds/bird_chat_bg.png',
       overlay: const _BirdScreenOverlay(),
@@ -63,7 +59,7 @@ class _ChatWithBirdScreenState extends State<ChatWithBirdScreen> {
           return Stack(
             children: [
               StoryTopBar(
-                title: 'Chim Thần',
+                title: strings.magicBird,
                 onBack: widget.controller.closeBirdChat,
                 onPause: widget.controller.showPause,
               ),
@@ -80,7 +76,8 @@ class _ChatWithBirdScreenState extends State<ChatWithBirdScreen> {
                         children: [
                           _BirdGreeting(layout: layout),
                           SizedBox(height: layout.gap(12)),
-                          for (final question in _presetQuestions) ...[
+                          for (final question
+                              in strings.birdPresetQuestions) ...[
                             _PresetQuestionButton(
                               label: question,
                               layout: layout,
@@ -140,7 +137,7 @@ class _BirdGreeting extends StatelessWidget {
               layout.s(16),
             ),
             child: Text(
-              'Ta là Chim Thần, ta sẽ giải đáp mọi thắc mắc của con. Con có muốn hỏi ta điều gì không?',
+              context.strings.birdGreeting,
               style: TextStyle(
                 color: const Color(0xffd4b072),
                 fontSize: layout.font(18),
@@ -244,7 +241,7 @@ class _BirdMessageInput extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
               decoration: InputDecoration(
-                hintText: 'Nhập tin nhắn ...',
+                hintText: context.strings.messageHint,
                 hintStyle: TextStyle(
                   color: const Color(0xff73684c),
                   fontSize: layout.font(15),

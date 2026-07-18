@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/models/app_language.dart';
+import 'package:fqa/services/text_to_speech_service.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_pressable.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
@@ -21,6 +22,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.loadTtsVoices();
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = context.strings;
@@ -62,6 +69,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             trailing: _LanguageSelector(
                               value: widget.controller.language,
                               onChanged: widget.controller.setLanguage,
+                            ),
+                          ),
+                          SizedBox(height: layout.gap(15)),
+                          _SettingCard(
+                            layout: layout,
+                            height: 120,
+                            icon: Icons.speed,
+                            title: strings.speechRate,
+                            subtitle: strings.speechRateHint,
+                            footer: _SettingSlider(
+                              layout: layout,
+                              value: widget.controller.speechRate,
+                              min: 0,
+                              max: 2,
+                              divisions: 20,
+                              leadingIcon: Icons.slow_motion_video_outlined,
+                              trailingIcon: Icons.fast_forward,
+                              valueLabel:
+                                  '${widget.controller.speechRate.toStringAsFixed(2)}×',
+                              semanticLabel: strings.speechRate,
+                              onChanged: widget.controller.setSpeechRate,
+                            ),
+                          ),
+                          SizedBox(height: layout.gap(15)),
+                          _SettingCard(
+                            layout: layout,
+                            height: 80,
+                            icon: Icons.record_voice_over_outlined,
+                            title: strings.voice,
+                            subtitle: strings.voiceHint,
+                            trailing: _VoiceSelector(
+                              voices: widget.controller.availableVoices,
+                              value: widget.controller.selectedVoiceName,
+                              defaultLabel: strings.defaultVoice,
+                              onChanged: widget.controller.setVoiceName,
                             ),
                           ),
                           SizedBox(height: layout.gap(15)),
@@ -216,9 +258,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _restoreDefaults() {
     widget.controller
       ..setMusicEnabled(true)
-      ..setMusicVolume(100)
+      ..setMusicVolume(20)
       ..setTextSize(AppTextSize.medium)
-      ..setScreenBrightness(100);
+      ..setScreenBrightness(100)
+      ..resetVoiceNames()
+      ..setSpeechRate(0.46);
   }
 }
 
@@ -468,6 +512,54 @@ class _LanguageSelector extends StatelessWidget {
   }
 }
 
+class _VoiceSelector extends StatelessWidget {
+  const _VoiceSelector({
+    required this.voices,
+    required this.value,
+    required this.defaultLabel,
+    required this.onChanged,
+  });
+
+  final List<TtsVoice> voices;
+  final String? value;
+  final String defaultLabel;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 116,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String?>(
+          value: voices.any((voice) => voice.name == value) ? value : null,
+          isExpanded: true,
+          isDense: true,
+          dropdownColor: const Color(0xfffff4d6),
+          iconEnabledColor: const Color(0xff76522a),
+          style: const TextStyle(
+            color: Color(0xff76522a),
+            fontWeight: FontWeight.w800,
+            fontSize: 12,
+          ),
+          onChanged: onChanged,
+          items: [
+            DropdownMenuItem<String?>(
+              value: null,
+              child: Text(defaultLabel, overflow: TextOverflow.ellipsis),
+            ),
+            ...voices.map(
+              (voice) => DropdownMenuItem<String?>(
+                value: voice.name,
+                child: Text(voice.name, overflow: TextOverflow.ellipsis),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SettingSwitch extends StatelessWidget {
   const _SettingSwitch({required this.value, required this.onChanged});
 
@@ -528,6 +620,9 @@ class _SettingSlider extends StatelessWidget {
     this.enabled = true,
     this.trailingIcon,
     this.valueLabel,
+    this.min = 0,
+    this.max = 100,
+    this.divisions = 100,
   });
 
   final ResponsiveLayout layout;
@@ -538,6 +633,9 @@ class _SettingSlider extends StatelessWidget {
   final bool enabled;
   final IconData? trailingIcon;
   final String? valueLabel;
+  final double min;
+  final double max;
+  final int divisions;
 
   @override
   Widget build(BuildContext context) {
@@ -575,13 +673,13 @@ class _SettingSlider extends StatelessWidget {
               ),
               child: Semantics(
                 label: semanticLabel,
-                value: '${value.round()}%',
+                value: valueLabel ?? value.toStringAsFixed(2),
                 child: Slider(
                   key: ValueKey('setting_slider_$semanticLabel'),
                   value: value,
-                  min: 0,
-                  max: 100,
-                  divisions: 100,
+                  min: min,
+                  max: max,
+                  divisions: divisions,
                   onChanged: enabled ? onChanged : null,
                 ),
               ),
@@ -682,7 +780,11 @@ class _TextSizeOption extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                option.label,
+                switch (option) {
+                  AppTextSize.small => context.strings.small,
+                  AppTextSize.medium => context.strings.medium,
+                  AppTextSize.large => context.strings.large,
+                },
                 style: TextStyle(
                   color: const Color(0xffddcc9e),
                   fontSize: layout.font(12),

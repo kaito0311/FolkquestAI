@@ -11,6 +11,9 @@ class GameSnapshot {
     this.completedEndingId,
     this.playCount = 0,
     this.language = AppLanguage.vietnamese,
+    this.vietnameseVoiceName,
+    this.englishVoiceName,
+    this.speechRate = 0.46,
   });
 
   final String currentNodeId;
@@ -21,6 +24,9 @@ class GameSnapshot {
   final String? completedEndingId;
   final int playCount;
   final AppLanguage language;
+  final String? vietnameseVoiceName;
+  final String? englishVoiceName;
+  final double speechRate;
 
   Map<String, Object?> toJson() => {
     'currentNodeId': currentNodeId,
@@ -31,6 +37,9 @@ class GameSnapshot {
     'completedEndingId': completedEndingId,
     'playCount': playCount,
     'language': language.languageCode,
+    'vietnameseVoiceName': vietnameseVoiceName,
+    'englishVoiceName': englishVoiceName,
+    'speechRate': speechRate,
   };
 
   static GameSnapshot fromJson(Map<String, Object?> json) {
@@ -52,6 +61,9 @@ class GameSnapshot {
       completedEndingId: json['completedEndingId'] as String?,
       playCount: (json['playCount'] as num?)?.toInt() ?? 0,
       language: AppLanguage.fromLanguageCode(json['language'] as String?),
+      vietnameseVoiceName: json['vietnameseVoiceName'] as String?,
+      englishVoiceName: json['englishVoiceName'] as String?,
+      speechRate: (json['speechRate'] as num?)?.toDouble() ?? 0.46,
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_image_button.dart';
@@ -59,7 +60,7 @@ class KarmaReflectionScreen extends StatelessWidget {
                           const FqaAssetImage('panels/karma_title.png'),
                           Center(
                             child: Text(
-                              'Nghiệp Lực',
+                              context.strings.karma,
                               style: TextStyle(
                                 color: const Color(0xfff7e4b0),
                                 fontSize: layout.font(23),
@@ -157,7 +158,7 @@ class KarmaReflectionScreen extends StatelessWidget {
                   delay: const Duration(milliseconds: 240),
                   child: Center(
                     child: FqaImageButton(
-                      label: 'Hỏi Chim Thần',
+                      label: context.strings.askMagicBird,
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(19),
@@ -177,7 +178,7 @@ class KarmaReflectionScreen extends StatelessWidget {
                   delay: const Duration(milliseconds: 300),
                   child: Center(
                     child: FqaImageButton(
-                      label: 'Tiếp tục',
+                      label: context.strings.continueLabel,
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(19),

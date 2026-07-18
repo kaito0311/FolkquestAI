@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/fqa_colors.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/widgets/fqa_image_button.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
@@ -16,6 +17,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.strings;
     return FqaScaffold(
       background: 'backgrounds/home_bg.png',
       child: LayoutBuilder(
@@ -103,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                         _SubtitleRule(width: layout.s(30)),
                         SizedBox(width: layout.gap(8)),
                         Text(
-                          'ĂN KHẾ TRẢ VÀNG',
+                          strings.homeSubtitle,
                           key: const ValueKey('home_subtitle'),
                           style: TextStyle(
                             color: FqaColors.cream,
@@ -132,7 +134,7 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     FqaImageButton(
-                      label: 'Bắt đầu',
+                      label: strings.start,
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(22),
@@ -140,7 +142,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: layout.gap(16)),
                     FqaImageButton(
-                      label: 'Bộ sưu tập',
+                      label: strings.collection,
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(22),
@@ -148,7 +150,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: layout.gap(16)),
                     FqaImageButton(
-                      label: 'Hồ sơ',
+                      label: strings.profile,
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(22),
@@ -166,14 +168,14 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     UtilityIcon(
                       assetName: 'icons/guide_icon.png',
-                      semanticLabel: 'Hướng dẫn',
+                      semanticLabel: strings.guide,
                       size: utilitySize,
                       onTap: controller.openTutorial,
                     ),
                     SizedBox(width: utilityGap),
                     UtilityIcon(
                       assetName: 'icons/settings_icon.png',
-                      semanticLabel: 'Cài đặt',
+                      semanticLabel: strings.settings,
                       size: utilitySize,
                       onTap: controller.openSettings,
                     ),
@@ -186,8 +188,8 @@ class HomeScreen extends StatelessWidget {
                               ? 'icons/logout_icon.png'
                               : 'icons/login_icon.png',
                           semanticLabel: controller.isSignedIn
-                              ? 'Đăng xuất'
-                              : 'Đăng nhập',
+                              ? strings.signOut
+                              : strings.signIn,
                           size: utilitySize,
                           onTap: controller.authBusy
                               ? () {}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
@@ -13,6 +14,8 @@ class InformationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final english = controller.language.name == 'english';
+    final sections = english ? _englishInformation : _vietnameseInformation;
     return FqaScaffold(
       background: 'backgrounds/collection_bg.png',
       child: LayoutBuilder(
@@ -50,34 +53,35 @@ class InformationScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _InformationIntro(layout: layout),
+                      _InformationIntro(
+                        layout: layout,
+                        text: english
+                            ? 'FolkQuest AI combines storytelling, choices, and reflection to make folktales an interactive journey.'
+                            : 'FolkQuest AI kết hợp kể chuyện, lựa chọn và suy ngẫm để biến truyện dân gian thành một hành trình có thể tương tác.',
+                      ),
                       SizedBox(height: layout.gap(22)),
                       _InformationSection(
                         layout: layout,
-                        title: 'FolkQuest AI',
-                        body:
-                            'Ứng dụng giúp người chơi khám phá truyện dân gian Việt Nam qua các lựa chọn tương tác, phản hồi Karma và bộ sưu tập vật phẩm.',
+                        title: sections[0].$1,
+                        body: sections[0].$2,
                       ),
                       SizedBox(height: layout.gap(20)),
                       _InformationSection(
                         layout: layout,
-                        title: 'Trải nghiệm',
-                        body:
-                            'Mỗi nhánh truyện được thiết kế để khuyến khích đọc chậm, suy nghĩ về hệ quả và thử lại nhiều hướng khác nhau.',
+                        title: sections[1].$1,
+                        body: sections[1].$2,
                       ),
                       SizedBox(height: layout.gap(20)),
                       _InformationSection(
                         layout: layout,
-                        title: 'Dữ liệu chơi',
-                        body:
-                            'Tiến trình, lựa chọn, vật phẩm đã mở khóa và cài đặt cá nhân được lưu để bạn có thể tiếp tục hành trình sau này.',
+                        title: sections[2].$1,
+                        body: sections[2].$2,
                       ),
                       SizedBox(height: layout.gap(20)),
                       _InformationSection(
                         layout: layout,
-                        title: 'Phiên bản',
-                        body:
-                            'Phiên bản 1.0.0\nFQA/FolkQuest mobile experience.',
+                        title: sections[3].$1,
+                        body: sections[3].$2,
                       ),
                       SizedBox(height: layout.gap(16)),
                     ],
@@ -93,14 +97,15 @@ class InformationScreen extends StatelessWidget {
 }
 
 class _InformationIntro extends StatelessWidget {
-  const _InformationIntro({required this.layout});
+  const _InformationIntro({required this.layout, required this.text});
 
   final ResponsiveLayout layout;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      'FolkQuest AI kết hợp kể chuyện, lựa chọn và suy ngẫm để biến truyện dân gian thành một hành trình có thể tương tác.',
+      text,
       textAlign: TextAlign.center,
       style: TextStyle(
         color: const Color(0xffe5d4a5),
@@ -173,14 +178,14 @@ class _InformationHeader extends StatelessWidget {
             top: layout.s(10),
             child: UtilityIcon(
               assetName: 'icons/back_icon.png',
-              semanticLabel: 'Quay lại',
+              semanticLabel: context.strings.back,
               size: layout.s(46).clamp(42.0, 48.0),
               onTap: onBack,
             ),
           ),
           Center(
             child: Text(
-              'THÔNG TIN',
+              context.strings.information.toUpperCase(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: const Color(0xffb07d36),
@@ -196,3 +201,34 @@ class _InformationHeader extends StatelessWidget {
     );
   }
 }
+
+const _vietnameseInformation = [
+  (
+    'FolkQuest AI',
+    'Ứng dụng giúp người chơi khám phá truyện dân gian Việt Nam qua các lựa chọn tương tác, phản hồi Karma và bộ sưu tập vật phẩm.',
+  ),
+  (
+    'Trải nghiệm',
+    'Mỗi nhánh truyện được thiết kế để khuyến khích đọc chậm, suy nghĩ về hệ quả và thử lại nhiều hướng khác nhau.',
+  ),
+  (
+    'Dữ liệu chơi',
+    'Tiến trình, lựa chọn, vật phẩm đã mở khóa và cài đặt cá nhân được lưu để bạn có thể tiếp tục hành trình sau này.',
+  ),
+  ('Phiên bản', 'Phiên bản 1.0.0\nFQA/FolkQuest mobile experience.'),
+];
+const _englishInformation = [
+  (
+    'FolkQuest AI',
+    'Explore Vietnamese folktales through interactive choices, Karma reflections, and collectible items.',
+  ),
+  (
+    'Experience',
+    'Each story branch encourages careful reading, thinking about consequences, and trying different paths.',
+  ),
+  (
+    'Game data',
+    'Your progress, choices, unlocked items, and personal settings are saved so you can continue later.',
+  ),
+  ('Version', 'Version 1.0.0\nFQA/FolkQuest mobile experience.'),
+];

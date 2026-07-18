@@ -45,6 +45,7 @@ class StoryRepository {
       name: 'Cán cân công bằng',
       description: 'Biểu tượng của lời yêu cầu chia tài sản công bằng.',
       assetName: 'collectibles/item_fair_share_scale.png',
+      displayScale: 0.76,
     ),
   ];
 
@@ -63,6 +64,7 @@ class StoryRepository {
           description:
               _englishCollectibleDescriptions[item.id] ?? item.description,
           assetName: item.assetName,
+          displayScale: item.displayScale,
           initiallyUnlocked: item.initiallyUnlocked,
         ),
     ];
