@@ -63,6 +63,18 @@ class AppLocalizations {
       isEnglish ? 'THE STARFRUIT TREE' : 'ĂN KHẾ TRẢ VÀNG';
   String get start => isEnglish ? 'Start' : 'Bắt đầu';
   String get collection => isEnglish ? 'Collection' : 'Bộ sưu tập';
+  String get all => isEnglish ? 'All' : 'Tất cả';
+  String get opened => isEnglish ? 'Opened' : 'Đã mở';
+  String get locked => isEnglish ? 'Locked' : 'Chưa mở';
+  String get collectionNote => isEnglish
+      ? 'Collect items to discover\nthe story and hidden meanings.'
+      : 'Thu thập để khám phá\ncâu chuyện và ý nghĩa ẩn giấu.';
+  String get noOpenedItems => isEnglish
+      ? 'You have not unlocked any items yet.'
+      : 'Bạn chưa mở vật phẩm nào.';
+  String get allItemsOpened => isEnglish
+      ? 'You have unlocked every item.'
+      : 'Bạn đã mở toàn bộ vật phẩm.';
   String get profile => isEnglish ? 'Profile' : 'Hồ sơ';
   String get guide => isEnglish ? 'Guide' : 'Hướng dẫn';
   String get signIn => isEnglish ? 'Sign in' : 'Đăng nhập';
@@ -93,6 +105,20 @@ class AppLocalizations {
   String get exit => isEnglish ? 'Exit' : 'Thoát';
   String get help => isEnglish ? 'Help' : 'Trợ giúp';
   String get information => isEnglish ? 'Information' : 'Thông tin';
+  String get folkQuestPlayer =>
+      isEnglish ? 'FolkQuest player' : 'Người chơi FolkQuest';
+  String get notSignedInShort => isEnglish ? 'Not signed in' : 'Chưa đăng nhập';
+  String get syncing => isEnglish ? 'Syncing' : 'Đang đồng bộ';
+  String get localPlay => isEnglish ? 'Local play' : 'Chơi cục bộ';
+  String get playCount => isEnglish ? 'Plays' : 'Lượt chơi';
+  String get choices => isEnglish ? 'Choices' : 'Lựa chọn';
+  String get items => isEnglish ? 'Items' : 'Vật phẩm';
+  String get profileSyncedNote => isEnglish
+      ? 'Your progress is saved with your account.'
+      : 'Tiến trình của bạn đang được lưu cùng tài khoản.';
+  String get profileLocalNote => isEnglish
+      ? 'Sign in from the home screen to sync your progress.'
+      : 'Đăng nhập ở màn hình chính để đồng bộ tiến trình.';
   List<String> get birdPresetQuestions => isEnglish
       ? const [
           'Why a three-span bag?',
