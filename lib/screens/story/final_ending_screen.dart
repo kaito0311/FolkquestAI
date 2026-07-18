@@ -75,6 +75,7 @@ class FinalEndingScreen extends StatelessWidget {
                     layout: layout,
                     horizontalPadding: horizontalPadding,
                     topPadding: titleTop,
+                    onSpeak: controller.speakFinalEndingSummary,
                   ),
                 ),
               ),
@@ -105,6 +106,7 @@ class _FinalEndingContent extends StatelessWidget {
     required this.layout,
     required this.horizontalPadding,
     required this.topPadding,
+    required this.onSpeak,
   });
 
   final Ending ending;
@@ -116,6 +118,7 @@ class _FinalEndingContent extends StatelessWidget {
   final ResponsiveLayout layout;
   final double horizontalPadding;
   final double topPadding;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) {
@@ -123,8 +126,8 @@ class _FinalEndingContent extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(height: topPadding),
-          _FinalEndingTitles(ending: ending, layout: layout),
-          SizedBox(height: layout.gap(20)),
+          _FinalEndingTitles(ending: ending, layout: layout, onSpeak: onSpeak),
+          SizedBox(height: layout.gap(10)),
           _FinalEndingCover(
             background: coverBackground,
             alignment: coverAlignment,
@@ -164,10 +167,15 @@ class _FinalEndingContent extends StatelessWidget {
 }
 
 class _FinalEndingTitles extends StatelessWidget {
-  const _FinalEndingTitles({required this.ending, required this.layout});
+  const _FinalEndingTitles({
+    required this.ending,
+    required this.layout,
+    required this.onSpeak,
+  });
 
   final Ending ending;
   final ResponsiveLayout layout;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) {
@@ -192,6 +200,12 @@ class _FinalEndingTitles extends StatelessWidget {
             fontSize: layout.font(22),
             fontWeight: FontWeight.w900,
           ),
+        ),
+        IconButton(
+              icon: const Icon(Icons.volume_up_rounded),
+              color: const Color(0xfff5da92),
+              tooltip: 'Read aloud',
+              onPressed: onSpeak,
         ),
       ],
     );
@@ -339,8 +353,8 @@ class _FinalEndingUnlockedCollection extends StatelessWidget {
                         child: SizedBox(
                           width: itemSize,
                           height: itemSize,
-                          child: Transform.scale(
-                            scale: item.displayScale,
+                          child: SizedBox.square(
+                            dimension: itemSize * 0.72,
                             child: FqaAssetImage(
                               item.assetName,
                               key: ValueKey('ending_unlocked_${item.id}'),

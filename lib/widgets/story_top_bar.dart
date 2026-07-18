@@ -50,7 +50,12 @@ class StoryTopBar extends StatelessWidget {
         );
         final plaqueHeight = plaqueWidth * 127 / 240;
         final plaqueTop = -(constraints.maxHeight * 0.08).clamp(10.0, 14.0);
-        final titleFontSize = (constraints.maxHeight * 0.16).clamp(18.0, 20.0);
+        final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+        final titleFontSize =
+            (constraints.maxHeight * (isEnglish ? 0.16 : 0.16)).clamp(
+              isEnglish ? 18.0 : 18.0,
+              isEnglish ? 20.0 : 20.0,
+            );
 
         return Stack(
           children: [

@@ -31,17 +31,17 @@ class EnglishStoryContent {
 
   static const _copy = <String, _Copy>{
     'start_intro': _Copy(
-      'The story begins',
+      'Opening',
       'Narrator',
       'Long ago, two brothers lived together in a small village. You are the kind younger brother, and your choices will shape the story.',
     ),
     'father_passes_away': _Copy(
-      'Their father passes away',
+      'Loss',
       'Narrator',
       'After their father dies, the house falls quiet. The brothers must divide the inheritance, though neither finds it easy to say what is fair.',
     ),
     'divide_inheritance': _Copy(
-      'Dividing the inheritance',
+      'Division',
       'Older brother',
       'From now on, live on your own. I will keep the fields and house. Take the starfruit tree behind the garden and make a life with it.',
       choiceLabels: ['Accept the starfruit tree', 'Ask for a fair share'],
@@ -62,7 +62,7 @@ class EnglishStoryContent {
       'The younger brother accepts the modest share. He does not want wealth to destroy their bond, and hopes the tree will sustain him.',
     ),
     'inheritance_argument': _Copy(
-      'The inheritance dispute',
+      'Dispute',
       'Narrator',
       'The younger brother does not wish to quarrel, but the division still does not feel fair.',
       choiceLabels: [
@@ -72,27 +72,27 @@ class EnglishStoryContent {
       ],
     ),
     'fair_argument': _Copy(
-      'A fair request',
+      'Fairness',
       'Younger brother',
       'The younger brother keeps his voice calm. He asks his brother to think again, then accepts caring for the tree when he sees the decision is final.',
     ),
     'angry_argument': _Copy(
-      'Anger rises',
+      'Anger',
       'Narrator',
       'Harsh words make the courtyard heavy. The younger brother leaves in anger, hurt by his meagre share.',
     ),
     'early_bad_ending': _Copy(
-      'An opportunity closes',
+      'Closed',
       null,
       'By demanding more, the younger brother loses even the bond that remained. The starfruit tree is no longer his, and the story of gold ends before it begins.',
     ),
     'starfruit_tree': _Copy(
-      'The starfruit tree',
+      'Starfruit',
       'Narrator',
       'From the day he receives it, the younger brother tends the tree every day. It grows lush and bears fruit in every season.',
     ),
     'bird_appears': _Copy(
-      'The Magic Bird',
+      'Magic Bird',
       'Narrator',
       'One day, a great bird lands in the starfruit tree and eats its ripe golden fruit. The younger brother is surprised and worried.',
       choiceLabels: [
@@ -101,28 +101,28 @@ class EnglishStoryContent {
       ],
     ),
     'gentle_complaint': _Copy(
-      'Meeting the Magic Bird',
+      'Meeting',
       'Younger brother',
       'The younger brother says softly: “If you eat all the fruit, how will my family live? If you need it, please leave me a way to earn a living.”',
     ),
     'chase_bird': _Copy(
-      'Chasing the Magic Bird',
+      'Chasing',
       'Narrator',
       'Fearing the loss of all his fruit, the younger brother runs out with a stick. The Magic Bird flies up, its gaze seeming to see into his heart.',
     ),
     'karma_check': _Copy('Karma', null, ''),
     'no_promise_ending': _Copy(
-      'The Magic Bird leaves',
+      'Bird Gone',
       'Magic Bird',
       'Your heart is still full of anger and greed. A good opportunity that is not held with kindness can fly away like a bird in the wind.',
     ),
     'bird_promise': _Copy(
-      'The Magic Bird replies',
+      'Promise',
       'Magic Bird',
       'Eat one fruit, repay one lump of gold. Sew a three-span bag, and carry it away.',
     ),
     'choose_bag': _Copy(
-      'Choose a bag',
+      'Choose Bag',
       'Narrator',
       'Following the Magic Bird’s words, the younger brother prepares a bag for gold. But he must decide: take enough, or take too much?',
       choiceLabels: ['Sew a three-span bag', 'Sew a twelve-span bag'],
@@ -135,27 +135,27 @@ class EnglishStoryContent {
     'gold_unlock': _Copy('Unlocked', null, 'A reward that tests the heart.'),
     'bag12_unlock': _Copy('Unlocked', null, 'A reminder about greed.'),
     'gold_island': _Copy(
-      'The Island of Gold',
+      'Gold Isle',
       'Narrator',
       'The Magic Bird carries the younger brother over high mountains and wide seas to an island glittering with gold.',
     ),
     'gold_island_large': _Copy(
-      'The Island of Gold',
+      'Gold Isle',
       'Narrator',
       'The Magic Bird carries the younger brother to the island. Before the glittering gold, the twelve-span bag becomes too tempting to leave empty.',
     ),
     'younger_brother_prospers': _Copy(
-      'A good life',
+      'Prosper',
       'Narrator',
       'The younger brother returns with just enough gold. He repairs his home, helps those in need, and lives peacefully.',
     ),
     'brother_returns': _Copy(
-      'The older brother',
+      'Brother',
       'Narrator',
       'Seeing his younger brother prosper, the older brother grows curious. He returns, sees the fruitful tree, and smiles with calculation.',
     ),
     'player_decides_exchange': _Copy(
-      'Exchange the tree',
+      'Exchange',
       'Older brother',
       'Trade the starfruit tree to me. I will return the old fields, and I will care for this tree for one season.',
       choiceLabels: [
@@ -164,17 +164,17 @@ class EnglishStoryContent {
       ],
     ),
     'brother_greed_cutscene': _Copy(
-      'A large bag',
+      'Big Bag',
       'Narrator',
       'After gaining the tree, the older brother ignores the three-span instruction. He secretly sews a huge bag, hoping for more gold than his brother.',
     ),
     'brother_bad_ending': _Copy(
-      'The older brother',
+      'Brother',
       'Narrator',
       'The heavy bag makes the older brother sway in the sky. Gold falls into the sea as he realizes that greed has become a burden he cannot carry.',
     ),
     'brother_bad_first_ending': _Copy(
-      'The ending',
+      'Ending',
       null,
       'The younger brother watches quietly. Some losses cannot be called back; the older brother’s story closes with the price of greed.',
     ),
@@ -184,12 +184,12 @@ class EnglishStoryContent {
       'The younger brother chooses a bag that is too large and fills it with gold. Over the sea, its weight makes him lose his balance.',
     ),
     'keep_tree_ending': _Copy(
-      'Keep the starfruit tree',
+      'Keep Tree',
       'Narrator',
       'The younger brother smiles and refuses. The tree is not only wealth; it is a lesson in gratitude and knowing what is enough.',
     ),
     'keep_tree_first_ending': _Copy(
-      'Keep the starfruit tree',
+      'Keep Tree',
       null,
       'The younger brother keeps the tree and continues his peaceful life. Knowing what is enough also means protecting what truly belongs to you.',
     ),
@@ -234,24 +234,20 @@ class EnglishStoryContent {
       null,
       'A symbol of good fortune, reward, and kindness repaid.',
     ),
-    'early_bad_summary': _Copy(
-      'Your ending',
-      null,
-      'The starfruit tree is lost.',
-    ),
-    'no_promise_summary': _Copy('Your ending', null, 'The Magic Bird leaves.'),
-    'enough_ending': _Copy('Your ending', null, 'The path of knowing enough.'),
+    'early_bad_summary': _Copy('Outcome', null, 'The starfruit tree is lost.'),
+    'no_promise_summary': _Copy('Outcome', null, 'The Magic Bird leaves.'),
+    'enough_ending': _Copy('Outcome', null, 'The path of knowing enough.'),
     'player_bad_summary': _Copy(
-      'Your ending',
+      'Outcome',
       null,
       'The younger brother falls into the sea.',
     ),
     'brother_bad_summary': _Copy(
-      'Your ending',
+      'Outcome',
       null,
       'The younger brother’s compassion.',
     ),
-    'keep_tree_summary': _Copy('Your ending', null, 'Keep the starfruit tree.'),
+    'keep_tree_summary': _Copy('Outcome', null, 'Keep the starfruit tree.'),
   };
 }
 

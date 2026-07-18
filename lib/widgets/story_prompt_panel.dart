@@ -42,7 +42,7 @@ class StoryPromptPanel extends StatelessWidget {
           ),
           Positioned(
             left: 46,
-            right: 46,
+            right: 88,
             top: 45,
             bottom: 10,
             child: FqaScrollHint(
