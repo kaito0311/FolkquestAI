@@ -63,7 +63,7 @@ class StoryDialoguePanel extends StatelessWidget {
           ),
           SpeakerTag(speaker: speaker),
           Positioned(
-            right: 45,
+            right: 50,
             top: 57,
             child: IconButton(
               icon: const Icon(Icons.volume_up_rounded),

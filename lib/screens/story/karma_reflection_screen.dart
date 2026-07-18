@@ -39,6 +39,7 @@ class KarmaReflectionScreen extends StatelessWidget {
           final buttonWidth = layout.contentWidth(238, landscapeValue: 238);
           final buttonHeight = layout.s(56).clamp(48.0, 56.0);
           final buttonGap = layout.gap(11);
+          final textTitlePadding = Localizations.localeOf(context).languageCode == 'en' ? 10.0 : 0.0;
 
           return Stack(
             children: [
@@ -59,13 +60,21 @@ class KarmaReflectionScreen extends StatelessWidget {
                         children: [
                           const FqaAssetImage('panels/karma_title.png'),
                           Center(
-                            child: Text(
-                              context.strings.karma,
-                              style: TextStyle(
-                                color: const Color(0xfff7e4b0),
-                                fontSize: layout.font(23),
-                                fontWeight: FontWeight.w900,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                0,
+                                textTitlePadding,
+                                0,
+                                0,
                               ),
+                              child: Text(
+                                context.strings.karma,
+                                style: TextStyle(
+                                  color: const Color(0xfff7e4b0),
+                                  fontSize: layout.font(23),
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              )
                             ),
                           ),
                         ],
@@ -74,6 +83,16 @@ class KarmaReflectionScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              // Positioned(
+              //   top: titleTop + layout.gap(22),
+              //   right: horizontalPadding + layout.gap(6),
+              //   child: IconButton(
+              //     icon: const Icon(Icons.volume_up_rounded),
+              //     color: const Color(0xfff7e4b0),
+              //     tooltip: 'Read aloud',
+              //     onPressed: controller.speakCurrentStoryText,
+              //   ),
+              // ),
               Positioned(
                 left: horizontalPadding,
                 right: horizontalPadding,
@@ -142,6 +161,12 @@ class KarmaReflectionScreen extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.volume_up_rounded),
+                          color: const Color(0xfff7e4b0),
+                          tooltip: 'Read aloud',
+                          onPressed: controller.speakCurrentStoryText,
                         ),
                       ],
                     ),

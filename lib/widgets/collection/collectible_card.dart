@@ -39,9 +39,7 @@ class CollectibleCard extends StatelessWidget {
                       child: Center(
                         child: Opacity(
                           opacity: unlocked ? 1 : 0.28,
-                          child: Transform.scale(
-                            scale: collectible.displayScale,
-                            child: FqaAssetImage(
+                          child: FqaAssetImage(
                               collectible.assetName,
                               fallback: Icon(
                                 unlocked ? Icons.auto_awesome : Icons.lock,
@@ -49,7 +47,6 @@ class CollectibleCard extends StatelessWidget {
                                 size: 46,
                               ),
                             ),
-                          ),
                         ),
                       ),
                     ),

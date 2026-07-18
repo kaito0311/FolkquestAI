@@ -83,8 +83,8 @@ class UnlockCollectibleScreen extends StatelessWidget {
                     child: SizedBox(
                       width: artSize,
                       height: artSize,
-                      child: Transform.scale(
-                        scale: collectible.displayScale,
+                      child: SizedBox.square(
+                        dimension: artSize * 0.72,
                         child: FqaAssetImage(
                           collectible.assetName,
                           fallback: Icon(

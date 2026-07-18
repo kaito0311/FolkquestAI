@@ -119,6 +119,20 @@ class GameController extends ChangeNotifier {
     rate: speechRate,
   );
 
+  Future<void> speakFinalEndingSummary() {
+    final karmaLabel = language == AppLanguage.english ? 'Karma' : 'Nghiệp lực';
+    final choicesLabel = language == AppLanguage.english
+        ? 'Key choices'
+        : 'Những lựa chọn chính';
+    return textToSpeechService.speak(
+      '${currentEnding.title}. ${currentEnding.karmaSummary}. '
+      '$karmaLabel: $karma. $choicesLabel: ${selectedChoices.join('. ')}',
+      language: language,
+      voiceName: selectedVoiceName,
+      rate: speechRate,
+    );
+  }
+
   Future<void> loadTtsVoices() async {
     availableVoices = await textToSpeechService.voicesFor(language);
     notifyListeners();
@@ -272,6 +286,7 @@ class GameController extends ChangeNotifier {
   }
 
   void openCollection([CollectionFilter filter = CollectionFilter.all]) {
+    _stopSpeaking();
     _returnView = view == AppView.collection ? _returnView : view;
     view = AppView.collection;
     collectionFilter = filter;
@@ -320,6 +335,7 @@ class GameController extends ChangeNotifier {
   }
 
   void exitToHome() {
+    _stopSpeaking();
     view = AppView.home;
     _returnView = null;
     _nestedUtilityReturnView = null;
@@ -328,6 +344,7 @@ class GameController extends ChangeNotifier {
   }
 
   void showPause() {
+    _stopSpeaking();
     pauseVisible = true;
     notifyListeners();
   }
@@ -350,6 +367,7 @@ class GameController extends ChangeNotifier {
   }
 
   void openBirdChat() {
+    _stopSpeaking();
     birdMessages = [];
     birdResponsePending = false;
     birdChatError = null;
@@ -535,6 +553,7 @@ class GameController extends ChangeNotifier {
   }
 
   void restartRun() {
+    _stopSpeaking();
     _resetCurrentRun();
     playCount += 1;
     view = AppView.story;
@@ -564,6 +583,7 @@ class GameController extends ChangeNotifier {
   }
 
   void _openUtility(AppView utilityView) {
+    _stopSpeaking();
     _nestedUtilityReturnView = null;
     _returnView = switch (view) {
       AppView.settings ||
@@ -577,6 +597,7 @@ class GameController extends ChangeNotifier {
   }
 
   void _goToNode(String nodeId) {
+    _stopSpeaking();
     final next = StoryRepository.node(_resolveNodeId(nodeId));
     storyTransition = StoryTransitionKind.between(currentNode.type, next.type);
     currentNodeId = next.id;
@@ -607,6 +628,8 @@ class GameController extends ChangeNotifier {
         .toList();
     _goToNode(StoryRepository.unlockNodeIdForCollectible(collectibleId));
   }
+
+  void _stopSpeaking() => unawaited(textToSpeechService.stop());
 
   void _persist() {
     unawaited(

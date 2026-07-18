@@ -43,6 +43,7 @@ class FirstEndingScreen extends StatelessWidget {
                 bottom: dialogBottom,
                 horizontalPadding: horizontalPadding,
                 onContinue: controller.advance,
+                onSpeak: controller.speakCurrentStoryText,
               ),
             ],
           );
@@ -152,6 +153,7 @@ class _FirstEndingDialog extends StatelessWidget {
     required this.bottom,
     required this.horizontalPadding,
     required this.onContinue,
+    required this.onSpeak,
   });
 
   final String quote;
@@ -159,13 +161,14 @@ class _FirstEndingDialog extends StatelessWidget {
   final double bottom;
   final double horizontalPadding;
   final VoidCallback onContinue;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) {
     final width = layout.maxWidth(366, padding: horizontalPadding);
     final height = layout.isLandscape
         ? layout.s(260).clamp(220.0, 280.0)
-        : layout.s(240).clamp(240.0, 300.0);
+        : layout.s(280).clamp(240.0, 300.0);
     final buttonWidth = layout.maxWidth(238, padding: horizontalPadding + 64);
     final buttonHeight = layout.s(56).clamp(48.0, 56.0);
 
@@ -209,9 +212,15 @@ class _FirstEndingDialog extends StatelessWidget {
                           child: _FirstEndingQuote(text: quote, layout: layout),
                         ),
                       ),
-                      SizedBox(height: layout.gap(12)),
+                      IconButton(
+                        icon: const Icon(Icons.volume_up_rounded),
+                        color: const Color(0xfff4dda2),
+                        tooltip: 'Read aloud',
+                        onPressed: onSpeak,
+                      ),
+                      SizedBox(height: layout.gap(2)),
                       _FirstEndingDecorativeLine(layout: layout),
-                      SizedBox(height: layout.gap(12)),
+                      SizedBox(height: layout.gap(6)),
                       _FirstEndingContinueButton(
                         width: buttonWidth,
                         height: buttonHeight,
