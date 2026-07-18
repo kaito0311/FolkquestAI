@@ -244,8 +244,9 @@ class _UtilityHeader extends StatelessWidget {
           Center(
             child: SizedBox(
               width: titleWidth,
-              height: 33 * titleScale,
+              height: 44 * titleScale,
               child: Stack(
+                clipBehavior: Clip.none,
                 alignment: Alignment.center,
                 children: [
                   Positioned(
@@ -275,6 +276,7 @@ class _UtilityHeader extends StatelessWidget {
                   Text(
                     title,
                     textAlign: TextAlign.center,
+                    textScaler: TextScaler.noScaling,
                     style: TextStyle(
                       color: const Color(0xffb07d36),
                       fontSize: layout.font(30),

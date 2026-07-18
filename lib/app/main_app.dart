@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 import 'package:fqa/app/fqa_app.dart';
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/fqa_assets.dart';
 import 'package:fqa/core/fqa_colors.dart';
+import 'package:fqa/services/bird_chat_service.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({
@@ -26,6 +28,7 @@ class _MainAppState extends State<MainApp> {
   bool _musicPlaying = false;
   bool? _lastMusicEnabled;
   double? _lastMusicVolume;
+  bool _initialWarmupScheduled = false;
 
   @override
   void initState() {
@@ -95,6 +98,41 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
+  void _scheduleInitialWarmup(BuildContext context) {
+    if (_initialWarmupScheduled) return;
+    _initialWarmupScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final service = widget.controller.birdChatService;
+      if (service is FirebaseBirdChatService) {
+        unawaited(_preloadBirdChatConfig(service));
+      }
+      unawaited(_precacheFirstInteractionAssets(context));
+    });
+  }
+
+  Future<void> _preloadBirdChatConfig(FirebaseBirdChatService service) async {
+    try {
+      await service.preload();
+    } catch (error) {
+      debugPrint('Bird chat configuration preload failed: $error');
+    }
+  }
+
+  Future<void> _precacheFirstInteractionAssets(BuildContext context) async {
+    const assets = [
+      'backgrounds/story_bg.png',
+      'backgrounds/options_bg.png',
+      'backgrounds/collection_bg.png',
+      'buttons/primary_button.png',
+      'icons/back_icon.png',
+      'panels/dialog_panel.png',
+    ];
+    for (final asset in assets) {
+      await precacheImage(AssetImage(FqaAssets.image(asset)), context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -109,6 +147,7 @@ class _MainAppState extends State<MainApp> {
             useMaterial3: true,
           ),
           builder: (context, child) {
+            _scheduleInitialWarmup(context);
             final mediaQuery = MediaQuery.of(context);
             final scaledChild = MediaQuery(
               data: mediaQuery.copyWith(

@@ -26,7 +26,7 @@ class SpeakerTag extends StatelessWidget {
                 speaker,
                 style: const TextStyle(
                   color: FqaColors.cream,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w800,
                 ),
               ),

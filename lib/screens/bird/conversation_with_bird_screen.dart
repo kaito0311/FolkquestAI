@@ -311,7 +311,7 @@ class _BirdBubble extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: layout.contentWidth(270, landscapeValue: 320),
+              width: layout.contentWidth(210, landscapeValue: 320),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: layout.s(45).clamp(40.0, 45.0),
@@ -435,7 +435,7 @@ class _UserBubble extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SizedBox(
-              width: layout.contentWidth(270, landscapeValue: 320),
+              width: layout.contentWidth(210, landscapeValue: 320),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: layout.s(45).clamp(40.0, 45.0),
