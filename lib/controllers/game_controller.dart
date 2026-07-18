@@ -66,6 +66,13 @@ class GameController extends ChangeNotifier {
   StreamSubscription<AuthUser?>? _authSubscription;
 
   bool get isSignedIn => currentUser != null;
+  String get playerName {
+    final displayName = currentUser?.displayName?.trim();
+    return displayName == null || displayName.isEmpty
+        ? 'Người chơi FolkQuest'
+        : displayName;
+  }
+
   double get textScaleFactor => textSize.scale;
   double get brightnessOverlayOpacity =>
       ((100 - screenBrightness) / 100 * 0.68).clamp(0.0, 0.68).toDouble();
@@ -307,6 +314,7 @@ class GameController extends ChangeNotifier {
         karma: karma,
         storyTitle: currentNode.title,
         selectedChoices: selectedChoices,
+        playerName: playerName,
       );
       await for (final reply
           in birdChatService
@@ -335,7 +343,7 @@ class GameController extends ChangeNotifier {
       _replaceStreamingBirdMessage(
         'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau.',
       );
-      birdChatError = 'Chim Thần phản hồi quá 5 giây.';
+      birdChatError = 'Chim Thần phản hồi quá 15 giây.';
     } catch (error) {
       debugPrint(
         'Error during bird chat after ${replyTimer.elapsedMilliseconds}ms: '

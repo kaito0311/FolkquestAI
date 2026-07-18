@@ -12,6 +12,7 @@ class BirdChatRequest {
     required this.karma,
     required this.storyTitle,
     required this.selectedChoices,
+    required this.playerName,
   });
 
   final String question;
@@ -19,6 +20,7 @@ class BirdChatRequest {
   final int karma;
   final String storyTitle;
   final List<String> selectedChoices;
+  final String playerName;
 }
 
 abstract class BirdChatService {
@@ -95,7 +97,7 @@ class FirebaseBirdChatService implements BirdChatService {
           : null;
       throw BirdChatRemoteException(
         message ??
-            'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau.',
+            'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau. Hãy đảm bảo đường truyền Internet ổn định.',
       );
     }
     if (decoded is! Map<String, dynamic>) {
@@ -105,7 +107,7 @@ class FirebaseBirdChatService implements BirdChatService {
     }
     final reply = _extractOpenAIReply(decoded);
     if (reply == null || reply.isEmpty) {
-      throw const BirdChatRemoteException('Chim Thần chưa kịp trả lời.');
+      throw const BirdChatRemoteException('Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau. Hãy đảm bảo đường truyền Internet ổn định.');
     }
     return reply;
   }
@@ -121,7 +123,7 @@ class FirebaseBirdChatService implements BirdChatService {
           : null;
       throw BirdChatRemoteException(
         message ??
-            'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau.',
+            'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau. Hãy đảm bảo đường truyền Internet ổn định.',
       );
     }
 
@@ -309,6 +311,7 @@ class FirebaseBirdChatService implements BirdChatService {
         'content':
             'Ngữ cảnh hiện tại: ${request.storyTitle}. '
             'Karma: ${request.karma}. '
+            'Tên người chơi: ${request.playerName}. '
             'Các lựa chọn đã đi qua: ${request.selectedChoices.join("; ")}.',
       },
       ...history,
