@@ -17,9 +17,10 @@ class UnlockCollectibleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final collectible = StoryRepository.collectibles.firstWhere(
+    final collectibles = StoryRepository.collectiblesFor(controller.language);
+    final collectible = collectibles.firstWhere(
       (item) => item.id == controller.currentNode.unlockCollectibleId,
-      orElse: () => StoryRepository.collectibles.first,
+      orElse: () => collectibles.first,
     );
     return FqaScaffold(
       background: 'backgrounds/unlock_bg.png',

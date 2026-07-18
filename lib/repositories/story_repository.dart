@@ -3,6 +3,8 @@ import 'package:fqa/models/ending.dart';
 import 'package:fqa/models/story_choice.dart';
 import 'package:fqa/models/story_node.dart';
 import 'package:fqa/models/story_node_type.dart';
+import 'package:fqa/models/app_language.dart';
+import 'package:fqa/repositories/english_story_content.dart';
 
 class StoryRepository {
   static const startNodeId = 'start_intro';
@@ -51,6 +53,38 @@ class StoryRepository {
       .map((collectible) => collectible.id)
       .toSet();
 
+  static List<Collectible> collectiblesFor(AppLanguage language) {
+    if (language != AppLanguage.english) return collectibles;
+    return [
+      for (final item in collectibles)
+        Collectible(
+          id: item.id,
+          name: _englishCollectibleNames[item.id] ?? item.name,
+          description:
+              _englishCollectibleDescriptions[item.id] ?? item.description,
+          assetName: item.assetName,
+          initiallyUnlocked: item.initiallyUnlocked,
+        ),
+    ];
+  }
+
+  static const _englishCollectibleNames = {
+    'bag3': 'Three-span bag',
+    'starfruit': 'Starfruit tree',
+    'gold': 'Gold',
+    'feather': 'Magic Bird feather',
+    'bag12': 'Twelve-span bag',
+    'half': 'Fair-share scale',
+  };
+  static const _englishCollectibleDescriptions = {
+    'bag3': 'A symbol of knowing what is enough.',
+    'starfruit': 'A small inheritance that opens a new path.',
+    'gold': 'A reward that tests the heart.',
+    'feather': 'A symbol of good fortune and kindness repaid.',
+    'bag12': 'A reminder about greed.',
+    'half': 'A symbol of asking for a fair division of the inheritance.',
+  };
+
   static const endings = {
     'early_bad': Ending(
       id: 'early_bad',
@@ -81,6 +115,36 @@ class StoryRepository {
       id: 'keep_tree',
       title: 'Giữ lấy cây khế',
       karmaSummary: 'Người em biết bảo vệ điều quý giá bằng lòng bình an.',
+    ),
+  };
+
+  static Ending ending(
+    String id, {
+    AppLanguage language = AppLanguage.vietnamese,
+  }) {
+    final ending = endings[id] ?? endings.values.first;
+    if (language != AppLanguage.english) return ending;
+    final text = _englishEndings[ending.id];
+    return text == null
+        ? ending
+        : Ending(id: ending.id, title: text.$1, karmaSummary: text.$2);
+  }
+
+  static const _englishEndings = {
+    'early_bad': ('An opportunity closes', 'Greed closed the door too early.'),
+    'no_promise': (
+      'The Magic Bird leaves',
+      'Good opportunities need kindness to remain.',
+    ),
+    'enough': ('The path of knowing enough', 'You knew when to stop.'),
+    'player_bad': (
+      'The younger brother falls into the sea',
+      'An oversized bag pulled the heart down with it.',
+    ),
+    'brother_bad': ('Compassion', 'A heart can remain compassionate.'),
+    'keep_tree': (
+      'Keep the starfruit tree',
+      'The younger brother protects what is precious with peace.',
     ),
   };
 
@@ -585,5 +649,13 @@ class StoryRepository {
     };
   }
 
-  static StoryNode node(String id) => nodes[id] ?? nodes[startNodeId]!;
+  static StoryNode node(
+    String id, {
+    AppLanguage language = AppLanguage.vietnamese,
+  }) {
+    final node = nodes[id] ?? nodes[startNodeId]!;
+    return language == AppLanguage.english
+        ? EnglishStoryContent.localize(node)
+        : node;
+  }
 }

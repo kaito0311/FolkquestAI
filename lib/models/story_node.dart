@@ -35,6 +35,30 @@ class StoryNode {
   final String reflectionTitle;
   final String? unlockCollectibleId;
   final String? endingId;
+
+  StoryNode copyWith({
+    String? title,
+    String? text,
+    String? speaker,
+    String? reflectionTitle,
+    List<StoryChoice>? choices,
+  }) => StoryNode(
+    id: id,
+    title: title ?? this.title,
+    type: type,
+    text: text ?? this.text,
+    speaker: speaker ?? this.speaker,
+    background: background,
+    coverAlignmentX: coverAlignmentX,
+    coverAlignmentY: coverAlignmentY,
+    nextId: nextId,
+    choices: choices ?? this.choices,
+    karmaRoutes: karmaRoutes,
+    karmaDelta: karmaDelta,
+    reflectionTitle: reflectionTitle ?? this.reflectionTitle,
+    unlockCollectibleId: unlockCollectibleId,
+    endingId: endingId,
+  );
 }
 
 class KarmaRoute {

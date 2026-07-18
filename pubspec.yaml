@@ -13,6 +13,8 @@ dependencies:
   firebase_core: ^4.10.0
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   google_sign_in: ^7.2.0
   http: ^1.2.2
   shared_preferences: ^2.3.5
