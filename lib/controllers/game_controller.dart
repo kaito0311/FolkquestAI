@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:fqa/models/app_view.dart';
+import 'package:fqa/models/app_language.dart';
 import 'package:fqa/models/auth_user.dart';
 import 'package:fqa/models/bird_conversation_message.dart';
 import 'package:fqa/models/collectible.dart';
@@ -63,6 +64,7 @@ class GameController extends ChangeNotifier {
   double screenBrightness = 100;
   bool musicEnabled = true;
   double musicVolume = 100;
+  AppLanguage language = AppLanguage.vietnamese;
   StreamSubscription<AuthUser?>? _authSubscription;
 
   bool get isSignedIn => currentUser != null;
@@ -84,11 +86,13 @@ class GameController extends ChangeNotifier {
     return '';
   }
 
-  StoryNode get currentNode => StoryRepository.node(currentNodeId);
+  StoryNode get currentNode =>
+      StoryRepository.node(currentNodeId, language: language);
 
-  Ending get currentEnding =>
-      StoryRepository.endings[completedEndingId ?? currentNode.endingId] ??
-      StoryRepository.endings.values.first;
+  Ending get currentEnding => StoryRepository.ending(
+    completedEndingId ?? currentNode.endingId ?? '',
+    language: language,
+  );
 
   Future<void> load() async {
     final snapshot = await store.load();
@@ -160,11 +164,19 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setLanguage(AppLanguage value) {
+    if (language == value) return;
+    language = value;
+    _persist();
+    notifyListeners();
+  }
+
   void _applySnapshot(GameSnapshot snapshot) {
     currentNodeId = StoryRepository.nodes.containsKey(snapshot.currentNodeId)
         ? snapshot.currentNodeId
         : StoryRepository.startNodeId;
     karma = snapshot.karma;
+    language = snapshot.language;
     selectedChoices = snapshot.selectedChoices;
     unlockedCollectibleIds = {
       ...StoryRepository.initialUnlockedIds,
@@ -315,6 +327,7 @@ class GameController extends ChangeNotifier {
         storyTitle: currentNode.title,
         selectedChoices: selectedChoices,
         playerName: playerName,
+        language: language,
       );
       await for (final reply
           in birdChatService
@@ -476,7 +489,7 @@ class GameController extends ChangeNotifier {
   }
 
   Iterable<Collectible> filteredCollectibles() {
-    return StoryRepository.collectibles.where((collectible) {
+    return StoryRepository.collectiblesFor(language).where((collectible) {
       return switch (collectionFilter) {
         CollectionFilter.all => true,
         CollectionFilter.opened => isUnlocked(collectible),
@@ -546,6 +559,7 @@ class GameController extends ChangeNotifier {
           runUnlockedCollectibles: runUnlockedCollectibleIds,
           completedEndingId: completedEndingId,
           playCount: playCount,
+          language: language,
         ),
       ),
     );

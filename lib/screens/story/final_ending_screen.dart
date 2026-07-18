@@ -21,7 +21,7 @@ class FinalEndingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ending = controller.currentEnding;
-    final opened = StoryRepository.collectibles
+    final opened = StoryRepository.collectiblesFor(controller.language)
         .where(
           (collectible) =>
               controller.runUnlockedCollectibleIds.contains(collectible.id),

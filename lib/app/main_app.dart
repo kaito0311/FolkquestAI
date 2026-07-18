@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:fqa/app/fqa_app.dart';
 import 'package:fqa/controllers/game_controller.dart';
@@ -141,6 +142,9 @@ class _MainAppState extends State<MainApp> {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'FolkQuest',
+          locale: Locale(widget.controller.language.languageCode),
+          supportedLocales: const [Locale('vi'), Locale('en')],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: FqaColors.gold),
             fontFamily: 'Roboto',

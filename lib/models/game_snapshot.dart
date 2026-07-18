@@ -1,4 +1,5 @@
 import 'package:fqa/repositories/story_repository.dart';
+import 'package:fqa/models/app_language.dart';
 
 class GameSnapshot {
   const GameSnapshot({
@@ -9,6 +10,7 @@ class GameSnapshot {
     this.runUnlockedCollectibles = const {},
     this.completedEndingId,
     this.playCount = 0,
+    this.language = AppLanguage.vietnamese,
   });
 
   final String currentNodeId;
@@ -18,6 +20,7 @@ class GameSnapshot {
   final Set<String> runUnlockedCollectibles;
   final String? completedEndingId;
   final int playCount;
+  final AppLanguage language;
 
   Map<String, Object?> toJson() => {
     'currentNodeId': currentNodeId,
@@ -27,6 +30,7 @@ class GameSnapshot {
     'runUnlockedCollectibles': runUnlockedCollectibles.toList(),
     'completedEndingId': completedEndingId,
     'playCount': playCount,
+    'language': language.languageCode,
   };
 
   static GameSnapshot fromJson(Map<String, Object?> json) {
@@ -47,6 +51,7 @@ class GameSnapshot {
               .toSet(),
       completedEndingId: json['completedEndingId'] as String?,
       playCount: (json['playCount'] as num?)?.toInt() ?? 0,
+      language: AppLanguage.fromLanguageCode(json['language'] as String?),
     );
   }
 }
