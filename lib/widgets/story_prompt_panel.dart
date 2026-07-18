@@ -9,11 +9,13 @@ class StoryPromptPanel extends StatelessWidget {
   const StoryPromptPanel({
     required this.speaker,
     required this.text,
+    required this.onSpeak,
     super.key,
   });
 
   final String speaker;
   final String text;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +58,16 @@ class StoryPromptPanel extends StatelessWidget {
             ),
           ),
           SpeakerTag(speaker: speaker),
+          Positioned(
+            right: 36,
+            top: 38,
+            child: IconButton(
+              icon: const Icon(Icons.volume_up_rounded),
+              color: FqaColors.gold,
+              tooltip: 'Read aloud',
+              onPressed: onSpeak,
+            ),
+          ),
         ],
       ),
     );

@@ -72,6 +72,7 @@ class OptionsScreen extends StatelessWidget {
                         child: StoryPromptPanel(
                           speaker: node.speaker ?? '',
                           text: node.text,
+                          onSpeak: controller.speakCurrentStoryText,
                         ),
                       ),
                     ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/models/bird_conversation_message.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
@@ -125,7 +126,7 @@ class _ConversationWithBirdScreenState extends State<ConversationWithBirdScreen>
           return Stack(
             children: [
               StoryTopBar(
-                title: 'Chim Thần',
+                title: context.strings.magicBird,
                 onBack: widget.controller.backFromBirdConversation,
                 onPause: widget.controller.showPause,
               ),
@@ -155,7 +156,7 @@ class _ConversationWithBirdScreenState extends State<ConversationWithBirdScreen>
                 bottom: continueButtonBottom,
                 child: Center(
                   child: FqaImageButton(
-                    label: 'Tiếp tục câu chuyện',
+                    label: context.strings.continueStory,
                     width: layout.contentWidth(194, landscapeValue: 220),
                     height: continueButtonHeight,
                     fontSize: layout.font(14),
@@ -238,7 +239,7 @@ class _ConversationThread extends StatelessWidget {
                         child: _BirdBubble(
                           layout: layout,
                           text: message.text.isEmpty && responsePending
-                              ? 'Chim Thần đang suy nghĩ...'
+                              ? context.strings.magicBirdThinking
                               : message.text,
                           createdAt: message.createdAt,
                         ),
@@ -552,7 +553,7 @@ class _ConversationInput extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
               decoration: InputDecoration(
-                hintText: 'Nhập tin nhắn ...',
+                hintText: context.strings.messageHint,
                 hintStyle: TextStyle(
                   color: const Color(0xff73684c),
                   fontSize: layout.font(15),

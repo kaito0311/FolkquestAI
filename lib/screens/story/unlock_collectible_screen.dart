@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
@@ -57,7 +58,7 @@ class UnlockCollectibleScreen extends StatelessWidget {
                   offset: const Offset(0, -0.14),
                   delay: const Duration(milliseconds: 80),
                   child: Text(
-                    'Đã mở khóa',
+                    context.strings.unlocked,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: const Color(0xfff4d88f),
@@ -82,12 +83,15 @@ class UnlockCollectibleScreen extends StatelessWidget {
                     child: SizedBox(
                       width: artSize,
                       height: artSize,
-                      child: FqaAssetImage(
-                        collectible.assetName,
-                        fallback: Icon(
-                          Icons.auto_awesome,
-                          color: FqaColors.gold,
-                          size: artSize * 0.58,
+                      child: Transform.scale(
+                        scale: collectible.displayScale,
+                        child: FqaAssetImage(
+                          collectible.assetName,
+                          fallback: Icon(
+                            Icons.auto_awesome,
+                            color: FqaColors.gold,
+                            size: artSize * 0.58,
+                          ),
                         ),
                       ),
                     ),
@@ -142,7 +146,7 @@ class UnlockCollectibleScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     FqaImageButton(
-                      label: 'Xem bộ sưu tập',
+                      label: context.strings.viewCollection,
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(19),
@@ -153,7 +157,7 @@ class UnlockCollectibleScreen extends StatelessWidget {
                     ),
                     SizedBox(height: layout.gap(14)),
                     FqaImageButton(
-                      label: 'Tiếp tục',
+                      label: context.strings.continueLabel,
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(19),

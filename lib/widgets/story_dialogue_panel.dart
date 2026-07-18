@@ -11,12 +11,14 @@ class StoryDialoguePanel extends StatelessWidget {
     required this.speaker,
     required this.text,
     required this.onContinue,
+    required this.onSpeak,
     super.key,
   });
 
   final String speaker;
   final String text;
   final VoidCallback onContinue;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +62,16 @@ class StoryDialoguePanel extends StatelessWidget {
             ),
           ),
           SpeakerTag(speaker: speaker),
+          Positioned(
+            right: 45,
+            top: 57,
+            child: IconButton(
+              icon: const Icon(Icons.volume_up_rounded),
+              color: FqaColors.gold,
+              tooltip: 'Read aloud',
+              onPressed: onSpeak,
+            ),
+          ),
           Positioned(
             right: 48,
             bottom: 38,
