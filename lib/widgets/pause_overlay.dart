@@ -21,27 +21,32 @@ class PauseOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.sizeOf(context);
+    final portrait = screenSize.height > screenSize.width;
     return Material(
       color: Colors.black87,
       child: Center(
-        child: _PausePanel(
-          onClose: onContinue,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(40, 48, 40, 32),
-            child: Column(
-              children: [
-                const _PauseTitle(),
-                const SizedBox(height: 16),
-                const _PauseDecorativeLine(),
-                const SizedBox(height: 16),
-                _PauseButtons(
-                  onContinue: onContinue,
-                  onRestart: onRestart,
-                  onExit: onExit,
-                ),
-                const Spacer(),
-                _PauseOperationIcons(onUtility: onUtility),
-              ],
+        child: Transform.scale(
+          scale: portrait ? 0.92 : 1,
+          child: _PausePanel(
+            onClose: onContinue,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(40, 48, 40, 32),
+              child: Column(
+                children: [
+                  const _PauseTitle(),
+                  const SizedBox(height: 16),
+                  const _PauseDecorativeLine(),
+                  const SizedBox(height: 16),
+                  _PauseButtons(
+                    onContinue: onContinue,
+                    onRestart: onRestart,
+                    onExit: onExit,
+                  ),
+                  const Spacer(),
+                  _PauseOperationIcons(onUtility: onUtility),
+                ],
+              ),
             ),
           ),
         ),

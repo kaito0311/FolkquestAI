@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -60,6 +61,8 @@ class BirdChatRemoteException implements Exception {
 }
 
 class FirebaseBirdChatService implements BirdChatService {
+  static const _operationTimeout = Duration(seconds: 10);
+
   FirebaseBirdChatService({
     FirebaseFirestore? firestore,
     http.Client? httpClient,
@@ -114,40 +117,46 @@ class FirebaseBirdChatService implements BirdChatService {
 
   @override
   Stream<String> streamReply(BirdChatRequest request) async* {
-    final response = await _sendStreamingChatRequestWithConfigRefresh(request);
-    if (response.statusCode != 200) {
-      final body = await response.stream.bytesToString();
-      final decoded = _tryDecodeJson(body);
-      final message = decoded is Map<String, dynamic>
-          ? decoded['error']?.toString()
-          : null;
-      throw BirdChatRemoteException(
-        message ??
-            'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau. Hãy đảm bảo đường truyền Internet ổn định.',
+    try {
+      final response = await _sendStreamingChatRequestWithConfigRefresh(
+        request,
       );
-    }
+      if (response.statusCode != 200) {
+        final body = await response.stream.bytesToString();
+        final decoded = _tryDecodeJson(body);
+        final message = decoded is Map<String, dynamic>
+            ? decoded['error']?.toString()
+            : null;
+        throw BirdChatRemoteException(
+          message ??
+              'Không thể trò chuyện với Chim Thần lúc này. Vui lòng thử lại sau. Hãy đảm bảo đường truyền Internet ổn định.',
+        );
+      }
 
-    final reply = StringBuffer();
-    await for (final chunk
-        in response.stream
-            .transform(utf8.decoder)
-            .transform(const LineSplitter())) {
-      final data = chunk.trim();
-      if (data.isEmpty || data.startsWith(':')) continue;
-      if (!data.startsWith('data:')) continue;
+      final reply = StringBuffer();
+      await for (final chunk
+          in response.stream
+              .transform(utf8.decoder)
+              .transform(const LineSplitter())) {
+        final data = chunk.trim();
+        if (data.isEmpty || data.startsWith(':')) continue;
+        if (!data.startsWith('data:')) continue;
 
-      final payload = data.substring(5).trim();
-      if (payload == '[DONE]') break;
+        final payload = data.substring(5).trim();
+        if (payload == '[DONE]') break;
 
-      final decoded = _tryDecodeJson(payload);
-      final content = _extractOpenAIStreamDelta(decoded);
-      if (content == null || content.isEmpty) continue;
-      reply.write(content);
-      yield reply.toString().trimLeft();
-    }
+        final decoded = _tryDecodeJson(payload);
+        final content = _extractOpenAIStreamDelta(decoded);
+        if (content == null || content.isEmpty) continue;
+        reply.write(content);
+        yield reply.toString().trimLeft();
+      }
 
-    if (reply.toString().trim().isEmpty) {
-      throw const BirdChatRemoteException('Chim Thần chưa kịp trả lời.');
+      if (reply.toString().trim().isEmpty) {
+        throw const BirdChatRemoteException('Chim Thần chưa kịp trả lời.');
+      }
+    } catch (error) {
+      yield 'Chim Thần đang ở xa, con hãy thử lại sau.';
     }
   }
 
@@ -161,6 +170,10 @@ class FirebaseBirdChatService implements BirdChatService {
       if (response.statusCode == 200) {
         return response;
       }
+    } on TimeoutException {
+      rethrow;
+    } on http.ClientException {
+      rethrow;
     } catch (_) {
       // The provider config may have changed; retry once with a fresh snapshot.
     }
@@ -179,6 +192,10 @@ class FirebaseBirdChatService implements BirdChatService {
       if (response.statusCode == 200) {
         return response;
       }
+    } on TimeoutException {
+      rethrow;
+    } on http.ClientException {
+      rethrow;
     } catch (_) {
       // The provider config may have changed; retry once with a fresh snapshot.
     }
@@ -191,17 +208,19 @@ class FirebaseBirdChatService implements BirdChatService {
     _OpenRouterConfig config,
     BirdChatRequest request,
   ) {
-    return _httpClient.post(
-      Uri.parse(config.hostUrl),
-      headers: {
-        'Authorization': 'Bearer ${config.apiKey}',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'model': config.model,
-        'messages': _openAIChatMessages(request),
-      }),
-    );
+    return _httpClient
+        .post(
+          Uri.parse(config.hostUrl),
+          headers: {
+            'Authorization': 'Bearer ${config.apiKey}',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'model': config.model,
+            'messages': _openAIChatMessages(request),
+          }),
+        )
+        .timeout(_operationTimeout);
   }
 
   Future<http.StreamedResponse> _sendStreamingChatRequest(
@@ -218,7 +237,7 @@ class FirebaseBirdChatService implements BirdChatService {
         'stream': true,
         'messages': _openAIChatMessages(request),
       });
-    return _httpClient.send(chatRequest);
+    return _httpClient.send(chatRequest).timeout(_operationTimeout);
   }
 
   Future<_OpenRouterConfig> _loadProviderConfig({
@@ -259,7 +278,8 @@ class FirebaseBirdChatService implements BirdChatService {
     final snapshot = await _firestore
         .collection('app_config')
         .doc('openrouter')
-        .get();
+        .get()
+        .timeout(_operationTimeout);
     final data = snapshot.data();
     final apiKey = data?['apiKey']?.toString().trim();
     if (apiKey == null || apiKey.isEmpty) {

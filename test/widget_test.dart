@@ -596,7 +596,7 @@ void main() {
     expect(controller.birdChatError, 'Chim Thần phản hồi quá 5 giây.');
     expect(
       find.text(
-        'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau.',
+        'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau. Hãy kiểm tra lại kết nối mạng của con nhé.',
         findRichText: true,
       ),
       findsOneWidget,

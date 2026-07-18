@@ -19,7 +19,7 @@ import 'package:fqa/services/bird_chat_service.dart';
 import 'package:fqa/stores/progress_store.dart';
 
 class GameController extends ChangeNotifier {
-  static const birdChatReplyTimeout = Duration(seconds: 15);
+  static const birdChatReplyTimeout = Duration(seconds: 10);
 
   GameController(
     this.store, {
@@ -341,7 +341,7 @@ class GameController extends ChangeNotifier {
         'Bird chat timed out after ${replyTimer.elapsedMilliseconds}ms.',
       );
       _replaceStreamingBirdMessage(
-        'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau.',
+        'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau. Hãy kiểm tra lại kết nối mạng của con nhé.',
       );
       birdChatError = 'Chim Thần phản hồi quá 15 giây.';
     } catch (error) {
