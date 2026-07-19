@@ -113,11 +113,43 @@ class GameController extends ChangeNotifier {
       language == AppLanguage.english ? englishVoiceName : vietnameseVoiceName;
 
   Future<void> speakCurrentStoryText() => textToSpeechService.speak(
-    currentNode.text,
+    _speechTextForCurrentNode(),
     language: language,
     voiceName: selectedVoiceName,
     rate: speechRate,
   );
+
+  String _speechTextForCurrentNode() {
+    final node = currentNode;
+    return switch (node.type) {
+      StoryNodeType.dialogue || StoryNodeType.options => _joinSpeechParts([
+        if (_isOlderBrother(node))
+          language == AppLanguage.english
+              ? 'Older brother says'
+              : 'Người anh nói',
+        node.text,
+      ]),
+      StoryNodeType.firstEnding => _joinSpeechParts([
+        language == AppLanguage.english ? 'Ending' : 'Kết cục',
+        node.title,
+        node.text,
+      ]),
+      StoryNodeType.karma => _joinSpeechParts([
+        node.reflectionTitle,
+        node.text,
+      ]),
+      _ => node.text,
+    };
+  }
+
+  bool _isOlderBrother(StoryNode node) =>
+      node.speaker ==
+      (language == AppLanguage.english ? 'Older brother' : 'Người anh');
+
+  String _joinSpeechParts(Iterable<String> parts) => parts
+      .map((part) => part.trim())
+      .where((part) => part.isNotEmpty)
+      .join('. ');
 
   Future<void> speakFinalEndingSummary() {
     final karmaLabel = language == AppLanguage.english ? 'Karma' : 'Nghiệp lực';
