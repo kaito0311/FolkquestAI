@@ -125,7 +125,7 @@ class GameController extends ChangeNotifier {
         ? 'Key choices'
         : 'Những lựa chọn chính';
     return textToSpeechService.speak(
-      '${currentEnding.title}. ${currentEnding.karmaSummary}. '
+      '${currentEnding.title}. '
       '$karmaLabel: $karma. $choicesLabel: ${selectedChoices.join('. ')}',
       language: language,
       voiceName: selectedVoiceName,

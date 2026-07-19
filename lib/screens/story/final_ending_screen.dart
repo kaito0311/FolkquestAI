@@ -309,7 +309,7 @@ class _FinalEndingChoices extends StatelessWidget {
         children: [
           SectionTitle(context.strings.keyChoices),
           const SizedBox(height: 6),
-          for (final choice in choices.take(3)) ChoiceBullet(choice),
+          for (final choice in choices) ChoiceBullet(choice),
           if (choices.isEmpty) ChoiceBullet(context.strings.noChoices),
         ],
       ),
