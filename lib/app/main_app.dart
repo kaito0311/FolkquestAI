@@ -24,9 +24,10 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   AudioPlayer? _backgroundPlayer;
   bool _musicPlaying = false;
+  bool _isAppResumed = true;
   bool? _lastMusicEnabled;
   double? _lastMusicVolume;
   bool _initialWarmupScheduled = false;
@@ -34,11 +35,32 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _isAppResumed =
+        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     widget.controller.addListener(_syncBackgroundMusicIfNeeded);
     if (widget.enableBackgroundMusic) {
       _backgroundPlayer = AudioPlayer(playerId: 'folkquest_background_music');
       unawaited(_backgroundPlayer!.setReleaseMode(ReleaseMode.loop));
       unawaited(_syncBackgroundMusic(force: true));
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final isResumed = state == AppLifecycleState.resumed;
+    if (_isAppResumed == isResumed) return;
+
+    _isAppResumed = isResumed;
+    if (isResumed) {
+      unawaited(_syncBackgroundMusic(force: true));
+      return;
+    }
+
+    _musicPlaying = false;
+    final player = _backgroundPlayer;
+    if (player != null) {
+      unawaited(player.pause());
     }
   }
 
@@ -56,6 +78,7 @@ class _MainAppState extends State<MainApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     widget.controller.removeListener(_syncBackgroundMusicIfNeeded);
     final player = _backgroundPlayer;
     _backgroundPlayer = null;
@@ -78,12 +101,11 @@ class _MainAppState extends State<MainApp> {
     final player = _backgroundPlayer;
     if (player == null) return;
 
-    final enabled = widget.controller.musicEnabled;
     final volume = (widget.controller.musicVolume / 100).clamp(0.0, 1.0);
 
     try {
       await player.setVolume(volume);
-      if (!enabled) {
+      if (!_isAppResumed || !widget.controller.musicEnabled) {
         await player.pause();
         _musicPlaying = false;
         return;
@@ -92,6 +114,15 @@ class _MainAppState extends State<MainApp> {
       if (_musicPlaying && !force) return;
 
       await player.play(AssetSource('music/TownTheme.mp3'), volume: volume);
+
+      // The lifecycle or music setting can change while play() is awaiting the
+      // platform player. Do not let a late completion restart background audio.
+      if (!_isAppResumed || !widget.controller.musicEnabled) {
+        await player.pause();
+        _musicPlaying = false;
+        return;
+      }
+
       _musicPlaying = true;
     } catch (error) {
       _musicPlaying = false;
