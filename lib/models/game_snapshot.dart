@@ -13,7 +13,7 @@ class GameSnapshot {
     this.language = AppLanguage.vietnamese,
     this.vietnameseVoiceName,
     this.englishVoiceName,
-    this.speechRate = 0.46,
+    this.speechRate = 0.5,
   });
 
   final String currentNodeId;
@@ -63,7 +63,7 @@ class GameSnapshot {
       language: AppLanguage.fromLanguageCode(json['language'] as String?),
       vietnameseVoiceName: json['vietnameseVoiceName'] as String?,
       englishVoiceName: json['englishVoiceName'] as String?,
-      speechRate: (json['speechRate'] as num?)?.toDouble() ?? 0.46,
+      speechRate: (json['speechRate'] as num?)?.toDouble() ?? 0.5,
     );
   }
 }

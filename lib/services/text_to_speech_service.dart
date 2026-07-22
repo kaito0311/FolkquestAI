@@ -1,4 +1,5 @@
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:fqa/models/app_language.dart';
 
@@ -36,7 +37,7 @@ class FlutterTextToSpeechService implements TextToSpeechService {
         'locale': language == AppLanguage.english ? 'en-US' : 'vi-VN',
       });
     }
-    await _tts.setSpeechRate(rate);
+    await _tts.setSpeechRate(ttsPlatformSpeechRate(rate));
     await _tts.setPitch(1.0);
     await _tts.speak(normalized);
   }
@@ -66,6 +67,13 @@ class FlutterTextToSpeechService implements TextToSpeechService {
         )
         .toList();
   }
+}
+
+@visibleForTesting
+double ttsPlatformSpeechRate(double normalizedRate, {bool isWeb = kIsWeb}) {
+  // flutter_tts defines 0.5 as the normal rate on native platforms, while
+  // Web Speech uses 1.0. Keep the user-facing multiplier consistent.
+  return isWeb ? normalizedRate * 2 : normalizedRate;
 }
 
 class NoopTextToSpeechService implements TextToSpeechService {
