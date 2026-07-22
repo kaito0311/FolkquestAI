@@ -744,8 +744,20 @@ void main() {
     await tester.pump();
     expect(controller.musicEnabled, isTrue);
 
-    expect(find.byType(Slider), findsNWidgets(2));
-    final musicSlider = tester.widgetList<Slider>(find.byType(Slider)).first;
+    expect(find.byType(Slider), findsNWidgets(3));
+
+    final speechRateSlider = tester.widget<Slider>(
+      find.byKey(const ValueKey('setting_slider_Tốc độ đọc')),
+    );
+    expect(speechRateSlider.value, 0);
+    speechRateSlider.onChanged?.call(1);
+    await tester.pump();
+    expect(controller.speechRateMultiplier, 2);
+    expect(controller.speechRate, 1);
+
+    final musicSlider = tester.widget<Slider>(
+      find.byKey(const ValueKey('setting_slider_Âm lượng nhạc nền')),
+    );
     musicSlider.onChanged?.call(35);
     await tester.pump();
     expect(controller.musicVolume, 35);
