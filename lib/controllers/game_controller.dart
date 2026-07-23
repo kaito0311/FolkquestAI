@@ -74,7 +74,7 @@ class GameController extends ChangeNotifier {
   AppTextSize textSize = AppTextSize.medium;
   double screenBrightness = 100;
   bool musicEnabled = true;
-  double musicVolume = 20;
+  double musicVolume = 10;
   AppLanguage language = AppLanguage.vietnamese;
   String? vietnameseVoiceName;
   String? englishVoiceName;
@@ -639,6 +639,18 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> resetGameData() async {
+    _stopSpeaking();
+    _resetCurrentRun();
+    unlockedCollectibleIds = StoryRepository.initialUnlockedIds;
+    playCount = 0;
+    collectionFilter = CollectionFilter.all;
+    _returnView = AppView.home;
+    _nestedUtilityReturnView = null;
+    notifyListeners();
+    await store.save(_createSnapshot());
+  }
+
   bool isUnlocked(Collectible collectible) {
     return unlockedCollectibleIds.contains(collectible.id);
   }
@@ -708,24 +720,22 @@ class GameController extends ChangeNotifier {
   void _stopSpeaking() => unawaited(textToSpeechService.stop());
 
   void _persist() {
-    unawaited(
-      store.save(
-        GameSnapshot(
-          currentNodeId: currentNodeId,
-          karma: karma,
-          selectedChoices: selectedChoices,
-          unlockedCollectibles: unlockedCollectibleIds,
-          runUnlockedCollectibles: runUnlockedCollectibleIds,
-          completedEndingId: completedEndingId,
-          playCount: playCount,
-          language: language,
-          vietnameseVoiceName: vietnameseVoiceName,
-          englishVoiceName: englishVoiceName,
-          speechRate: speechRate,
-        ),
-      ),
-    );
+    unawaited(store.save(_createSnapshot()));
   }
+
+  GameSnapshot _createSnapshot() => GameSnapshot(
+    currentNodeId: currentNodeId,
+    karma: karma,
+    selectedChoices: selectedChoices,
+    unlockedCollectibles: unlockedCollectibleIds,
+    runUnlockedCollectibles: runUnlockedCollectibleIds,
+    completedEndingId: completedEndingId,
+    playCount: playCount,
+    language: language,
+    vietnameseVoiceName: vietnameseVoiceName,
+    englishVoiceName: englishVoiceName,
+    speechRate: speechRate,
+  );
 
   String _resolveNodeId(String nodeId) {
     var resolvedId = nodeId;
