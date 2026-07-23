@@ -12,6 +12,7 @@ import 'package:fqa/models/collection_filter.dart';
 import 'package:fqa/models/story_node_type.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/services/bird_chat_service.dart';
+import 'package:fqa/services/text_to_speech_service.dart';
 import 'package:fqa/stores/memory_progress_store.dart';
 import 'package:fqa/widgets/collection/collectible_card.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
@@ -22,6 +23,7 @@ Future<GameController> _controller({BirdChatService? birdChatService}) async {
   final controller = GameController(
     MemoryProgressStore(),
     birdChatService: birdChatService,
+    textToSpeechService: const NoopTextToSpeechService(),
   );
   await controller.load();
   return controller;
@@ -849,6 +851,59 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
     await _settleTransitions(tester);
     expect(controller.view, AppView.story);
+  });
+
+  testWidgets('profile reset clears game data after confirmation', (
+    tester,
+  ) async {
+    final store = MemoryProgressStore();
+    final controller =
+        GameController(
+            store,
+            textToSpeechService: const NoopTextToSpeechService(),
+          )
+          ..currentNodeId = 'enough_reflection'
+          ..karma = 4
+          ..selectedChoices = ['keep_tree', 'small_bag']
+          ..unlockedCollectibleIds = {'bag3', 'gold'}
+          ..runUnlockedCollectibleIds = {'bag3'}
+          ..completedEndingId = 'enough'
+          ..playCount = 3;
+    controller.openProfile();
+    await _pumpApp(tester, controller);
+
+    final resetButton = find.byKey(const ValueKey('profile_reset_game_data'));
+    expect(resetButton, findsOneWidget);
+
+    await tester.tap(resetButton);
+    await tester.pumpAndSettle();
+    expect(find.text('Đặt lại toàn bộ tiến trình?'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('profile_reset_cancel')));
+    await tester.pumpAndSettle();
+    expect(controller.playCount, 3);
+    expect(controller.unlockedCollectibleIds, {'bag3', 'gold'});
+
+    await tester.tap(resetButton);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('profile_reset_confirm')));
+    await tester.pumpAndSettle();
+
+    expect(controller.view, AppView.profile);
+    expect(controller.currentNodeId, StoryRepository.startNodeId);
+    expect(controller.karma, 0);
+    expect(controller.selectedChoices, isEmpty);
+    expect(controller.unlockedCollectibleIds, isEmpty);
+    expect(controller.runUnlockedCollectibleIds, isEmpty);
+    expect(controller.completedEndingId, isNull);
+    expect(controller.playCount, 0);
+    expect(store.snapshot?.playCount, 0);
+    expect(store.snapshot?.unlockedCollectibles, isEmpty);
+    expect(find.text('Đã đặt lại dữ liệu chơi.'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await _settleTransitions(tester);
+    expect(controller.view, AppView.home);
   });
 
   testWidgets('unlock collectible adds item to persisted state', (
