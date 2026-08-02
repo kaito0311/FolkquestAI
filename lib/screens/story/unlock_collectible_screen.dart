@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
@@ -8,6 +9,7 @@ import 'package:fqa/widgets/fqa_image_button.dart';
 import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
+import 'package:fqa/widgets/story_entrance.dart';
 
 class UnlockCollectibleScreen extends StatelessWidget {
   const UnlockCollectibleScreen({required this.controller, super.key});
@@ -16,9 +18,10 @@ class UnlockCollectibleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final collectible = StoryRepository.collectibles.firstWhere(
+    final collectibles = StoryRepository.collectiblesFor(controller.language);
+    final collectible = collectibles.firstWhere(
       (item) => item.id == controller.currentNode.unlockCollectibleId,
-      orElse: () => StoryRepository.collectibles.first,
+      orElse: () => collectibles.first,
     );
     return FqaScaffold(
       background: 'backgrounds/unlock_bg.png',
@@ -50,14 +53,19 @@ class UnlockCollectibleScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 top: titleTop,
-                child: Text(
-                  'Đã mở khóa',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: const Color(0xfff4d88f),
-                    fontSize: layout.font(18),
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.44,
+                child: StoryEntrance(
+                  key: ValueKey('unlock_title_${collectible.id}'),
+                  offset: const Offset(0, -0.14),
+                  delay: const Duration(milliseconds: 80),
+                  child: Text(
+                    context.strings.unlocked,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color(0xfff4d88f),
+                      fontSize: layout.font(18),
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.44,
+                    ),
                   ),
                 ),
               ),
@@ -65,16 +73,26 @@ class UnlockCollectibleScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 top: artTop,
-                child: Center(
-                  child: SizedBox(
-                    width: artSize,
-                    height: artSize,
-                    child: FqaAssetImage(
-                      collectible.assetName,
-                      fallback: Icon(
-                        Icons.auto_awesome,
-                        color: FqaColors.gold,
-                        size: artSize * 0.58,
+                child: StoryEntrance(
+                  key: ValueKey('unlock_art_${collectible.id}'),
+                  offset: const Offset(0, 0.06),
+                  scaleBegin: 0.72,
+                  delay: const Duration(milliseconds: 180),
+                  duration: const Duration(milliseconds: 520),
+                  child: Center(
+                    child: SizedBox(
+                      width: artSize,
+                      height: artSize,
+                      child: SizedBox.square(
+                        dimension: artSize * 0.72,
+                        child: FqaAssetImage(
+                          collectible.assetName,
+                          fallback: Icon(
+                            Icons.auto_awesome,
+                            color: FqaColors.gold,
+                            size: artSize * 0.58,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -85,34 +103,39 @@ class UnlockCollectibleScreen extends StatelessWidget {
                 right: horizontalPadding,
                 top: textTop,
                 bottom: buttonBottom + buttonHeight * 2 + layout.gap(30),
-                child: FqaScrollHint(
-                  child: Column(
-                    children: [
-                      Text(
-                        collectible.name,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: const Color(0xffefcf86),
-                          fontSize: layout.font(30),
-                          height: 1.2,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      SizedBox(height: layout.gap(18)),
-                      SizedBox(
-                        width: layout.contentWidth(258, landscapeValue: 520),
-                        child: Text(
-                          collectible.description,
+                child: StoryEntrance(
+                  key: ValueKey('unlock_description_${collectible.id}'),
+                  offset: const Offset(0, 0.1),
+                  delay: const Duration(milliseconds: 300),
+                  child: FqaScrollHint(
+                    child: Column(
+                      children: [
+                        Text(
+                          collectible.name,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: const Color(0xffe7d3a2),
-                            fontSize: layout.font(16),
-                            height: 2,
-                            fontWeight: FontWeight.w600,
+                            color: const Color(0xffefcf86),
+                            fontSize: layout.font(30),
+                            height: 1.2,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: layout.gap(18)),
+                        SizedBox(
+                          width: layout.contentWidth(258, landscapeValue: 520),
+                          child: Text(
+                            collectible.description,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: const Color(0xffe7d3a2),
+                              fontSize: layout.font(16),
+                              height: 2,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -123,7 +146,7 @@ class UnlockCollectibleScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     FqaImageButton(
-                      label: 'Xem bộ sưu tập',
+                      label: context.strings.viewCollection,
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(19),
@@ -134,7 +157,7 @@ class UnlockCollectibleScreen extends StatelessWidget {
                     ),
                     SizedBox(height: layout.gap(14)),
                     FqaImageButton(
-                      label: 'Tiếp tục',
+                      label: context.strings.continueLabel,
                       width: buttonWidth,
                       height: buttonHeight,
                       fontSize: layout.font(19),

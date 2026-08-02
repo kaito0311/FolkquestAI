@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
@@ -27,8 +28,8 @@ class ProfileScreen extends StatelessWidget {
           );
           final contentWidth = layout.contentWidth(356, landscapeValue: 520);
           final user = controller.currentUser;
-          final displayName = user?.label ?? 'Người chơi FolkQuest';
-          final email = user?.email ?? 'Chưa đăng nhập';
+          final displayName = user?.label ?? context.strings.folkQuestPlayer;
+          final email = user?.email ?? context.strings.notSignedInShort;
           final collectibles =
               '${controller.unlockedCollectibleIds.length}/${StoryRepository.collectibles.length}';
 
@@ -102,7 +103,7 @@ class _ProfileHeader extends StatelessWidget {
             top: layout.s(10),
             child: UtilityIcon(
               assetName: 'icons/back_icon.png',
-              semanticLabel: 'Quay lại',
+              semanticLabel: context.strings.back,
               size: layout.s(46).clamp(42.0, 48.0),
               onTap: onBack,
             ),
@@ -139,7 +140,7 @@ class _ProfileHeader extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Hồ sơ',
+                    context.strings.profile,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: const Color(0xffb07d36),
@@ -257,7 +258,7 @@ class _StatusPill extends StatelessWidget {
           vertical: layout.s(5),
         ),
         child: Text(
-          signedIn ? 'Đang đồng bộ' : 'Chơi cục bộ',
+          signedIn ? context.strings.syncing : context.strings.localPlay,
           style: TextStyle(
             color: const Color(0xffddcc9e),
             fontSize: layout.font(11),
@@ -289,7 +290,7 @@ class _StatsGrid extends StatelessWidget {
         Expanded(
           child: _StatTile(
             layout: layout,
-            label: 'Lượt chơi',
+            label: context.strings.playCount,
             value: playCount.toString(),
             icon: Icons.replay,
           ),
@@ -298,7 +299,7 @@ class _StatsGrid extends StatelessWidget {
         Expanded(
           child: _StatTile(
             layout: layout,
-            label: 'Lựa chọn',
+            label: context.strings.choices,
             value: choices.toString(),
             icon: Icons.route,
           ),
@@ -307,7 +308,7 @@ class _StatsGrid extends StatelessWidget {
         Expanded(
           child: _StatTile(
             layout: layout,
-            label: 'Vật phẩm',
+            label: context.strings.items,
             value: collectibles,
             icon: Icons.inventory_2_outlined,
           ),
@@ -409,8 +410,8 @@ class _ProfileNote extends StatelessWidget {
             child: Center(
               child: Text(
                 signedIn
-                    ? 'Tiến trình của bạn đang được lưu cùng tài khoản.'
-                    : 'Đăng nhập ở màn hình chính để đồng bộ tiến trình.',
+                    ? context.strings.profileSyncedNote
+                    : context.strings.profileLocalNote,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: const Color(0xffe5d4a5),

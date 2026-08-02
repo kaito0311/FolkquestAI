@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
@@ -13,6 +14,8 @@ class TutorialScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final english = controller.language.name == 'english';
+    final sections = english ? _englishSections : _vietnameseSections;
     return FqaScaffold(
       background: 'backgrounds/collection_bg.png',
       child: LayoutBuilder(
@@ -47,43 +50,35 @@ class TutorialScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _TutorialIntro(layout: layout),
+                      _TutorialIntro(
+                        layout: layout,
+                        text: english
+                            ? 'FolkQuest AI is an interactive storytelling experience: read, choose, reflect, and unlock pieces of the tale.'
+                            : 'FolkQuest AI là trải nghiệm kể chuyện tương tác: bạn đọc, lựa chọn, suy ngẫm và mở khóa các mảnh ghép của truyện.',
+                      ),
                       SizedBox(height: layout.gap(22)),
                       _TutorialSection(
                         layout: layout,
-                        title: 'Mục tiêu',
-                        bullets: const [
-                          'Theo dõi câu chuyện dân gian và chọn cách nhân vật phản ứng trong từng tình huống.',
-                          'Mỗi lựa chọn có thể thay đổi Karma, mở nhánh truyện mới và dẫn tới kết thúc khác nhau.',
-                        ],
+                        title: sections[0].$1,
+                        bullets: sections[0].$2,
                       ),
                       SizedBox(height: layout.gap(20)),
                       _TutorialSection(
                         layout: layout,
-                        title: 'Cách chơi',
-                        bullets: const [
-                          'Chạm “Tiếp tục” để đọc lời thoại và tiến qua các cảnh.',
-                          'Khi màn hình lựa chọn xuất hiện, đọc kỹ lời dẫn rồi chọn phương án bạn muốn thử.',
-                          'Sau một nhánh kết thúc, hãy xem màn hình Karma để hiểu điều lựa chọn vừa phản ánh.',
-                        ],
+                        title: sections[1].$1,
+                        bullets: sections[1].$2,
                       ),
                       SizedBox(height: layout.gap(20)),
                       _TutorialSection(
                         layout: layout,
-                        title: 'Vật phẩm sưu tầm',
-                        bullets: const [
-                          'Hoàn thành một số nhánh truyện sẽ mở khóa vật phẩm trong Bộ sưu tập.',
-                          'Bạn có thể quay lại trang Bộ sưu tập để xem vật phẩm, kết thúc đã gặp và tiến trình của mình.',
-                        ],
+                        title: sections[2].$1,
+                        bullets: sections[2].$2,
                       ),
                       SizedBox(height: layout.gap(20)),
                       _TutorialSection(
                         layout: layout,
-                        title: 'Mẹo nhỏ',
-                        bullets: const [
-                          'Không có lựa chọn duy nhất đúng. Hãy thử nhiều hướng để thấy câu chuyện thay đổi ra sao.',
-                          'Dùng nút tạm dừng để mở cài đặt, hướng dẫn hoặc quay về màn hình chính khi cần.',
-                        ],
+                        title: sections[3].$1,
+                        bullets: sections[3].$2,
                       ),
                       SizedBox(height: layout.gap(16)),
                     ],
@@ -99,14 +94,15 @@ class TutorialScreen extends StatelessWidget {
 }
 
 class _TutorialIntro extends StatelessWidget {
-  const _TutorialIntro({required this.layout});
+  const _TutorialIntro({required this.layout, required this.text});
 
   final ResponsiveLayout layout;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      'FolkQuest AI là trải nghiệm kể chuyện tương tác: bạn đọc, lựa chọn, suy ngẫm và mở khóa các mảnh ghép của truyện.',
+      text,
       textAlign: TextAlign.center,
       style: TextStyle(
         color: const Color(0xffe5d4a5),
@@ -210,14 +206,14 @@ class _TutorialHeader extends StatelessWidget {
             top: layout.s(10),
             child: UtilityIcon(
               assetName: 'icons/back_icon.png',
-              semanticLabel: 'Quay lại',
+              semanticLabel: context.strings.back,
               size: layout.s(46).clamp(42.0, 48.0),
               onTap: onBack,
             ),
           ),
           Center(
             child: Text(
-              'HƯỚNG DẪN',
+              context.strings.guide.toUpperCase(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: const Color(0xffb07d36),
@@ -233,3 +229,66 @@ class _TutorialHeader extends StatelessWidget {
     );
   }
 }
+
+const _vietnameseSections = [
+  (
+    'Mục tiêu',
+    [
+      'Theo dõi câu chuyện dân gian và chọn cách nhân vật phản ứng trong từng tình huống.',
+      'Mỗi lựa chọn có thể thay đổi Karma, mở nhánh truyện mới và dẫn tới kết thúc khác nhau.',
+    ],
+  ),
+  (
+    'Cách chơi',
+    [
+      'Chạm “Tiếp tục” để đọc lời thoại và tiến qua các cảnh.',
+      'Khi màn hình lựa chọn xuất hiện, đọc kỹ lời dẫn rồi chọn phương án bạn muốn thử.',
+      'Sau một nhánh kết thúc, hãy xem màn hình Karma để hiểu điều lựa chọn vừa phản ánh.',
+    ],
+  ),
+  (
+    'Vật phẩm sưu tầm',
+    [
+      'Hoàn thành một số nhánh truyện sẽ mở khóa vật phẩm trong Bộ sưu tập.',
+      'Bạn có thể quay lại trang Bộ sưu tập để xem vật phẩm, kết thúc đã gặp và tiến trình của mình.',
+    ],
+  ),
+  (
+    'Mẹo nhỏ',
+    [
+      'Không có lựa chọn duy nhất đúng. Hãy thử nhiều hướng để thấy câu chuyện thay đổi ra sao.',
+      'Dùng nút tạm dừng để mở cài đặt, hướng dẫn hoặc quay về màn hình chính khi cần.',
+    ],
+  ),
+];
+const _englishSections = [
+  (
+    'Goal',
+    [
+      'Follow the folktale and choose how the character responds in each situation.',
+      'Each choice can change Karma, unlock story branches, and lead to different endings.',
+    ],
+  ),
+  (
+    'How to play',
+    [
+      'Tap “Continue” to read dialogue and move through scenes.',
+      'When choices appear, read the prompt and select the option you want to try.',
+      'After an ending, view the Karma screen to understand what your choice reflects.',
+    ],
+  ),
+  (
+    'Collectibles',
+    [
+      'Completing story branches unlocks items in the Collection.',
+      'Return to the Collection to view items, endings you have found, and your progress.',
+    ],
+  ),
+  (
+    'Tip',
+    [
+      'There is no single correct choice. Try different paths to see how the story changes.',
+      'Use Pause to open settings, this guide, or return to the main screen.',
+    ],
+  ),
+];

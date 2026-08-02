@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/core/fqa_colors.dart';
 import 'package:fqa/models/bird_conversation_message.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
@@ -20,18 +21,33 @@ class ConversationWithBirdScreen extends StatefulWidget {
       _ConversationWithBirdScreenState();
 }
 
-class _ConversationWithBirdScreenState
-    extends State<ConversationWithBirdScreen> {
+class _ConversationWithBirdScreenState extends State<ConversationWithBirdScreen>
+    with WidgetsBindingObserver {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   final _messageKeys = <DateTime, GlobalKey>{};
   DateTime? _pinnedUserMessageCreatedAt;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || MediaQuery.viewInsetsOf(context).bottom > 0) return;
+      _scrollLatestUserMessageToTop();
+    });
   }
 
   Future<void> _submit(String question) async {
@@ -91,10 +107,12 @@ class _ConversationWithBirdScreenState
     return FqaScaffold(
       background: 'backgrounds/bird_chat_bg.png',
       overlay: const _ConversationOverlay(),
+      resizeToAvoidBottomInset: false,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final layout = ResponsiveLayout.of(constraints);
-          final inputBottom = layout.gap(20);
+          final layout = ResponsiveLayout.portraitOf(constraints);
+          final inputBottom =
+              MediaQuery.viewInsetsOf(context).bottom + layout.gap(20);
           final inputHeight = layout.s(52).clamp(46.0, 52.0);
           final continueButtonBottom =
               inputBottom + inputHeight + layout.gap(14);
@@ -108,7 +126,7 @@ class _ConversationWithBirdScreenState
           return Stack(
             children: [
               StoryTopBar(
-                title: 'Chim Thần',
+                title: context.strings.magicBird,
                 onBack: widget.controller.backFromBirdConversation,
                 onPause: widget.controller.showPause,
               ),
@@ -138,7 +156,7 @@ class _ConversationWithBirdScreenState
                 bottom: continueButtonBottom,
                 child: Center(
                   child: FqaImageButton(
-                    label: 'Tiếp tục câu chuyện',
+                    label: context.strings.continueStory,
                     width: layout.contentWidth(194, landscapeValue: 220),
                     height: continueButtonHeight,
                     fontSize: layout.font(14),
@@ -221,7 +239,7 @@ class _ConversationThread extends StatelessWidget {
                         child: _BirdBubble(
                           layout: layout,
                           text: message.text.isEmpty && responsePending
-                              ? 'Chim Thần đang suy nghĩ...'
+                              ? context.strings.magicBirdThinking
                               : message.text,
                           createdAt: message.createdAt,
                         ),
@@ -294,7 +312,7 @@ class _BirdBubble extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: layout.contentWidth(212, landscapeValue: 320),
+              width: layout.contentWidth(210, landscapeValue: 320),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: layout.s(45).clamp(40.0, 45.0),
@@ -418,7 +436,7 @@ class _UserBubble extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SizedBox(
-              width: layout.contentWidth(212, landscapeValue: 320),
+              width: layout.contentWidth(210, landscapeValue: 320),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: layout.s(45).clamp(40.0, 45.0),
@@ -535,7 +553,7 @@ class _ConversationInput extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
               decoration: InputDecoration(
-                hintText: 'Nhập tin nhắn ...',
+                hintText: context.strings.messageHint,
                 hintStyle: TextStyle(
                   color: const Color(0xff73684c),
                   fontSize: layout.font(15),

@@ -8,17 +8,20 @@ class FqaScaffold extends StatelessWidget {
     required this.background,
     required this.child,
     this.overlay,
+    this.resizeToAvoidBottomInset = true,
     super.key,
   });
 
   final String background;
   final Widget child;
   final Widget? overlay;
+  final bool resizeToAvoidBottomInset;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: FqaColors.brown,
+      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       body: ClipRect(
         child: Stack(
           fit: StackFit.expand,
