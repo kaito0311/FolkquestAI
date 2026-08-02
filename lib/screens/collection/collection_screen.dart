@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/models/collection_filter.dart';
 import 'package:fqa/widgets/collection/collectible_grid.dart';
 import 'package:fqa/widgets/collection/collection_navigation.dart';
@@ -91,7 +92,7 @@ class CollectionScreen extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          'Thu thập để khám phá\ncâu chuyện và ý nghĩa ẩn giấu.',
+                          context.strings.collectionNote,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: const Color(0xffecdba8),
@@ -133,8 +134,8 @@ class _EmptyCollectionState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final message = switch (filter) {
-      CollectionFilter.opened => 'Bạn chưa mở vật phẩm nào.',
-      CollectionFilter.locked => 'Bạn đã mở toàn bộ vật phẩm.',
+      CollectionFilter.opened => context.strings.noOpenedItems,
+      CollectionFilter.locked => context.strings.allItemsOpened,
       CollectionFilter.all => '',
     };
 
@@ -187,7 +188,7 @@ class _CollectionHeader extends StatelessWidget {
             top: layout.s(20).clamp(16.0, 20.0),
             child: UtilityIcon(
               assetName: 'icons/back_icon.png',
-              semanticLabel: 'Quay lại',
+              semanticLabel: context.strings.back,
               size: layout.s(40).clamp(36.0, 44.0),
               onTap: onBack,
             ),
@@ -235,7 +236,7 @@ class _CollectionHeader extends StatelessWidget {
                     top: 25.09375 * titleScale,
                     height: 33 * titleScale,
                     child: Text(
-                      'Bộ sưu tập',
+                      context.strings.collection,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: const Color(0xfff0dca0),

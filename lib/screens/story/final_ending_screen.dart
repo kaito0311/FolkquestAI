@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fqa/controllers/game_controller.dart';
+import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/models/collectible.dart';
 import 'package:fqa/models/ending.dart';
 import 'package:fqa/repositories/story_repository.dart';
@@ -11,6 +12,7 @@ import 'package:fqa/widgets/fqa_scroll_hint.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/section_title.dart';
+import 'package:fqa/widgets/story_entrance.dart';
 
 class FinalEndingScreen extends StatelessWidget {
   const FinalEndingScreen({required this.controller, super.key});
@@ -20,7 +22,7 @@ class FinalEndingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ending = controller.currentEnding;
-    final opened = StoryRepository.collectibles
+    final opened = StoryRepository.collectiblesFor(controller.language)
         .where(
           (collectible) =>
               controller.runUnlockedCollectibleIds.contains(collectible.id),
@@ -52,21 +54,29 @@ class FinalEndingScreen extends StatelessWidget {
                 right: horizontalPadding,
                 top: 0,
                 bottom: contentBottom,
-                child: _FinalEndingContent(
-                  ending: ending,
-                  coverBackground:
-                      controller.currentNode.background ??
-                      'backgrounds/first_positive_ending_bg.png',
-                  coverAlignment: Alignment(
-                    controller.currentNode.coverAlignmentX,
-                    controller.currentNode.coverAlignmentY,
+                child: StoryEntrance(
+                  key: ValueKey('final_ending_content_${ending.id}'),
+                  offset: const Offset(0, 0.08),
+                  scaleBegin: 0.97,
+                  delay: const Duration(milliseconds: 140),
+                  duration: const Duration(milliseconds: 520),
+                  child: _FinalEndingContent(
+                    ending: ending,
+                    coverBackground:
+                        controller.currentNode.background ??
+                        'backgrounds/first_positive_ending_bg.png',
+                    coverAlignment: Alignment(
+                      controller.currentNode.coverAlignmentX,
+                      controller.currentNode.coverAlignmentY,
+                    ),
+                    karma: controller.karma,
+                    selectedChoices: controller.selectedChoices,
+                    unlockedCollectibles: opened,
+                    layout: layout,
+                    horizontalPadding: horizontalPadding,
+                    topPadding: titleTop,
+                    onSpeak: controller.speakFinalEndingSummary,
                   ),
-                  karma: controller.karma,
-                  selectedChoices: controller.selectedChoices,
-                  unlockedCollectibles: opened,
-                  layout: layout,
-                  horizontalPadding: horizontalPadding,
-                  topPadding: titleTop,
                 ),
               ),
               _FinalEndingActions(
@@ -96,6 +106,7 @@ class _FinalEndingContent extends StatelessWidget {
     required this.layout,
     required this.horizontalPadding,
     required this.topPadding,
+    required this.onSpeak,
   });
 
   final Ending ending;
@@ -107,6 +118,7 @@ class _FinalEndingContent extends StatelessWidget {
   final ResponsiveLayout layout;
   final double horizontalPadding;
   final double topPadding;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) {
@@ -114,8 +126,8 @@ class _FinalEndingContent extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(height: topPadding),
-          _FinalEndingTitles(ending: ending, layout: layout),
-          SizedBox(height: layout.gap(20)),
+          _FinalEndingTitles(ending: ending, layout: layout, onSpeak: onSpeak),
+          SizedBox(height: layout.gap(10)),
           _FinalEndingCover(
             background: coverBackground,
             alignment: coverAlignment,
@@ -155,17 +167,22 @@ class _FinalEndingContent extends StatelessWidget {
 }
 
 class _FinalEndingTitles extends StatelessWidget {
-  const _FinalEndingTitles({required this.ending, required this.layout});
+  const _FinalEndingTitles({
+    required this.ending,
+    required this.layout,
+    required this.onSpeak,
+  });
 
   final Ending ending;
   final ResponsiveLayout layout;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Text(
-          'Kết cục của bạn',
+          context.strings.ending,
           style: TextStyle(
             color: const Color(0xffd9b86d),
             fontSize: layout.font(14),
@@ -183,6 +200,12 @@ class _FinalEndingTitles extends StatelessWidget {
             fontSize: layout.font(22),
             fontWeight: FontWeight.w900,
           ),
+        ),
+        IconButton(
+              icon: const Icon(Icons.volume_up_rounded),
+              color: const Color(0xfff5da92),
+              tooltip: 'Read aloud',
+              onPressed: onSpeak,
         ),
       ],
     );
@@ -233,7 +256,7 @@ class _FinalEndingKarma extends StatelessWidget {
     return Row(
       children: [
         Text(
-          'Nghiệp lực',
+          context.strings.karma,
           style: TextStyle(
             color: const Color(0xffd7b66f),
             fontSize: layout.font(18),
@@ -284,10 +307,10 @@ class _FinalEndingChoices extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionTitle('Những lựa chọn chính'),
+          SectionTitle(context.strings.keyChoices),
           const SizedBox(height: 6),
-          for (final choice in choices.take(3)) ChoiceBullet(choice),
-          if (choices.isEmpty) const ChoiceBullet('Chưa có lựa chọn'),
+          for (final choice in choices) ChoiceBullet(choice),
+          if (choices.isEmpty) ChoiceBullet(context.strings.noChoices),
         ],
       ),
     );
@@ -312,7 +335,7 @@ class _FinalEndingUnlockedCollection extends StatelessWidget {
 
     return Column(
       children: [
-        const SectionTitle('Cổ vật đã mở khóa'),
+        SectionTitle(context.strings.unlockedItems),
         SizedBox(height: layout.gap(8)),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -330,9 +353,12 @@ class _FinalEndingUnlockedCollection extends StatelessWidget {
                         child: SizedBox(
                           width: itemSize,
                           height: itemSize,
-                          child: FqaAssetImage(
-                            item.assetName,
-                            key: ValueKey('ending_unlocked_${item.id}'),
+                          child: SizedBox.square(
+                            dimension: itemSize * 0.72,
+                            child: FqaAssetImage(
+                              item.assetName,
+                              key: ValueKey('ending_unlocked_${item.id}'),
+                            ),
                           ),
                         ),
                       ),
@@ -373,7 +399,7 @@ class _FinalEndingActions extends StatelessWidget {
       child: Column(
         children: [
           FqaImageButton(
-            label: 'Chơi lại',
+            label: context.strings.playAgain,
             width: width,
             height: height,
             fontSize: layout.font(19),
@@ -382,7 +408,7 @@ class _FinalEndingActions extends StatelessWidget {
           ),
           SizedBox(height: layout.gap(14)),
           FqaImageButton(
-            label: 'Về menu chính',
+            label: context.strings.mainMenu,
             width: width,
             height: height,
             fontSize: layout.font(19),
