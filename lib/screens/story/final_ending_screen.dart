@@ -202,10 +202,10 @@ class _FinalEndingTitles extends StatelessWidget {
           ),
         ),
         IconButton(
-              icon: const Icon(Icons.volume_up_rounded),
-              color: const Color(0xfff5da92),
-              tooltip: 'Read aloud',
-              onPressed: onSpeak,
+          icon: const Icon(Icons.volume_up_rounded),
+          color: const Color(0xfff5da92),
+          tooltip: 'Read aloud',
+          onPressed: onSpeak,
         ),
       ],
     );

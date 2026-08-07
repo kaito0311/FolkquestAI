@@ -50,6 +50,25 @@ Future<void> _settleTransitions(WidgetTester tester) async {
   await tester.pump();
 }
 
+Future<void> _pumpUntil(
+  WidgetTester tester,
+  bool Function() condition, {
+  int maxPumps = 30,
+  Duration step = const Duration(milliseconds: 10),
+}) async {
+  for (var i = 0; i < maxPumps && !condition(); i++) {
+    await tester.pump(step);
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+  }
+  await tester.pump();
+  expect(condition(), isTrue);
+}
+
+Future<void> _settleStoryEntrance(WidgetTester tester) async {
+  await tester.pump(const Duration(milliseconds: 300));
+  await tester.pumpAndSettle();
+}
+
 void _expectNoOverflow(WidgetTester tester) {
   final exception = tester.takeException();
   expect(exception, isNull);
@@ -65,6 +84,18 @@ class _DelayedBirdChatService implements BirdChatService {
   Stream<String> streamReply(BirdChatRequest request) async* {
     yield await completer.future;
   }
+}
+
+class _NeverReplyBirdChatService implements BirdChatService {
+  final _controller = StreamController<String>();
+
+  @override
+  Future<String> reply(BirdChatRequest request) => Completer<String>().future;
+
+  @override
+  Stream<String> streamReply(BirdChatRequest request) => _controller.stream;
+
+  Future<void> dispose() => _controller.close();
 }
 
 void main() {
@@ -480,6 +511,8 @@ void main() {
     expect(controller.birdQuestion, question);
     expect(find.text(question), findsOneWidget);
 
+    await _pumpUntil(tester, () => !controller.birdResponsePending);
+
     const followUp = 'Con muốn hỏi thêm.';
     await tester.enterText(
       find.byKey(const ValueKey('bird_followup_input')),
@@ -530,6 +563,9 @@ void main() {
     expect(find.text(followUp), findsOneWidget);
 
     birdChatService.completer.complete('A **patient** answer.');
+    await _pumpUntil(tester, () => !controller.birdResponsePending);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 240));
     await tester.pumpAndSettle();
 
     expect(controller.birdResponsePending, isFalse);
@@ -571,8 +607,9 @@ void main() {
     expect(find.text('Hello child.', findRichText: true), findsOneWidget);
   });
 
-  testWidgets('bird reply times out after five seconds', (tester) async {
-    final birdChatService = _DelayedBirdChatService();
+  testWidgets('bird reply times out after configured timeout', (tester) async {
+    final birdChatService = _NeverReplyBirdChatService();
+    addTearDown(birdChatService.dispose);
     final controller = await _controller(birdChatService: birdChatService);
     controller
       ..currentNodeId = 'enough_reflection'
@@ -591,11 +628,19 @@ void main() {
 
     expect(controller.birdResponsePending, isTrue);
 
-    await tester.pump(GameController.birdChatReplyTimeout);
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
     await tester.pump();
+    await tester.pump(
+      GameController.birdChatReplyTimeout + const Duration(milliseconds: 1),
+    );
+    await _pumpUntil(tester, () => !controller.birdResponsePending);
 
     expect(controller.birdResponsePending, isFalse);
-    expect(controller.birdChatError, 'Chim Thần phản hồi quá 5 giây.');
+    expect(
+      controller.birdChatError,
+      'Chim Thần phản hồi quá '
+      '${GameController.birdChatReplyTimeout.inSeconds} giây.',
+    );
     expect(
       find.text(
         'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau. Hãy kiểm tra lại kết nối mạng của con nhé.',
@@ -706,7 +751,10 @@ void main() {
     expect(controller.view, AppView.settings);
     expect(find.text('Cài đặt'), findsOneWidget);
 
-    await tester.tap(find.text('GIỚI THIỆU ỨNG DỤNG'));
+    final aboutButton = find.text('GIỚI THIỆU ỨNG DỤNG');
+    await tester.ensureVisible(aboutButton);
+    await tester.pumpAndSettle();
+    await tester.tap(aboutButton);
     await _settleTransitions(tester);
     expect(controller.view, AppView.information);
     expect(find.text('THÔNG TIN'), findsOneWidget);
@@ -932,6 +980,7 @@ void main() {
     controller.currentNodeId = 'enough_reflection';
     controller.startOrResume();
     await _pumpApp(tester, controller);
+    await _settleStoryEntrance(tester);
 
     final karmaButtonBottom = tester
         .getBottomRight(find.byKey(const ValueKey('button_Tiếp tục')))
@@ -940,6 +989,7 @@ void main() {
     controller.currentNodeId = 'feather_unlock';
     controller.startOrResume();
     await _settleTransitions(tester);
+    await _settleStoryEntrance(tester);
 
     final unlockButtonBottom = tester
         .getBottomRight(find.byKey(const ValueKey('button_Tiếp tục')))

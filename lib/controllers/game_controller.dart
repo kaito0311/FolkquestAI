@@ -521,7 +521,8 @@ class GameController extends ChangeNotifier {
       _replaceStreamingBirdMessage(
         'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau. Hãy kiểm tra lại kết nối mạng của con nhé.',
       );
-      birdChatError = 'Chim Thần phản hồi quá 15 giây.';
+      birdChatError =
+          'Chim Thần phản hồi quá ${birdChatReplyTimeout.inSeconds} giây.';
     } catch (error) {
       debugPrint(
         'Error during bird chat after ${replyTimer.elapsedMilliseconds}ms: '

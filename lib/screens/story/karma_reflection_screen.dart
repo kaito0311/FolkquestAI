@@ -39,7 +39,8 @@ class KarmaReflectionScreen extends StatelessWidget {
           final buttonWidth = layout.contentWidth(238, landscapeValue: 238);
           final buttonHeight = layout.s(56).clamp(48.0, 56.0);
           final buttonGap = layout.gap(11);
-          final textTitlePadding = Localizations.localeOf(context).languageCode == 'en' ? 10.0 : 0.0;
+          final textTitlePadding =
+              Localizations.localeOf(context).languageCode == 'en' ? 10.0 : 0.0;
 
           return Stack(
             children: [
@@ -74,7 +75,7 @@ class KarmaReflectionScreen extends StatelessWidget {
                                   fontSize: layout.font(23),
                                   fontWeight: FontWeight.w900,
                                 ),
-                              )
+                              ),
                             ),
                           ),
                         ],
