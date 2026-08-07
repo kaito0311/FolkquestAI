@@ -40,13 +40,13 @@ class CollectibleCard extends StatelessWidget {
                         child: Opacity(
                           opacity: unlocked ? 1 : 0.28,
                           child: FqaAssetImage(
-                              collectible.assetName,
-                              fallback: Icon(
-                                unlocked ? Icons.auto_awesome : Icons.lock,
-                                color: const Color(0xff6a481d),
-                                size: 46,
-                              ),
+                            collectible.assetName,
+                            fallback: Icon(
+                              unlocked ? Icons.auto_awesome : Icons.lock,
+                              color: const Color(0xff6a481d),
+                              size: 46,
                             ),
+                          ),
                         ),
                       ),
                     ),
