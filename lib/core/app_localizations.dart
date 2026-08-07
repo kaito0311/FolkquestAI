@@ -119,6 +119,20 @@ class AppLocalizations {
   String get profileLocalNote => isEnglish
       ? 'Sign in from the home screen to sync your progress.'
       : 'Đăng nhập ở màn hình chính để đồng bộ tiến trình.';
+  String get resetGameData =>
+      isEnglish ? 'Reset game data' : 'Đặt lại dữ liệu chơi';
+  String get resetGameDataTitle =>
+      isEnglish ? 'Reset all game progress?' : 'Đặt lại toàn bộ tiến trình?';
+  String get resetGameDataMessage => isEnglish
+      ? 'Your story progress, choices, karma, unlocked items, and play count will be reset. Account and app settings will be kept.'
+      : 'Tiến trình truyện, lựa chọn, nghiệp lực, vật phẩm đã mở và số lượt chơi sẽ bị đặt lại. Tài khoản và cài đặt ứng dụng vẫn được giữ nguyên.';
+  String get cancel => isEnglish ? 'Cancel' : 'Hủy';
+  String get confirmReset => isEnglish ? 'Reset' : 'Đặt lại';
+  String get gameDataResetSuccess =>
+      isEnglish ? 'Game data has been reset.' : 'Đã đặt lại dữ liệu chơi.';
+  String get gameDataResetError => isEnglish
+      ? 'Could not reset game data. Please try again.'
+      : 'Không thể đặt lại dữ liệu chơi. Vui lòng thử lại.';
   List<String> get birdPresetQuestions => isEnglish
       ? const [
           'Why a three-span bag?',

@@ -12,6 +12,7 @@ import 'package:fqa/models/collection_filter.dart';
 import 'package:fqa/models/story_node_type.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/services/bird_chat_service.dart';
+import 'package:fqa/services/text_to_speech_service.dart';
 import 'package:fqa/stores/memory_progress_store.dart';
 import 'package:fqa/widgets/collection/collectible_card.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
@@ -22,6 +23,7 @@ Future<GameController> _controller({BirdChatService? birdChatService}) async {
   final controller = GameController(
     MemoryProgressStore(),
     birdChatService: birdChatService,
+    textToSpeechService: const NoopTextToSpeechService(),
   );
   await controller.load();
   return controller;
@@ -48,6 +50,25 @@ Future<void> _settleTransitions(WidgetTester tester) async {
   await tester.pump();
 }
 
+Future<void> _pumpUntil(
+  WidgetTester tester,
+  bool Function() condition, {
+  int maxPumps = 30,
+  Duration step = const Duration(milliseconds: 10),
+}) async {
+  for (var i = 0; i < maxPumps && !condition(); i++) {
+    await tester.pump(step);
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+  }
+  await tester.pump();
+  expect(condition(), isTrue);
+}
+
+Future<void> _settleStoryEntrance(WidgetTester tester) async {
+  await tester.pump(const Duration(milliseconds: 300));
+  await tester.pumpAndSettle();
+}
+
 void _expectNoOverflow(WidgetTester tester) {
   final exception = tester.takeException();
   expect(exception, isNull);
@@ -63,6 +84,18 @@ class _DelayedBirdChatService implements BirdChatService {
   Stream<String> streamReply(BirdChatRequest request) async* {
     yield await completer.future;
   }
+}
+
+class _NeverReplyBirdChatService implements BirdChatService {
+  final _controller = StreamController<String>();
+
+  @override
+  Future<String> reply(BirdChatRequest request) => Completer<String>().future;
+
+  @override
+  Stream<String> streamReply(BirdChatRequest request) => _controller.stream;
+
+  Future<void> dispose() => _controller.close();
 }
 
 void main() {
@@ -478,6 +511,8 @@ void main() {
     expect(controller.birdQuestion, question);
     expect(find.text(question), findsOneWidget);
 
+    await _pumpUntil(tester, () => !controller.birdResponsePending);
+
     const followUp = 'Con muốn hỏi thêm.';
     await tester.enterText(
       find.byKey(const ValueKey('bird_followup_input')),
@@ -528,6 +563,9 @@ void main() {
     expect(find.text(followUp), findsOneWidget);
 
     birdChatService.completer.complete('A **patient** answer.');
+    await _pumpUntil(tester, () => !controller.birdResponsePending);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 240));
     await tester.pumpAndSettle();
 
     expect(controller.birdResponsePending, isFalse);
@@ -569,8 +607,9 @@ void main() {
     expect(find.text('Hello child.', findRichText: true), findsOneWidget);
   });
 
-  testWidgets('bird reply times out after five seconds', (tester) async {
-    final birdChatService = _DelayedBirdChatService();
+  testWidgets('bird reply times out after configured timeout', (tester) async {
+    final birdChatService = _NeverReplyBirdChatService();
+    addTearDown(birdChatService.dispose);
     final controller = await _controller(birdChatService: birdChatService);
     controller
       ..currentNodeId = 'enough_reflection'
@@ -589,11 +628,19 @@ void main() {
 
     expect(controller.birdResponsePending, isTrue);
 
-    await tester.pump(GameController.birdChatReplyTimeout);
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
     await tester.pump();
+    await tester.pump(
+      GameController.birdChatReplyTimeout + const Duration(milliseconds: 1),
+    );
+    await _pumpUntil(tester, () => !controller.birdResponsePending);
 
     expect(controller.birdResponsePending, isFalse);
-    expect(controller.birdChatError, 'Chim Thần phản hồi quá 5 giây.');
+    expect(
+      controller.birdChatError,
+      'Chim Thần phản hồi quá '
+      '${GameController.birdChatReplyTimeout.inSeconds} giây.',
+    );
     expect(
       find.text(
         'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau. Hãy kiểm tra lại kết nối mạng của con nhé.',
@@ -704,7 +751,10 @@ void main() {
     expect(controller.view, AppView.settings);
     expect(find.text('Cài đặt'), findsOneWidget);
 
-    await tester.tap(find.text('GIỚI THIỆU ỨNG DỤNG'));
+    final aboutButton = find.text('GIỚI THIỆU ỨNG DỤNG');
+    await tester.ensureVisible(aboutButton);
+    await tester.pumpAndSettle();
+    await tester.tap(aboutButton);
     await _settleTransitions(tester);
     expect(controller.view, AppView.information);
     expect(find.text('THÔNG TIN'), findsOneWidget);
@@ -744,8 +794,20 @@ void main() {
     await tester.pump();
     expect(controller.musicEnabled, isTrue);
 
-    expect(find.byType(Slider), findsNWidgets(2));
-    final musicSlider = tester.widgetList<Slider>(find.byType(Slider)).first;
+    expect(find.byType(Slider), findsNWidgets(3));
+
+    final speechRateSlider = tester.widget<Slider>(
+      find.byKey(const ValueKey('setting_slider_Tốc độ đọc')),
+    );
+    expect(speechRateSlider.value, 0);
+    speechRateSlider.onChanged?.call(1);
+    await tester.pump();
+    expect(controller.speechRateMultiplier, 2);
+    expect(controller.speechRate, 1);
+
+    final musicSlider = tester.widget<Slider>(
+      find.byKey(const ValueKey('setting_slider_Âm lượng nhạc nền')),
+    );
     musicSlider.onChanged?.call(35);
     await tester.pump();
     expect(controller.musicVolume, 35);
@@ -839,6 +901,59 @@ void main() {
     expect(controller.view, AppView.story);
   });
 
+  testWidgets('profile reset clears game data after confirmation', (
+    tester,
+  ) async {
+    final store = MemoryProgressStore();
+    final controller =
+        GameController(
+            store,
+            textToSpeechService: const NoopTextToSpeechService(),
+          )
+          ..currentNodeId = 'enough_reflection'
+          ..karma = 4
+          ..selectedChoices = ['keep_tree', 'small_bag']
+          ..unlockedCollectibleIds = {'bag3', 'gold'}
+          ..runUnlockedCollectibleIds = {'bag3'}
+          ..completedEndingId = 'enough'
+          ..playCount = 3;
+    controller.openProfile();
+    await _pumpApp(tester, controller);
+
+    final resetButton = find.byKey(const ValueKey('profile_reset_game_data'));
+    expect(resetButton, findsOneWidget);
+
+    await tester.tap(resetButton);
+    await tester.pumpAndSettle();
+    expect(find.text('Đặt lại toàn bộ tiến trình?'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('profile_reset_cancel')));
+    await tester.pumpAndSettle();
+    expect(controller.playCount, 3);
+    expect(controller.unlockedCollectibleIds, {'bag3', 'gold'});
+
+    await tester.tap(resetButton);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('profile_reset_confirm')));
+    await tester.pumpAndSettle();
+
+    expect(controller.view, AppView.profile);
+    expect(controller.currentNodeId, StoryRepository.startNodeId);
+    expect(controller.karma, 0);
+    expect(controller.selectedChoices, isEmpty);
+    expect(controller.unlockedCollectibleIds, isEmpty);
+    expect(controller.runUnlockedCollectibleIds, isEmpty);
+    expect(controller.completedEndingId, isNull);
+    expect(controller.playCount, 0);
+    expect(store.snapshot?.playCount, 0);
+    expect(store.snapshot?.unlockedCollectibles, isEmpty);
+    expect(find.text('Đã đặt lại dữ liệu chơi.'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('icon_Quay lại')));
+    await _settleTransitions(tester);
+    expect(controller.view, AppView.home);
+  });
+
   testWidgets('unlock collectible adds item to persisted state', (
     tester,
   ) async {
@@ -865,6 +980,7 @@ void main() {
     controller.currentNodeId = 'enough_reflection';
     controller.startOrResume();
     await _pumpApp(tester, controller);
+    await _settleStoryEntrance(tester);
 
     final karmaButtonBottom = tester
         .getBottomRight(find.byKey(const ValueKey('button_Tiếp tục')))
@@ -873,6 +989,7 @@ void main() {
     controller.currentNodeId = 'feather_unlock';
     controller.startOrResume();
     await _settleTransitions(tester);
+    await _settleStoryEntrance(tester);
 
     final unlockButtonBottom = tester
         .getBottomRight(find.byKey(const ValueKey('button_Tiếp tục')))
