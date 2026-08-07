@@ -1,4 +1,4 @@
-package com.example.fqa
+package com.folkquest.ai
 
 import io.flutter.embedding.android.FlutterActivity
 
