@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyBPr3yzbNJ82arE7PDoU6p8APpwg0Xw9Vk',
-    appId: '1:230102404223:web:ab7d76f6fd3e418913834a',
+    appId: '1:230102404223:web:98002300a67d448613834a',
     messagingSenderId: '230102404223',
     projectId: 'fbfirst-c8b62',
     authDomain: 'fbfirst-c8b62.firebaseapp.com',
@@ -60,7 +60,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyB0j3UjHyjzNdbr5Ge7rOXzyA4q9_7dYRs',
-    appId: '1:230102404223:android:e04edd4ce79f1d9513834a',
+    appId: '1:230102404223:android:813fa7ab802a838313834a',
     messagingSenderId: '230102404223',
     projectId: 'fbfirst-c8b62',
     storageBucket: 'fbfirst-c8b62.firebasestorage.app',

@@ -80,16 +80,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             subtitle: strings.speechRateHint,
                             footer: _SettingSlider(
                               layout: layout,
-                              value: widget.controller.speechRate,
-                              min: 0,
-                              max: 2,
-                              divisions: 20,
+                              value: widget.controller.speechRateSliderPosition,
+                              min: GameController.minSpeechRateSliderPosition,
+                              max: GameController.maxSpeechRateSliderPosition,
+                              divisions: 10,
                               leadingIcon: Icons.slow_motion_video_outlined,
                               trailingIcon: Icons.fast_forward,
                               valueLabel:
-                                  '${widget.controller.speechRate.toStringAsFixed(2)}×',
+                                  '${widget.controller.speechRateMultiplier.toStringAsFixed(1)}×',
                               semanticLabel: strings.speechRate,
-                              onChanged: widget.controller.setSpeechRate,
+                              onChanged:
+                                  widget.controller.setSpeechRateSliderPosition,
                             ),
                           ),
                           SizedBox(height: layout.gap(15)),
@@ -262,7 +263,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ..setTextSize(AppTextSize.medium)
       ..setScreenBrightness(100)
       ..resetVoiceNames()
-      ..setSpeechRate(0.46);
+      ..setSpeechRateMultiplier(1);
   }
 }
 

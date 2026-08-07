@@ -4,6 +4,7 @@ import 'package:fqa/controllers/game_controller.dart';
 import 'package:fqa/core/app_localizations.dart';
 import 'package:fqa/repositories/story_repository.dart';
 import 'package:fqa/widgets/fqa_asset_image.dart';
+import 'package:fqa/widgets/fqa_pressable.dart';
 import 'package:fqa/widgets/fqa_scaffold.dart';
 import 'package:fqa/widgets/responsive_layout.dart';
 import 'package:fqa/widgets/utility_icon.dart';
@@ -65,6 +66,11 @@ class ProfileScreen extends StatelessWidget {
                             layout: layout,
                             signedIn: controller.isSignedIn,
                           ),
+                          SizedBox(height: layout.gap(16)),
+                          _ResetGameDataButton(
+                            layout: layout,
+                            onTap: () => _confirmResetGameData(context),
+                          ),
                         ],
                       ),
                     ),
@@ -74,6 +80,106 @@ class ProfileScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Future<void> _confirmResetGameData(BuildContext context) async {
+    final strings = context.strings;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xff241710),
+        title: Text(
+          strings.resetGameDataTitle,
+          style: const TextStyle(
+            color: Color(0xffe5d4a5),
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        content: Text(
+          strings.resetGameDataMessage,
+          style: const TextStyle(color: Color(0xffc8b98f), height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            key: const ValueKey('profile_reset_cancel'),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(strings.cancel),
+          ),
+          FilledButton(
+            key: const ValueKey('profile_reset_confirm'),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xff9f3b32),
+              foregroundColor: const Color(0xffffeee0),
+            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(strings.confirmReset),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    try {
+      await controller.resetGameData();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(strings.gameDataResetSuccess)));
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(strings.gameDataResetError)));
+    }
+  }
+}
+
+class _ResetGameDataButton extends StatelessWidget {
+  const _ResetGameDataButton({required this.layout, required this.onTap});
+
+  final ResponsiveLayout layout;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: layout.s(58).clamp(52.0, 62.0),
+      child: FqaPressable(
+        key: const ValueKey('profile_reset_game_data'),
+        borderRadius: 8,
+        onTap: onTap,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            const FqaAssetImage(
+              'panels/setting_frame.png',
+              fit: BoxFit.fill,
+              centerSlice: _settingFrameCenterSlice,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.delete_forever_outlined,
+                  color: const Color.fromARGB(255, 160, 60, 38),
+                  size: layout.s(23).clamp(20.0, 25.0),
+                ),
+                SizedBox(width: layout.gap(9)),
+                Text(
+                  context.strings.resetGameData,
+                  style: TextStyle(
+                    color: const Color(0xffffc2b4),
+                    fontSize: layout.font(14),
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -21,6 +21,12 @@ import 'package:fqa/services/text_to_speech_service.dart';
 import 'package:fqa/stores/progress_store.dart';
 
 class GameController extends ChangeNotifier {
+  static const double normalSpeechRate = 0.5;
+  static const double minSpeechRateMultiplier = 0.5;
+  static const double maxSpeechRateMultiplier = 2.0;
+  static const double minSpeechRateSliderPosition = -1.0;
+  static const double maxSpeechRateSliderPosition = 1.0;
+
   static const birdChatReplyTimeout = Duration(seconds: 10);
 
   GameController(
@@ -68,12 +74,12 @@ class GameController extends ChangeNotifier {
   AppTextSize textSize = AppTextSize.medium;
   double screenBrightness = 100;
   bool musicEnabled = true;
-  double musicVolume = 20;
+  double musicVolume = 10;
   AppLanguage language = AppLanguage.vietnamese;
   String? vietnameseVoiceName;
   String? englishVoiceName;
   List<TtsVoice> availableVoices = const [];
-  double speechRate = 0.46;
+  double speechRate = normalSpeechRate;
   StreamSubscription<AuthUser?>? _authSubscription;
 
   bool get isSignedIn => currentUser != null;
@@ -85,6 +91,15 @@ class GameController extends ChangeNotifier {
   }
 
   double get textScaleFactor => textSize.scale;
+  double get speechRateMultiplier => speechRate / normalSpeechRate;
+  double get speechRateSliderPosition {
+    final multiplier = speechRateMultiplier;
+    if (multiplier <= 1) {
+      return (multiplier - 1) / (1 - minSpeechRateMultiplier);
+    }
+    return (multiplier - 1) / (maxSpeechRateMultiplier - 1);
+  }
+
   double get brightnessOverlayOpacity =>
       ((100 - screenBrightness) / 100 * 0.68).clamp(0.0, 0.68).toDouble();
 
@@ -188,9 +203,33 @@ class GameController extends ChangeNotifier {
   }
 
   void setSpeechRate(double value) {
-    speechRate = value.clamp(0.0, 2.0).toDouble();
+    speechRate = value
+        .clamp(
+          normalSpeechRate * minSpeechRateMultiplier,
+          normalSpeechRate * maxSpeechRateMultiplier,
+        )
+        .toDouble();
     _persist();
     notifyListeners();
+  }
+
+  void setSpeechRateMultiplier(double value) {
+    final multiplier = value
+        .clamp(minSpeechRateMultiplier, maxSpeechRateMultiplier)
+        .toDouble();
+    speechRate = normalSpeechRate * multiplier;
+    _persist();
+    notifyListeners();
+  }
+
+  void setSpeechRateSliderPosition(double value) {
+    final position = value
+        .clamp(minSpeechRateSliderPosition, maxSpeechRateSliderPosition)
+        .toDouble();
+    final multiplier = position <= 0
+        ? 1 + position * (1 - minSpeechRateMultiplier)
+        : 1 + position * (maxSpeechRateMultiplier - 1);
+    setSpeechRateMultiplier(multiplier);
   }
 
   Future<void> stopSpeaking() => textToSpeechService.stop();
@@ -292,7 +331,12 @@ class GameController extends ChangeNotifier {
     language = snapshot.language;
     vietnameseVoiceName = snapshot.vietnameseVoiceName;
     englishVoiceName = snapshot.englishVoiceName;
-    speechRate = snapshot.speechRate;
+    speechRate = snapshot.speechRate
+        .clamp(
+          normalSpeechRate * minSpeechRateMultiplier,
+          normalSpeechRate * maxSpeechRateMultiplier,
+        )
+        .toDouble();
     selectedChoices = snapshot.selectedChoices;
     unlockedCollectibleIds = {
       ...StoryRepository.initialUnlockedIds,
@@ -477,7 +521,8 @@ class GameController extends ChangeNotifier {
       _replaceStreamingBirdMessage(
         'Chim Thần trả lời hơi lâu, con hãy thử hỏi lại sau. Hãy kiểm tra lại kết nối mạng của con nhé.',
       );
-      birdChatError = 'Chim Thần phản hồi quá 15 giây.';
+      birdChatError =
+          'Chim Thần phản hồi quá ${birdChatReplyTimeout.inSeconds} giây.';
     } catch (error) {
       debugPrint(
         'Error during bird chat after ${replyTimer.elapsedMilliseconds}ms: '
@@ -595,6 +640,18 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> resetGameData() async {
+    _stopSpeaking();
+    _resetCurrentRun();
+    unlockedCollectibleIds = StoryRepository.initialUnlockedIds;
+    playCount = 0;
+    collectionFilter = CollectionFilter.all;
+    _returnView = AppView.home;
+    _nestedUtilityReturnView = null;
+    notifyListeners();
+    await store.save(_createSnapshot());
+  }
+
   bool isUnlocked(Collectible collectible) {
     return unlockedCollectibleIds.contains(collectible.id);
   }
@@ -664,24 +721,22 @@ class GameController extends ChangeNotifier {
   void _stopSpeaking() => unawaited(textToSpeechService.stop());
 
   void _persist() {
-    unawaited(
-      store.save(
-        GameSnapshot(
-          currentNodeId: currentNodeId,
-          karma: karma,
-          selectedChoices: selectedChoices,
-          unlockedCollectibles: unlockedCollectibleIds,
-          runUnlockedCollectibles: runUnlockedCollectibleIds,
-          completedEndingId: completedEndingId,
-          playCount: playCount,
-          language: language,
-          vietnameseVoiceName: vietnameseVoiceName,
-          englishVoiceName: englishVoiceName,
-          speechRate: speechRate,
-        ),
-      ),
-    );
+    unawaited(store.save(_createSnapshot()));
   }
+
+  GameSnapshot _createSnapshot() => GameSnapshot(
+    currentNodeId: currentNodeId,
+    karma: karma,
+    selectedChoices: selectedChoices,
+    unlockedCollectibles: unlockedCollectibleIds,
+    runUnlockedCollectibles: runUnlockedCollectibleIds,
+    completedEndingId: completedEndingId,
+    playCount: playCount,
+    language: language,
+    vietnameseVoiceName: vietnameseVoiceName,
+    englishVoiceName: englishVoiceName,
+    speechRate: speechRate,
+  );
 
   String _resolveNodeId(String nodeId) {
     var resolvedId = nodeId;
