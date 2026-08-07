@@ -7,7 +7,7 @@ service cloud.firestore {
     }
 
     match /app_config/openrouter {
-      allow read: if true;
+      allow read: if request.auth != null;
       allow write: if false;
     }
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:fqa/models/bird_conversation_message.dart';
@@ -74,13 +75,16 @@ class FirebaseBirdChatService implements BirdChatService {
 
   FirebaseBirdChatService({
     FirebaseFirestore? firestore,
+    FirebaseAuth? firebaseAuth,
     http.Client? httpClient,
     Duration providerConfigCacheTtl = const Duration(minutes: 5),
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
        _httpClient = httpClient ?? http.Client(),
        _providerConfigCacheTtl = providerConfigCacheTtl;
 
   final FirebaseFirestore _firestore;
+  final FirebaseAuth _firebaseAuth;
   final http.Client _httpClient;
   final Duration _providerConfigCacheTtl;
 
@@ -95,10 +99,7 @@ class FirebaseBirdChatService implements BirdChatService {
 
   @override
   Future<String> reply(BirdChatRequest request) async {
-    // NOTE: Re-enable auth check when we require login for bird chat.
-    // if (_firebaseAuth.currentUser == null) {
-    //   throw BirdChatAuthRequiredException();
-    // }
+    _requireAuthenticatedUser();
 
     final response = await _postChatRequestWithConfigRefresh(request);
 
@@ -128,6 +129,7 @@ class FirebaseBirdChatService implements BirdChatService {
 
   @override
   Stream<String> streamReply(BirdChatRequest request) async* {
+    _requireAuthenticatedUser();
     try {
       final response = await _sendStreamingChatRequestWithConfigRefresh(
         request,
@@ -168,6 +170,12 @@ class FirebaseBirdChatService implements BirdChatService {
       }
     } catch (error) {
       yield 'Chim Thần đang ở xa, con hãy thử lại sau.';
+    }
+  }
+
+  void _requireAuthenticatedUser() {
+    if (_firebaseAuth.currentUser == null) {
+      throw BirdChatAuthRequiredException();
     }
   }
 

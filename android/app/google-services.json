@@ -7,25 +7,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:230102404223:android:e04edd4ce79f1d9513834a",
+        "mobilesdk_app_id": "1:230102404223:android:813fa7ab802a838313834a",
         "android_client_info": {
-          "package_name": "com.example.fqa"
+          "package_name": "com.folkquest.ai"
         }
       },
       "oauth_client": [
         {
-          "client_id": "230102404223-8lc47pkuo5mh96q4rkrrcau2ocr5699r.apps.googleusercontent.com",
+          "client_id": "230102404223-5nvmgiim9kvf446o8ebspmtcu8ssi5br.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.fqa",
+            "package_name": "com.folkquest.ai",
             "certificate_hash": "17d9216e3cc4e9d297fedb70264b2c7beef4c767"
           }
         },
         {
-          "client_id": "230102404223-i4hlja39r8s98lt9aj8uq2etkivinufo.apps.googleusercontent.com",
+          "client_id": "230102404223-aiv557l1e3oqqf79mfkeq7it7uk88ocj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.fqa",
+            "package_name": "com.folkquest.ai",
             "certificate_hash": "cab7df1058f783b900e39e32e3696885a939c78c"
           }
         },
