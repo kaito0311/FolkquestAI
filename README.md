@@ -268,4 +268,4 @@ The tests cover story branching, Karma rules, collectibles, endings, progress sy
 
 ## License
 
-No license file is currently included. Add an explicit license before public distribution or third-party reuse.
+This project is licensed under the [Apache License 2.0](LICENSE).
