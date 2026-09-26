@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "230102404223",
+    "project_id": "fbfirst-c8b62",
+    "storage_bucket": "fbfirst-c8b62.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230102404223:android:813fa7ab802a838313834a",
+        "android_client_info": {
+          "package_name": "com.folkquest.ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230102404223-5nvmgiim9kvf446o8ebspmtcu8ssi5br.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.folkquest.ai",
+            "certificate_hash": "17d9216e3cc4e9d297fedb70264b2c7beef4c767"
+          }
+        },
+        {
+          "client_id": "230102404223-aiv557l1e3oqqf79mfkeq7it7uk88ocj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.folkquest.ai",
+            "certificate_hash": "cab7df1058f783b900e39e32e3696885a939c78c"
+          }
+        },
+        {
+          "client_id": "230102404223-vk3q26uviirepd0do0c6j6m9luvcd36u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0j3UjHyjzNdbr5Ge7rOXzyA4q9_7dYRs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230102404223-vk3q26uviirepd0do0c6j6m9luvcd36u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

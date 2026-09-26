@@ -1,0 +1,60 @@
+name: fqa
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  audioplayers: ^6.5.1
+  cloud_firestore: ^6.5.0
+  firebase_auth: ^6.5.2
+  firebase_core: ^4.10.0
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_tts: ^4.2.3
+  google_sign_in: ^7.2.0
+  http: ^1.2.2
+  shared_preferences: ^2.3.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  image_path: assets/images/figma/icons/folkquest_app_icon.png
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  adaptive_icon_background: "#120B1F"
+  adaptive_icon_foreground: assets/images/figma/icons/folkquest_app_icon.png
+  adaptive_icon_foreground_inset: 16
+  web:
+    generate: true
+    image_path: assets/images/figma/icons/folkquest_app_icon.png
+    background_color: "#120B1F"
+    theme_color: "#120B1F"
+  windows:
+    generate: true
+    image_path: assets/images/figma/icons/folkquest_app_icon.png
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: assets/images/figma/icons/folkquest_app_icon.png
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/music/
+    - assets/images/figma/backgrounds/
+    - assets/images/figma/buttons/
+    - assets/images/figma/collectibles/
+    - assets/images/figma/decor/
+    - assets/images/figma/icons/
+    - assets/images/figma/navigation/
+    - assets/images/figma/panels/
